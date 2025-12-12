@@ -7,6 +7,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Nullable;
+
 @Slf4j
 @RestController
 @SpringBootApplication
@@ -29,7 +31,7 @@ public class ApplicationBootstrap implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(@Nullable String... args) {
         log.info("[{}]应用启动成功!", appName);
         log.info("本地URL地址: {}", String.format("http://127.0.0.1:%s%s", port, contextPath));
         log.info("测试API地址: {}", String.format("http://127.0.0.1:%s%s%s", port, contextPath, openapi));
