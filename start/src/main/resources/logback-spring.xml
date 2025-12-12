@@ -5,7 +5,7 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
     <!-- 多环境配置（通过Spring Profile区分） -->
-    <springProperty scope="context" name="LOG_PATH" source="logging.file.path" defaultValue="${user.dir}/logs"/>
+    <springProperty scope="context" name="LOG_PATH" source="logging.file.path" defaultValue="${user.dir}/../_logs"/>
     <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root" defaultValue="INFO"/>
 
     <!-- 文件滚动策略（按日期和大小分割） -->
