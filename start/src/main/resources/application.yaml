@@ -1,6 +1,9 @@
 spring:
   application:
     name: quickstart
+  threads:
+    virtual:
+      enabled: true
   # datasource:
   #   url: jdbc:h2:./data_h2/mydb;AUTO_SERVER=TRUE
   #   driverClassName: org.h2.Driver

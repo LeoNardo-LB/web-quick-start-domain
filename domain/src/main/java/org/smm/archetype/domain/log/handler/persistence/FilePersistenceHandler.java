@@ -99,15 +99,13 @@ public class FilePersistenceHandler implements PersistenceHandler {
         if (args != null && args.length > 0) {
             builder.append("Args:[").append(handler.stringify(args)).append("]; ");
         }
-        // 返回值
-        if (result != null) {
-            builder.append("BaseResult:[").append(handler.stringify(result)).append("]; ");
-        }
-        if (error == null) {
-            logger.info(builder.toString());
-        } else {
+        // 异常或正常的返回值
+        if (error != null) {
             builder.append("Exception:[").append(error.getMessage()).append("]; ");
             logger.error(builder.toString());
+        } else {
+            builder.append("Result:[").append(handler.stringify(result)).append("]; ");
+            logger.info(builder.toString());
         }
     }
 

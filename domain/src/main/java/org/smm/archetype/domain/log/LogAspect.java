@@ -34,42 +34,41 @@ public class LogAspect {
 
     /**
      * 持久化处理器映射表
-     *
+     * <p>
      * 存储不同持久化类型的处理器实例，用于根据日志配置的持久化类型执行相应的持久化操作。
      */
     private final Map<PersistenceType, PersistenceHandler> persistenceHandlerMap;
 
     /**
      * 异步执行服务
-     *
+     * <p>
      * 用于异步执行日志持久化操作，避免阻塞业务方法的执行。
      */
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     /**
      * 构造函数
-     *
+     * <p>
      * 初始化持久化处理器映射表，将注入的处理器列表转换为按类型索引的映射表。
      * @param persistenceHandlers 持久化处理器列表
      */
     @Autowired
     public LogAspect(List<PersistenceHandler> persistenceHandlers) {
-
         this.persistenceHandlerMap = persistenceHandlers.stream().collect(Collectors.toMap(PersistenceHandler::getPersistenceType, s -> s));
     }
 
     /**
      * 业务日志切点
-     *
+     * <p>
      * 定义切入点，拦截标记了@Log注解的方法。
      */
-    @Pointcut("@annotation(org.smm.archetype.util.util.log.BizLog)")
+    @Pointcut("@annotation(org.smm.archetype.domain.log.LogAnno)")
     public void bizLogCut() {
     }
 
     /**
      * 环绕通知处理方法
-     *
+     * <p>
      * 拦截标记了@Log注解的方法，在方法执行前后收集相关信息并异步持久化。
      * 记录方法的入参、出参、执行时间、线程信息等，并在出现异常时记录异常信息。
      * @param joinPoint 连接点对象

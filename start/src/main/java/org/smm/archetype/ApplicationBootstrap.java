@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Nullable;
@@ -17,9 +20,12 @@ import javax.annotation.Nullable;
  * 启动Web服务器，并在应用启动完成后执行一些初始化操作。
  */
 @Slf4j
+@EnableAsync
+@EnableScheduling
 @RestController
 @SpringBootApplication
 @EnableAspectJAutoProxy
+@ServletComponentScan
 public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
@@ -77,5 +83,4 @@ public class ApplicationBootstrap implements CommandLineRunner {
         log.info("本地URL地址: {}", String.format("http://127.0.0.1:%s%s", port, contextPath));
         log.info("测试API地址: {}", String.format("http://127.0.0.1:%s%s%s", port, contextPath, openapi));
     }
-
 }
