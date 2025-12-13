@@ -78,7 +78,7 @@ target/generated-sources/archetype/src/main/resources/META-INF/maven/archetype-m
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <archetype-catalog
-        xsi:schemaLocation="https://maven.apache.org/plugins/maven-archetype-plugin/archetype-catalog/1.0.0 https://maven.apache.org/xsd/archetype-catalog-1.0.0.xsd"
+        xsi:schemaLocation="https://maven.apache.org/plugins/maven-archetype-plugin/archetype-catalog/1.0.0"
         xmlns="https://maven.apache.org/plugins/maven-archetype-plugin/archetype-catalog/1.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <archetypes>
