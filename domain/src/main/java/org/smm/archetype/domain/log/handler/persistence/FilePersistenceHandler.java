@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smm.archetype.domain.log.Log;
+import org.smm.archetype.domain.log.LogAnno;
 import org.smm.archetype.domain.log.LogDto;
 import org.smm.archetype.domain.log.handler.stringify.JdkStringifyHandler;
 import org.smm.archetype.domain.log.handler.stringify.StringifyHandler;
@@ -76,8 +76,8 @@ public class FilePersistenceHandler implements PersistenceHandler {
         Class<?> declaringClass = LogDto.getSignature().getMethod().getDeclaringClass();
         Logger logger = LoggerFactory.getLogger(declaringClass);
 
-        Log log = LogDto.getLog();
-        StringifyType stringify = log.stringify();
+        LogAnno logAnno = LogDto.getLogAnno();
+        StringifyType stringify = logAnno.stringify();
         MethodSignature signature = LogDto.getSignature();
         Object[] args = LogDto.getArgs();
         Object result = LogDto.getResult();
@@ -86,8 +86,8 @@ public class FilePersistenceHandler implements PersistenceHandler {
         StringifyHandler handler = Optional.ofNullable(stringifyHandlerMap.get(stringify)).orElse(JDKStringifyHandler);
         StringBuilder builder = new StringBuilder();
         // 业务名称
-        if (StringUtils.isNotBlank(log.value())) {
-            builder.append("Biz:[").append(log.value()).append("]; ");
+        if (StringUtils.isNotBlank(logAnno.value())) {
+            builder.append("Biz:[").append(logAnno.value()).append("]; ");
         }
         // 方法
         builder.append("Method:[").append(signature.toShortString()).append("]; ");

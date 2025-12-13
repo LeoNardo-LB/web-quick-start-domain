@@ -80,12 +80,12 @@ public class LogAspect {
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         // 获取注解信息
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        Log log = signature.getMethod().getAnnotation(Log.class);
+        LogAnno logAnno = signature.getMethod().getAnnotation(LogAnno.class);
         // 构建日志信息
         LogDto LogDto = new LogDto();
         LogDto.setArgs(joinPoint.getArgs());
         LogDto.setSignature(signature);
-        LogDto.setLog(log);
+        LogDto.setLogAnno(logAnno);
         LogDto.setThreadName(Thread.currentThread().getName());
         try {
             // 执行目标方法
@@ -101,7 +101,7 @@ public class LogAspect {
             // 持久化
             LogDto.setEndTime(Instant.now());
             executorService.execute(() -> {
-                PersistenceType[] persistence = log.persistence();
+                PersistenceType[] persistence = logAnno.persistence();
                 for (PersistenceType persistenceType : persistence) {
                     Optional.ofNullable(persistenceHandlerMap.get(persistenceType)).ifPresent(handler -> handler.persist(LogDto));
                 }

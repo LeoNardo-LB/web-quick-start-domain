@@ -21,7 +21,7 @@ public class LogDto {
      *
      * 包含方法上标记的@Log注解的配置信息。
      */
-    private Log log;
+    private LogAnno logAnno;
 
     /**
      * 方法签名信息

@@ -1,6 +1,6 @@
 // package org.smm.archetype.domain.log.handler.persistence;
 //
-// import org.smm.archetype.domain.log.Log;
+// import org.smm.archetype.domain.log.LogAnno;
 // import org.smm.archetype.domain.log.LogDto;
 // import org.smm.archetype.domain.log.handler.stringify.JdkStringifyHandler;
 // import org.smm.archetype.domain.log.handler.stringify.StringifyHandler;
@@ -38,7 +38,7 @@
 //     @Override
 //     public void persist(LogDto LogDto) {
 //         // 选择handler
-//         Log log = LogDto.getLog();
+//         LogAnno log = LogDto.getLogAnno();
 //         StringifyType stringify = log.stringify();
 //         StringifyHandler handler = Optional.ofNullable(stringifyHandlerMap.get(stringify)).orElse(new JdkStringifyHandler());
 //         // 构建日志并保存
