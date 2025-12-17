@@ -39,16 +39,21 @@ public class ThreadPoolConfig implements AsyncConfigurer {
     /**
      * CPU密集型线程池
      */
-    public static final String CPU_TASK_EXECUTOR     = "cpuTaskExecutor";
+    public static final String CPU_TASK_EXECUTOR          = "cpuTaskExecutor";
     /**
      * 守护线程池
      */
-    public static final String DAEMON_TASK_EXECUTOR  = "daemonTaskExecutor";
-    public static final  MdcTaskDecorator TASK_DECORATOR = new MdcTaskDecorator();
+    public static final String DAEMON_TASK_EXECUTOR = "lowPriorityTaskExecutor";
+
+    /**
+     * MDC任务装饰器
+     */
+    private static final MdcTaskDecorator TASK_DECORATOR = new MdcTaskDecorator();
+
     /**
      * CPU核心数
      */
-    private static final int              CPU_COUNT      = Runtime.getRuntime().availableProcessors();
+    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
 
     @Primary
     @Bean(name = IO_TASK_EXECUTOR)
@@ -85,6 +90,7 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         executor.setQueueCapacity(1000);
         executor.setThreadNamePrefix("daemon-task-");
         executor.setTaskDecorator(TASK_DECORATOR);
+        executor.setThreadPriority(Thread.MIN_PRIORITY);
         executor.initialize();
         return executor;
     }
@@ -107,7 +113,7 @@ public class ThreadPoolConfig implements AsyncConfigurer {
         // 设置在关闭调度器后是否继续执行已存在的任务
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         // 设置等待任务完成的超时时间（秒）
-        scheduler.setAwaitTerminationSeconds(30);
+        scheduler.setAwaitTerminationSeconds(60);
         scheduler.setTaskDecorator(TASK_DECORATOR);
         return scheduler;
     }

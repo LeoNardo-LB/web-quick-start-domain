@@ -17,25 +17,21 @@ public class EventFactory {
      * @return Web访问事件实例
      */
     public static Event<Void> webAccessEvent() {
-        return new Event<Void>()
-                       .setSource(Event.Source.WEB)
-                       .setType(Event.Type.WEB_ACCESS)
-                       .setExpireTime(Instant.now().plus(30, ChronoUnit.MINUTES)) // 1小时后过期
-                       .setDto(null);
+        return new Event<>(Event.Source.ADAPTER, Event.Type.WEB_ACCESS, null, null, Instant.now().plus(1, ChronoUnit.DAYS));
     }
 
-    /**
-     * 创建Domain事件
-     * @param data 数据
-     * @param type 事件类型
-     * @param <T>  数据类型
-     * @return Domain事件实例
-     */
-    public static <T> Event<T> domainEvent(T data, Event.Type type) {
-        return new Event<T>()
-                       .setSource(Event.Source.DOMAIN)
-                       .setType(type)
-                       .setDto(data);
-    }
+    // /**
+    //  * 创建Domain事件
+    //  * @param data 数据
+    //  * @param type 事件类型
+    //  * @param <T>  数据类型
+    //  * @return Domain事件实例
+    //  */
+    // public static <T> Event<T> domainEvent(T data, Event.Type type) {
+    //     return new Event<T>()
+    //                    .setContextFactory(Event.Source.DOMAIN)
+    //                    .setType(type)
+    //                    .setDto(data);
+    // }
 
 }

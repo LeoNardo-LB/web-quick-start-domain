@@ -1,8 +1,6 @@
 package org.smm.archetype.common.event;
 
 import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.smm.archetype.domain.Serial;
 
 import java.time.Instant;
@@ -12,34 +10,50 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  *
  * @author Leonardo
- * @since 2025/12/13
+ * @since 2025/12/14
  */
-@Accessors(chain = true)
+@Getter
 public class Event<T> extends Serial {
 
-    volatile AtomicBoolean valid = new AtomicBoolean(true);
+    private final Source source;
 
-    @Getter
-    @Setter
-    private Source source;
+    private final Type type;
 
-    @Getter
-    @Setter
-    private Type type;
+    private final String message;
 
-    @Getter
-    @Setter
-    private Instant expireTime;
+    private final Instant expireTime;
 
-    @Getter
-    @Setter
-    private T dto;
+    private final T dto;
+
+    private volatile AtomicBoolean valid = new AtomicBoolean(true);
+
+    /**
+     * 创建事件
+     */
+    public Event(Source source, Type type, String message, T dto, Instant expireTime) {
+        Instant now = Instant.now();
+        this.setCreateTime(now);
+        this.source = source;
+        this.type = type;
+        this.expireTime = expireTime;
+        this.dto = dto;
+        this.message = message;
+    }
+
+    /**
+     * 复制一份
+     */
+    public Event<T> copy() {
+        Event<T> event = new Event<>(source, type, message, dto, expireTime);
+        event.valid = this.valid;
+        return event;
+    }
 
     /**
      * 事件来源
      */
     public enum Source {
-        WEB,
+        ADAPTER,
         DOMAIN
     }
 
@@ -48,7 +62,8 @@ public class Event<T> extends Serial {
      */
     public enum Type {
         USER_CREATED,
-        WEB_ACCESS
+        WEB_ACCESS,
+
     }
 
 }

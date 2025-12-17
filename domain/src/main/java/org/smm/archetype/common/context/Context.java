@@ -1,7 +1,8 @@
-package org.smm.archetype.common.event;
+package org.smm.archetype.common.context;
 
 import cn.hutool.core.thread.NamedThreadFactory;
 import org.apache.commons.collections4.CollectionUtils;
+import org.smm.archetype.common.event.Event;
 import org.smm.archetype.common.event.Event.Type;
 
 import java.time.Instant;
@@ -22,18 +23,18 @@ import java.util.function.Supplier;
  * @author Leonardo
  * @since 2025/12/13
  */
-public class EventContext {
+public class Context {
 
     /**
-     * 事件上下文
+     * 上下文事件
      */
-    private static final ThreadLocal<EventContext> EVENT_CONTEXT = new ThreadLocal<>();
+    private static final ThreadLocal<Context> CONTEXT_EVENT = new ThreadLocal<>();
 
     /**
      * 定时清理过期事件
      */
-    private static final ScheduledExecutorService EXPIRE_SCHEDULER = new ScheduledThreadPoolExecutor(2,
-            new NamedThreadFactory("expire-event-clear-", true), new CallerRunsPolicy());
+    private static final ScheduledExecutorService EXPIRE_SCHEDULER =
+            new ScheduledThreadPoolExecutor(2, new NamedThreadFactory("expire-context-event-clear-", true), new CallerRunsPolicy());
 
     private final Map<Type, LinkedList<Event<?>>> eventsMap = new LinkedHashMap<>();
 
@@ -44,8 +45,9 @@ public class EventContext {
      * @return 最新事件
      */
     public static <T> Event<T> getLatest(Type type) {
-        return (Event<T>) Optional.ofNullable(getThreadContext(false)).map(eventContext -> eventContext.getByType(type)).map(
-                LinkedList::getFirst).orElse(null);
+        return (Event<T>) Optional.ofNullable(getThreadContext(false))
+                                         .map(context -> context.getByType(type)).map(LinkedList::getFirst)
+                                         .orElse(null);
     }
 
     /**
@@ -54,7 +56,7 @@ public class EventContext {
      * @return 所有事件
      */
     public static LinkedList<Event<?>> getAll(Type type) {
-        return Optional.ofNullable(getThreadContext(false)).map(eventContext -> eventContext.getByType(type)).orElse(null);
+        return Optional.ofNullable(getThreadContext(false)).map(context -> context.getByType(type)).orElse(null);
     }
 
     /**
@@ -133,14 +135,14 @@ public class EventContext {
      * @param event 要清理的事件
      */
     public static void clearEvent(Event<?> event) {
-        if (event == null || event.valid.compareAndSet(true, false)) {
+        if (event == null || event.getValid().compareAndSet(true, false)) {
             return;
         }
         Type type = event.getType();
-        EventContext context = getThreadContext(false);
+        Context context = getThreadContext(false);
         // 获取不到上下文的情况
         if (context == null) {
-            EVENT_CONTEXT.remove();
+            CONTEXT_EVENT.remove();
             return;
         }
         // 从事件链表中移除事件
@@ -152,8 +154,40 @@ public class EventContext {
         }
         // 如果map为空，则从线程本地变量中移除
         if (context.eventsMap.isEmpty()) {
-            EVENT_CONTEXT.remove();
+            CONTEXT_EVENT.remove();
         }
+    }
+
+    /**
+     * 导出当前上下文
+     */
+    static Context export() {
+        Context currentContext = CONTEXT_EVENT.get();
+        if (currentContext == null) {
+            return null;
+        }
+        Context newContext = new Context();
+        currentContext.eventsMap.forEach((type, events) -> {
+            events.stream()
+                    .filter(event -> event.getValid().get()) // 只复制有效的事件
+                    .map(Event::copy)
+                    .forEach(newContext::addNewEvent);
+        });
+        return newContext;
+    }
+
+    /**
+     * 传入外部上下文
+     */
+    static void load(Context context) {
+        CONTEXT_EVENT.set(context);
+    }
+
+    /**
+     * 清理当前线程的事件上下文
+     */
+    static void clear() {
+        CONTEXT_EVENT.remove();
     }
 
     /**
@@ -169,13 +203,13 @@ public class EventContext {
      * @param createIfNull 如果当前线程没有事件上下文，是否创建一个
      * @return 当前线程的事件上下文
      */
-    private static EventContext getThreadContext(boolean createIfNull) {
-        EventContext eventContext = EVENT_CONTEXT.get();
-        if (eventContext == null && createIfNull) {
-            eventContext = new EventContext();
-            EVENT_CONTEXT.set(eventContext);
+    private static Context getThreadContext(boolean createIfNull) {
+        Context context = CONTEXT_EVENT.get();
+        if (context == null && createIfNull) {
+            context = new Context();
+            CONTEXT_EVENT.set(context);
         }
-        return eventContext;
+        return context;
     }
 
     /**
