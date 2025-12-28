@@ -69,8 +69,8 @@ target/generated-sources/archetype/src/main/resources/META-INF/maven/archetype-m
 
 ```shell
 [INFO] --- install:3.1.1:install (default-install) @ habit-reminder-portal ---
-[INFO] Installing E:\Dev\code\scaffolding\nexa-app-archetype\target\generated-sources\archetype\pom.xml to E:\Dev\software\apache-maven-3.9.6\local_reposity\org\ssm\start\habit-reminder-portal\1.0.0\habit-reminder-portal-1.0.0.pom
-[INFO] Installing E:\Dev\code\scaffolding\nexa-app-archetype\target\generated-sources\archetype\target\habit-reminder-portal-1.0.0.jar to E:\Dev\software\apache-maven-3.9.6\local_reposity\org\ssm\start\habit-reminder-portal\1.0.0\habit-reminder-portal-1.0.0.jar
+[INFO] Installing E:\Dev\code\scaffolding\nexa-app-archetype\target\generated-sources\archetype\pom.xml to E:\Dev\software\apache-maven-3.9.6\local_reposity\org\smm\start\habit-reminder-portal\1.0.0\habit-reminder-portal-1.0.0.pom
+[INFO] Installing E:\Dev\code\scaffolding\nexa-app-archetype\target\generated-sources\archetype\target\habit-reminder-portal-1.0.0.jar to E:\Dev\software\apache-maven-3.9.6\local_reposity\org\smm\start\habit-reminder-portal\1.0.0\habit-reminder-portal-1.0.0.jar
 ```
 
 **坐标文件：本地仓库/archetype-catalog.xml**
@@ -124,8 +124,8 @@ mvn archetype:generate -DarchetypeCatalog=local ^
   -DarchetypeGroupId=org.smm.archetype ^
   -DarchetypeArtifactId=web-quick-start-domain ^
   -DarchetypeVersion=1.0.0 ^
-  -DgroupId=org.ssm ^
-  -DartifactId=web-demo ^
+  -DgroupId=org.smm.demo ^
+  -DartifactId=quick-start ^
   -Dversion=1.0.0-SNAPSHOT
 ```
 
