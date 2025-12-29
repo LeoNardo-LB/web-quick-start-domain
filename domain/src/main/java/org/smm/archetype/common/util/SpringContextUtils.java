@@ -1,4 +1,4 @@
-package org.smm.archetype;
+package org.smm.archetype.common.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

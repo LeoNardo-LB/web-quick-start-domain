@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.smm.archetype.common.context.executable.ContextRunner;
 import org.smm.archetype.domain.log.handler.persistence.PersistenceHandler;
 import org.smm.archetype.domain.log.handler.persistence.PersistenceType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,28 +82,31 @@ public class LogAspect {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         LogAnno logAnno = signature.getMethod().getAnnotation(LogAnno.class);
         // 构建日志信息
-        LogDto LogDto = new LogDto();
-        LogDto.setArgs(joinPoint.getArgs());
-        LogDto.setSignature(signature);
-        LogDto.setLogAnno(logAnno);
-        LogDto.setThreadName(Thread.currentThread().getName());
+        Log Log = new Log();
+        Log.setArgs(joinPoint.getArgs());
+        Log.setSignature(signature);
+        Log.setLogAnno(logAnno);
+        Log.setThreadName(Thread.currentThread().getName());
         try {
             // 执行目标方法
-            LogDto.setStartTime(Instant.now());
+            Log.setStartTime(Instant.now());
             Object result = joinPoint.proceed();
-            LogDto.setResult(result);
+            Log.setResult(result);
             return result;
         } catch (Throwable e) {
             // 捕获异常, 记录异常信息
-            LogDto.setError(e);
+            Log.setError(e);
             throw e;
         } finally {
             // 持久化
-            LogDto.setEndTime(Instant.now());
-            executorService.execute(() -> {
-                PersistenceType[] persistence = logAnno.persistence();
-                for (PersistenceType persistenceType : persistence) {
-                    Optional.ofNullable(persistenceHandlerMap.get(persistenceType)).ifPresent(handler -> handler.persist(LogDto));
+            Log.setEndTime(Instant.now());
+            executorService.execute(new ContextRunner() {
+                @Override
+                protected void doRun() {
+                    PersistenceType[] persistence = logAnno.persistence();
+                    for (PersistenceType persistenceType : persistence) {
+                        Optional.ofNullable(persistenceHandlerMap.get(persistenceType)).ifPresent(handler -> handler.persist(Log));
+                    }
                 }
             });
         }

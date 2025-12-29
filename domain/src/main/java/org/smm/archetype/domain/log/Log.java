@@ -14,7 +14,7 @@ import java.time.Instant;
  */
 @Getter
 @Setter
-public class LogDto {
+public class Log {
 
     /**
      * 日志注解信息

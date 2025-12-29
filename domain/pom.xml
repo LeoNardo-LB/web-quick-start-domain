@@ -16,10 +16,6 @@
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>client</artifactId>
         </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>pure-util</artifactId>
-        </dependency>
 
         <!-- COLA components -->
         <dependency>

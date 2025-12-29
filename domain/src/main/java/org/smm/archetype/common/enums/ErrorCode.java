@@ -20,7 +20,6 @@ public enum ErrorCode {
 
     /**
      * 异常类型
-     *
      * 关联具体的异常类，用于在异常处理时创建对应类型的异常实例。
      */
     private final Class<? extends Exception> exceptionClass;

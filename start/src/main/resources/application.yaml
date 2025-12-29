@@ -4,11 +4,11 @@ spring:
   threads:
     virtual:
       enabled: true
-  # datasource:
-  #   url: jdbc:h2:./data_h2/mydb;AUTO_SERVER=TRUE
-  #   driverClassName: org.h2.Driver
-  #   username: sa
-  #   password: password
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/testdb?characterEncoding=utf-8&useInformationSchema=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: leonardo123
   # h2:
   #   console:
   #     settings:

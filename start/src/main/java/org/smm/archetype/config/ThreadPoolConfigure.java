@@ -1,6 +1,6 @@
 package org.smm.archetype.config;
 
-import org.smm.archetype.MdcTaskDecorator;
+import org.smm.archetype.common.util.MdcTaskDecorator;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
  * @since 2025/12/13
  */
 @Configuration
-public class ThreadPoolConfig implements AsyncConfigurer {
+public class ThreadPoolConfigure implements AsyncConfigurer {
 
     /**
      * IO密集型线程池

@@ -1,17 +1,15 @@
 package org.smm.archetype;
 
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Nullable;
 
 /**
  * Spring Boot应用启动类
@@ -25,7 +23,7 @@ import javax.annotation.Nullable;
 @RestController
 @SpringBootApplication
 @EnableAspectJAutoProxy
-@ServletComponentScan
+@MapperScan("org.smm.archetype.repository.mapper")
 public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
@@ -78,9 +76,10 @@ public class ApplicationBootstrap implements CommandLineRunner {
      * @param args 命令行参数
      */
     @Override
-    public void run(@Nullable String... args) {
+    public void run(String... args) {
         log.info("[{}]应用启动成功!", appName);
         log.info("本地URL地址: {}", String.format("http://127.0.0.1:%s%s", port, contextPath));
         log.info("测试API地址: {}", String.format("http://127.0.0.1:%s%s%s", port, contextPath, openapi));
     }
+
 }

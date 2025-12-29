@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smm.archetype.domain.log.Log;
 import org.smm.archetype.domain.log.LogAnno;
-import org.smm.archetype.domain.log.LogDto;
 import org.smm.archetype.domain.log.handler.stringify.JdkStringifyHandler;
 import org.smm.archetype.domain.log.handler.stringify.StringifyHandler;
 import org.smm.archetype.domain.log.handler.stringify.StringifyType;
@@ -68,20 +68,20 @@ public class FilePersistenceHandler implements PersistenceHandler {
      *
      * 将日志信息格式化后通过SLF4J输出到日志文件中。根据是否有异常信息决定使用info级别还是error级别记录日志。
      * 日志内容包括业务名称、方法签名、执行耗时、线程名称、方法参数、返回值和异常信息等。
-     * @param LogDto 日志数据传输对象，包含待持久化的日志信息
+     * @param Log 日志数据传输对象，包含待持久化的日志信息
      */
     @Override
-    public void persist(LogDto LogDto) {
+    public void persist(Log Log) {
         // 输出实际的类
-        Class<?> declaringClass = LogDto.getSignature().getMethod().getDeclaringClass();
+        Class<?> declaringClass = Log.getSignature().getMethod().getDeclaringClass();
         Logger logger = LoggerFactory.getLogger(declaringClass);
 
-        LogAnno logAnno = LogDto.getLogAnno();
+        LogAnno logAnno = Log.getLogAnno();
         StringifyType stringify = logAnno.stringify();
-        MethodSignature signature = LogDto.getSignature();
-        Object[] args = LogDto.getArgs();
-        Object result = LogDto.getResult();
-        Throwable error = LogDto.getError();
+        MethodSignature signature = Log.getSignature();
+        Object[] args = Log.getArgs();
+        Object result = Log.getResult();
+        Throwable error = Log.getError();
 
         StringifyHandler handler = Optional.ofNullable(stringifyHandlerMap.get(stringify)).orElse(JDKStringifyHandler);
         StringBuilder builder = new StringBuilder();
@@ -92,9 +92,9 @@ public class FilePersistenceHandler implements PersistenceHandler {
         // 方法
         builder.append("Method:[").append(signature.toShortString()).append("]; ");
         // 耗时
-        builder.append("Cost:[").append(Duration.between(LogDto.getStartTime(), LogDto.getEndTime()).toMillis()).append("ms]; ");
+        builder.append("Cost:[").append(Duration.between(Log.getStartTime(), Log.getEndTime()).toMillis()).append("ms]; ");
         // 线程名称
-        builder.append("Thread:[").append(LogDto.getThreadName()).append("]; ");
+        builder.append("Thread:[").append(Log.getThreadName()).append("]; ");
         // 入参
         if (args != null && args.length > 0) {
             builder.append("Args:[").append(handler.stringify(args)).append("]; ");

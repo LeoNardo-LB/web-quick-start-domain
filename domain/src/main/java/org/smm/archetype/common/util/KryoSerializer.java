@@ -1,4 +1,4 @@
-package org.smm.archetype;
+package org.smm.archetype.common.util;
 
 import com.alibaba.fastjson2.TypeReference;
 import com.esotericsoftware.kryo.Kryo;

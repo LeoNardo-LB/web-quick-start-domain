@@ -1,4 +1,4 @@
-package org.smm.archetype;
+package org.smm.archetype.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

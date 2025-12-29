@@ -1,6 +1,8 @@
 package org.smm.archetype.web.api;
 
 import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.log.LogAnno;
+import org.smm.archetype.domain.log.handler.persistence.PersistenceType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,11 +26,13 @@ public class TestController {
      * @return 包含键值对的二维列表
      */
     @GetMapping("hello")
-    List<List<String>> hello(KVRequest request) {
-        if (request == null) {
+    @LogAnno(persistence = PersistenceType.DB)
+    List<List<String>> hello(KVRequest request) throws InterruptedException {
+        if (request == null || request.key() == null || request.value() == null) {
             return List.of(List.of("hello", "world"), List.of("java", "spring", "mybatis", "hibernate"));
         }
         log.info(request.toString());
+        Thread.sleep(5000);
         return List.of(List.of(request.key(), request.value()));
     }
 
@@ -40,6 +44,7 @@ public class TestController {
      * @throws RuntimeException 总是抛出此异常用于测试
      */
     @GetMapping("exception")
+    @LogAnno(persistence = PersistenceType.DB)
     List<List<String>> exception() {
         throw new RuntimeException("test");
     }

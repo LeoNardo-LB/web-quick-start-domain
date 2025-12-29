@@ -1,4 +1,4 @@
-package org.smm.archetype;
+package org.smm.archetype.common.util;
 
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;

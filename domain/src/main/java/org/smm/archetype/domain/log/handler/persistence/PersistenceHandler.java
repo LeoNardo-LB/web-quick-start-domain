@@ -1,6 +1,6 @@
 package org.smm.archetype.domain.log.handler.persistence;
 
-import org.smm.archetype.domain.log.LogDto;
+import org.smm.archetype.domain.log.Log;
 
 /**
  * 日志持久化处理器接口
@@ -22,8 +22,8 @@ public interface PersistenceHandler {
      * 执行持久化操作
      *
      * 根据具体的持久化策略，将日志信息保存到相应的存储介质中。
-     * @param LogDto 日志数据传输对象，包含待持久化的日志信息
+     * @param Log 日志数据传输对象，包含待持久化的日志信息
      */
-    void persist(LogDto LogDto);
+    void persist(Log Log);
 
 }

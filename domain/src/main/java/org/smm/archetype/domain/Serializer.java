@@ -14,7 +14,7 @@ import java.time.Instant;
  */
 @Getter
 @Setter
-public abstract class Serial {
+public abstract class Serializer {
 
     private Long serialno;
 
