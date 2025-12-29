@@ -3,8 +3,8 @@ package org.smm.archetype.repository.entity;
 import com.mybatisflex.annotation.Table;
 import java.io.Serializable;
 import java.time.Instant;
-import org.smm.archetype.repository.entity.BaseDO;
-import org.smm.archetype.repository.listener.AutoFillListener;
+
+import org.smm.archetype.repository.listener.BaseDOFillListener;
 
 import java.io.Serial;
 
@@ -25,7 +25,7 @@ import lombok.EqualsAndHashCode;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(value = "log", onInsert = AutoFillListener.class, onUpdate = AutoFillListener.class)
+@Table(value = "log", onInsert = BaseDOFillListener.class, onUpdate = BaseDOFillListener.class)
 public class LogDO extends BaseDO implements Serializable {
 
     @Serial

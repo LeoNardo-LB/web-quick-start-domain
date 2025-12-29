@@ -7,7 +7,7 @@ import com.mybatisflex.codegen.dialect.JdbcTypeMapping;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
 import org.smm.archetype.repository.entity.BaseDO;
-import org.smm.archetype.repository.listener.AutoFillListener;
+import org.smm.archetype.repository.listener.BaseDOFillListener;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -43,8 +43,8 @@ public class MybatisFlexCodegen {
         globalConfig.setEntityClassSuffix("DO");
         globalConfig.setEntitySuperClass(BaseDO.class);
         TableConfig tableConfig = new TableConfig();
-        tableConfig.setUpdateListenerClass(AutoFillListener.class);
-        tableConfig.setInsertListenerClass(AutoFillListener.class);
+        tableConfig.setUpdateListenerClass(BaseDOFillListener.class);
+        tableConfig.setInsertListenerClass(BaseDOFillListener.class);
         globalConfig.setTableConfig(tableConfig);
 
         // 设置项目的JDK版本，项目的JDK为14及以上时建议设置该项，小于14则可以不设置

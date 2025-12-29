@@ -3,10 +3,10 @@ package org.smm.archetype.repository.listener;
 import com.mybatisflex.annotation.InsertListener;
 import com.mybatisflex.annotation.UpdateListener;
 import org.smm.archetype.common.context.ContextHolder;
-import org.smm.archetype.dto.UserAuthInfo;
+import org.smm.archetype.common.event.AccessEvent;
 import org.smm.archetype.repository.entity.BaseDO;
 
-import java.lang.reflect.Type;
+import java.time.Instant;
 
 /**
  *
@@ -14,12 +14,15 @@ import java.lang.reflect.Type;
  * @author Leonardo
  * @since 2025/12/30
  */
-public class AutoFillListener implements InsertListener, UpdateListener {
+public class BaseDOFillListener implements InsertListener, UpdateListener {
 
     @Override
     public void onInsert(Object entity) {
+        Instant now = Instant.now();
         if (entity instanceof BaseDO baseDO) {
-            ContextHolder.get(UserAuthInfo.class).map(UserAuthInfo::getUserId).ifPresent(userId -> {
+            baseDO.setCreateTime(now);
+            baseDO.setUpdateTime(now);
+            ContextHolder.get(AccessEvent.class).map(AccessEvent::getUserId).ifPresent(userId -> {
                 baseDO.setCreateUser(userId);
                 baseDO.setUpdateUser(userId);
             });
@@ -29,7 +32,8 @@ public class AutoFillListener implements InsertListener, UpdateListener {
     @Override
     public void onUpdate(Object entity) {
         if (entity instanceof BaseDO baseDO) {
-            ContextHolder.get(UserAuthInfo.class).map(UserAuthInfo::getUserId).ifPresent(baseDO::setUpdateUser);
+            baseDO.setUpdateTime(Instant.now());
+            ContextHolder.get(AccessEvent.class).map(AccessEvent::getUserId).ifPresent(baseDO::setUpdateUser);
         }
     }
 

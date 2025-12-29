@@ -22,10 +22,8 @@ public class BaseDO {
     @Id(keyType = KeyType.Generator, value = KeyGenerators.flexId)
     private String id;
 
-    @Column(onInsertValue = "now()")
     private Instant createTime;
 
-    @Column(onInsertValue = "now()", onUpdateValue = "now()")
     private Instant updateTime;
 
     private String createUser;
