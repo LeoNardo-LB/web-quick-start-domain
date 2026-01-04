@@ -16,7 +16,6 @@ public class DataBaseConfigure implements ConfigurationCustomizer {
 
     @Override
     public void customize(FlexConfiguration configuration) {
-        // TODO 线上环境去除
         configuration.setLogImpl(StdOutImpl.class);
     }
 
