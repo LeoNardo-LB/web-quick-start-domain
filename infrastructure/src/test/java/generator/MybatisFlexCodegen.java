@@ -6,8 +6,8 @@ import com.mybatisflex.codegen.config.TableConfig;
 import com.mybatisflex.codegen.dialect.JdbcTypeMapping;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
-import org.smm.archetype.repository.entity.BaseDO;
-import org.smm.archetype.repository.listener.BaseDOFillListener;
+import org.smm.archetype.shared.dal.entity.BaseDO;
+import org.smm.archetype.shared.dal.listener.BaseDOFillListener;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -21,8 +21,8 @@ public class MybatisFlexCodegen {
     private static final String   DATABASE_NAME = "testdb";
     private static final String   USERNAME      = "root";
     private static final String   PASSWORD      = "leonardo123";
-    private static final String   PACKAGE       = "org.smm.archetype.repository";
-    private static final String[] tables        = {"log"};
+    private static final String   PACKAGE       = "org.smm.archetype.dal";
+    private static final String[] tables        = {"log", "event_consume", "event_publish"};
 
     public static GlobalConfig createGlobalConfigUseStyle1() {
         // 创建配置内容
