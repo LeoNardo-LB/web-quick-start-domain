@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @SpringBootApplication
 @EnableAspectJAutoProxy
-@MapperScan("org.smm.archetype.dal.mapper")
+@MapperScan("org.smm.archetype.**.mapper")
 public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
