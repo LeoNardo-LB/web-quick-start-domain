@@ -23,12 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @SpringBootApplication
 @EnableAspectJAutoProxy
-@MapperScan("org.smm.archetype.**.mapper")
+@MapperScan("org.smm.archetype.infrastructure.**.mapper")
 public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
      * 服务器端口
-     *
      * 从配置文件中读取服务器监听的端口号。
      */
     @Value("${server.port}")
@@ -36,7 +35,6 @@ public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
      * Servlet上下文路径
-     *
      * 从配置文件中读取Servlet的上下文路径。
      */
     @Value("${server.servlet.context-path}")
@@ -44,7 +42,6 @@ public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
      * 应用名称
-     *
      * 从配置文件中读取应用的名称。
      */
     @Value("${spring.application.name}")
@@ -52,7 +49,6 @@ public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
      * OpenAPI文档路径
-     *
      * 从配置文件中读取OpenAPI(Swagger)文档的访问路径。
      */
     @Value("${springdoc.swagger-ui.path}")
@@ -60,7 +56,6 @@ public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
      * 应用程序入口点
-     *
      * 启动Spring Boot应用程序，初始化应用上下文并启动Web服务器。
      * @param args 命令行参数
      */
@@ -70,7 +65,6 @@ public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
      * 应用启动完成后执行的回调方法
-     *
      * 在Spring Boot应用完全启动后执行，用于打印应用启动成功的日志信息，
      * 包括应用名称、本地访问URL和测试API地址。
      * @param args 命令行参数

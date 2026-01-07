@@ -1,0 +1,30 @@
+package org.smm.archetype.domain._shared.exception;
+
+/**
+ * 系统异常
+ * @author Leonardo
+ * @since 2026/1/6
+ */
+public class SysException extends BaseException {
+
+    public SysException() {
+        super();
+    }
+
+    public SysException(String message) {
+        super(message);
+    }
+
+    public SysException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public SysException(Throwable cause) {
+        super(cause);
+    }
+
+    protected SysException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+}
