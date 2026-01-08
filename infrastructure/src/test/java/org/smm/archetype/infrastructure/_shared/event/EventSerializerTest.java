@@ -2,12 +2,8 @@ package org.smm.archetype.infrastructure._shared.event;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.smm.archetype.domain._shared.base.DomainEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * 事件序列化器测试

@@ -1,17 +1,16 @@
 package org.smm.archetype.infrastructure._shared.generated.repository.entity;
 
 import com.mybatisflex.annotation.Table;
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.smm.archetype.infrastructure._shared.dal.BaseDO;
 import org.smm.archetype.infrastructure._shared.dal.BaseDOFillListener;
 
 import java.io.Serial;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.EqualsAndHashCode;
+import java.io.Serializable;
 
 /**
  * 文件业务关联表 实体类。

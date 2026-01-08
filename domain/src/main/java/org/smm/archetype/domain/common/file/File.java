@@ -9,9 +9,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.smm.archetype.domain._shared.base.Entity;
 
-import java.io.InputStream;
-import java.time.Instant;
-
 /**
  * 文件领域模型
  *
@@ -257,7 +254,7 @@ public class File extends Entity {
      * @return true-是PDF，false-不是PDF
      */
     public boolean isPdf() {
-        return getExtension().toLowerCase().equals(".pdf");
+        return getExtension().equalsIgnoreCase(".pdf");
     }
 
     /**

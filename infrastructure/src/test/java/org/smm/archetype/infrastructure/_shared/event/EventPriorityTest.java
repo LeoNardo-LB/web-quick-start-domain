@@ -3,7 +3,9 @@ package org.smm.archetype.infrastructure._shared.event;
 import org.junit.jupiter.api.Test;
 import org.smm.archetype.domain._shared.event.EventPriority;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 事件优先级枚举测试
