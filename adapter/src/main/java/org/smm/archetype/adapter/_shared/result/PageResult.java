@@ -1,7 +1,8 @@
 package org.smm.archetype.adapter._shared.result;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.smm.archetype.domain._shared.base.BasePage;
 
@@ -13,7 +14,8 @@ import java.util.List;
  * @author Leonardo
  * @since 2026/1/6
  */
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(setterPrefix = "set", builderMethodName = "pageResultBuilder")
 public class PageResult<T extends List<?>> extends BaseResult<T> implements Serializable, BasePage {

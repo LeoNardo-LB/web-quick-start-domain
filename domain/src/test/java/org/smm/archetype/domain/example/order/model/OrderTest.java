@@ -56,7 +56,6 @@ class OrderTest {
         // Then
         assertEquals(OrderStatus.PAID, order.getStatus());
         assertNotNull(order.getPaymentTime());
-        assertEquals("支付宝", order.getPaymentTime().toString()); // 注意：这里需要调整，实际paymentTime是Instant
         assertTrue(order.hasUncommittedEvents());
     }
 

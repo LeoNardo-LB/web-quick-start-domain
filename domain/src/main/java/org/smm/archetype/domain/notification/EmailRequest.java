@@ -2,8 +2,9 @@ package org.smm.archetype.domain.notification;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,8 @@ import java.util.Map;
  * @author Leonardo
  * @since 2026/01/09
  */
-@Data
+@Getter
+@Setter
 @Builder(setterPrefix = "set")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -57,7 +59,8 @@ public class EmailRequest {
     /**
      * 邮件附件
      */
-    @Data
+    @Getter
+    @Setter
     @Builder(setterPrefix = "set")
     @NoArgsConstructor
     @AllArgsConstructor

@@ -2,8 +2,9 @@ package org.smm.archetype.app.common.log;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * 日志注解配置信息
@@ -12,7 +13,8 @@ import lombok.NoArgsConstructor;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

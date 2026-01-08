@@ -1,8 +1,9 @@
 package org.smm.archetype.adapter._shared.result;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
@@ -13,7 +14,8 @@ import java.time.LocalDateTime;
  * @author Leonardo
  * @since 2026/1/6
  */
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder(setterPrefix = "set")

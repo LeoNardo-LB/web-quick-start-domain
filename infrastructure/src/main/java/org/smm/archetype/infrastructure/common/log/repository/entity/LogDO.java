@@ -3,9 +3,10 @@ package org.smm.archetype.infrastructure.common.log.repository.entity;
 import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.smm.archetype.infrastructure._shared.dal.BaseDO;
 import org.smm.archetype.infrastructure._shared.dal.BaseDOFillListener;
 
@@ -18,7 +19,8 @@ import java.time.Instant;
  * @author Administrator
  * @since 2025-12-31
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

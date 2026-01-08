@@ -3,9 +3,10 @@ package org.smm.archetype.infrastructure.example.order.repository.entity;
 import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.smm.archetype.infrastructure._shared.dal.BaseDO;
 
 import java.math.BigDecimal;
@@ -15,7 +16,8 @@ import java.math.BigDecimal;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Data
+@Getter
+@Setter
 @Builder(setterPrefix = "set")
 @NoArgsConstructor
 @AllArgsConstructor

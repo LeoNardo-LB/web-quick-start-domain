@@ -2,8 +2,9 @@ package org.smm.archetype.app.common.log;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.aspectj.lang.reflect.MethodSignature;
 
 import java.time.Instant;
@@ -18,7 +19,8 @@ import java.time.Instant;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

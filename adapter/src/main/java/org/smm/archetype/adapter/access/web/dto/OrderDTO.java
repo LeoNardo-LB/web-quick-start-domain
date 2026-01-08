@@ -2,8 +2,9 @@ package org.smm.archetype.adapter.access.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -14,7 +15,8 @@ import java.util.List;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

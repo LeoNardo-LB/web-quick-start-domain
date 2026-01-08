@@ -2,15 +2,17 @@ package org.smm.archetype.domain.notification;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * 短信发送结果
  * @author Leonardo
  * @since 2026/01/09
  */
-@Data
+@Getter
+@Setter
 @Builder(setterPrefix = "set")
 @NoArgsConstructor
 @AllArgsConstructor

@@ -2,8 +2,9 @@ package org.smm.archetype.app.example.order.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.smm.archetype.domain._shared.base.Query;
 import org.smm.archetype.domain.example.order.model.OrderStatus;
 
@@ -12,7 +13,8 @@ import org.smm.archetype.domain.example.order.model.OrderStatus;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

@@ -2,7 +2,6 @@ package org.smm.archetype.domain.common.file;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +20,8 @@ import java.time.Instant;
  * @author Leonardo
  * @since 2026/01/09
  */
-@Data
+@Getter
+@Setter
 @SuperBuilder(setterPrefix = "set")
 @EqualsAndHashCode(callSuper = true)
 public class File extends Entity {
@@ -95,7 +95,8 @@ public class File extends Entity {
     /**
      * 业务关联信息
      */
-    @Data
+    @Getter
+    @Setter
     @Builder(setterPrefix = "set")
     @NoArgsConstructor
     @AllArgsConstructor
@@ -124,6 +125,7 @@ public class File extends Entity {
         /**
          * 排序（用于多文件排序）
          */
+        @Builder.Default
         private Integer order = 0;
 
     }
