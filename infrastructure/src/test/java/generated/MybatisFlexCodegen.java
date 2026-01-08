@@ -6,8 +6,8 @@ import com.mybatisflex.codegen.config.TableConfig;
 import com.mybatisflex.codegen.dialect.JdbcTypeMapping;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.Test;
-import org.smm.archetype.infrastructure._shared.dal.entity.BaseDO;
-import org.smm.archetype.infrastructure._shared.dal.listener.BaseDOFillListener;
+import org.smm.archetype.infrastructure._shared.dal.BaseDO;
+import org.smm.archetype.infrastructure._shared.dal.BaseDOFillListener;
 
 import java.sql.Timestamp;
 import java.time.Instant;

@@ -3,7 +3,7 @@ package org.smm.archetype.domain.common.log;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.smm.archetype.domain._shared.base.BaseModel;
+import org.smm.archetype.domain._shared.base.Entity;
 
 import java.time.Instant;
 
@@ -15,8 +15,7 @@ import java.time.Instant;
  */
 @Getter
 @SuperBuilder(setterPrefix = "set")
-public class Log extends BaseModel {
-
+public class Log extends Entity {
 
     /**
      * 日志注解信息

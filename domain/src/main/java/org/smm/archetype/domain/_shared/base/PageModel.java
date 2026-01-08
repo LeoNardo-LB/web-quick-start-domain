@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class PageModel<T extends BaseModel> implements BasePage {
+public class PageModel<T extends Entity> implements BasePage {
 
     private Long pageNumber;
 

@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.smm.archetype.infrastructure._shared.dal.entity.BaseDO;
-import org.smm.archetype.infrastructure._shared.dal.listener.BaseDOFillListener;
+import org.smm.archetype.infrastructure._shared.dal.BaseDO;
+import org.smm.archetype.infrastructure._shared.dal.BaseDOFillListener;
 
 import java.io.Serial;
 import java.io.Serializable;

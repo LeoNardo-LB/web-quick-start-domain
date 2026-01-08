@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(dir:*)",
+      "Bash(mvn compile:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(java:*)",
+      "Bash(mvn:*)",
+      "Bash(findstr:*)"
+    ]
+  }
+}

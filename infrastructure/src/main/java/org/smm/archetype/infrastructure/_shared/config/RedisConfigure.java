@@ -14,7 +14,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 /**
  * Redis配置类
  * 使用Fastjson2序列化，启用加速特性
- *
  * @author Leonardo
  * @since 2026/1/7
  */
@@ -85,5 +84,7 @@ public class RedisConfigure {
                 throw new SerializationException("Could not deserialize: " + e.getMessage(), e);
             }
         }
+
     }
+
 }

@@ -1,10 +1,10 @@
 package org.smm.archetype.adapter.access.web.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain._shared.exception.BizException;
-import org.smm.archetype.domain._shared.exception.SysException;
 import org.smm.archetype.adapter._shared.enums.ResultEnum;
 import org.smm.archetype.adapter._shared.result.BaseResult;
+import org.smm.archetype.domain._shared.exception.BizException;
+import org.smm.archetype.domain._shared.exception.SysException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -29,9 +29,9 @@ public class WebExceptionAdvise {
     public BaseResult<Void> handleSysException(SysException e) {
         log.error("系统异常", e);
         return BaseResult.<Void>builder()
-                .setCode(ResultEnum.SYSTEM_ERROR.getCode())
-                .setMessage(e.getMessage())
-                .build();
+                       .setCode(ResultEnum.SYSTEM_ERROR.getCode())
+                       .setMessage(e.getMessage())
+                       .build();
     }
 
     /**
@@ -45,9 +45,9 @@ public class WebExceptionAdvise {
     public BaseResult<Void> handleBizException(BizException e) {
         log.error("业务异常", e);
         return BaseResult.<Void>builder()
-                .setCode(ResultEnum.BUSINESS_ERROR.getCode())
-                .setMessage(e.getMessage())
-                .build();
+                       .setCode(ResultEnum.BUSINESS_ERROR.getCode())
+                       .setMessage(e.getMessage())
+                       .build();
     }
 
     /**
@@ -61,9 +61,9 @@ public class WebExceptionAdvise {
     public BaseResult<Void> handleException(Exception e) {
         log.error("未知异常", e);
         return BaseResult.<Void>builder()
-                .setCode(ResultEnum.UNKNOWN_ERROR.getCode())
-                .setMessage(e.getMessage())
-                .build();
+                       .setCode(ResultEnum.UNKNOWN_ERROR.getCode())
+                       .setMessage(e.getMessage())
+                       .build();
     }
 
 }

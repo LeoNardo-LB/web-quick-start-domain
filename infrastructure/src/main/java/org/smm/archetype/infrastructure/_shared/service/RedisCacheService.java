@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 /**
  * Redis缓存服务实现
  * 基于Fastjson2序列化，充分利用WriteClassName特性实现零拷贝类型转换
- *
  * @author Leonardo
  * @since 2026/1/7
  */
@@ -43,8 +42,8 @@ public class RedisCacheService implements CacheService {
         }
         // 直接转换，Fastjson2已经处理了类型信息，零拷贝高性能
         return range.stream()
-                .map(item -> (T) item)
-                .collect(Collectors.toList());
+                       .map(item -> (T) item)
+                       .collect(Collectors.toList());
     }
 
     @Override
@@ -56,8 +55,8 @@ public class RedisCacheService implements CacheService {
         }
         // 直接转换，Fastjson2已经处理了类型信息，零拷贝高性能
         return range.stream()
-                .map(item -> (T) item)
-                .collect(Collectors.toList());
+                       .map(item -> (T) item)
+                       .collect(Collectors.toList());
     }
 
     @Override
@@ -67,7 +66,7 @@ public class RedisCacheService implements CacheService {
 
     @Override
     public void put(String key, Object value, Duration duration) {
-         redisTemplate.opsForValue().set(key, value, duration);
+        redisTemplate.opsForValue().set(key, value, duration);
     }
 
     @Override
@@ -94,4 +93,5 @@ public class RedisCacheService implements CacheService {
     public Long getExpire(String key) {
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
+
 }

@@ -44,4 +44,38 @@ public class BaseResult<T> implements Serializable {
      */
     protected String traceId;
 
+    /**
+     * 成功返回（无数据）
+     */
+    public static <T> BaseResult<T> success() {
+        return BaseResult.<T>builder()
+                       .setCode(200)
+                       .setMessage("success")
+                       .setTime(LocalDateTime.now())
+                       .build();
+    }
+
+    /**
+     * 成功返回（带数据）
+     */
+    public static <T> BaseResult<T> success(T data) {
+        return BaseResult.<T>builder()
+                       .setCode(200)
+                       .setData(data)
+                       .setMessage("success")
+                       .setTime(LocalDateTime.now())
+                       .build();
+    }
+
+    /**
+     * 错误返回
+     */
+    public static <T> BaseResult<T> error(int code, String message) {
+        return BaseResult.<T>builder()
+                       .setCode(code)
+                       .setMessage(message)
+                       .setTime(LocalDateTime.now())
+                       .build();
+    }
+
 }

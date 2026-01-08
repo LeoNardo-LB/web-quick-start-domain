@@ -8,6 +8,4 @@ package org.smm.archetype.adapter.access.schedule;
  */
 public class ConsumeFailRetryScheduler {
 
-
-
 }

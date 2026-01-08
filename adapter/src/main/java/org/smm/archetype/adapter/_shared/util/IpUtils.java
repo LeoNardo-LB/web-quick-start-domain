@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * IP地址工具类
- *
  * 提供获取客户端真实IP地址的功能，处理使用反向代理（如Nginx）时的IP获取问题。
  * 支持从多个HTTP头中获取IP地址，并按优先级处理，确保获取到真实的客户端IP。
  */
@@ -15,7 +14,6 @@ public class IpUtils {
 
     /**
      * 获取客户端真实IP地址
-     *
      * 当前端使用Nginx等反向代理时，不能通过request.getRemoteAddr()直接获取真实IP。
      * 本方法会依次尝试从以下HTTP头中获取IP地址：
      * 1. x-forwarded-for
