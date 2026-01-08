@@ -1,6 +1,7 @@
 package org.smm.archetype.domain._shared.base;
 
 import lombok.Getter;
+import org.smm.archetype.domain._shared.event.EventPriority;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -62,10 +63,41 @@ public abstract class DomainEvent extends ValueObject {
      */
     private String aggregateType;
 
+    /**
+     * 事件优先级（默认低优先级）
+     */
+    private EventPriority priority = EventPriority.LOW;
+
+    /**
+     * 最大重试次数（默认3次）
+     * <p>由发布方根据事件类型决定
+     */
+    private Integer maxRetryTimes = 3;
+
     protected DomainEvent() {
         this.eventId = generateEventId();
         this.occurredOn = Instant.now();
         this.eventType = this.getClass().getSimpleName();
+    }
+
+    /**
+     * 设置事件优先级
+     * @param priority 优先级
+     */
+    public void setPriority(EventPriority priority) {
+        if (this.priority == null || this.priority == EventPriority.LOW) {
+            this.priority = priority;
+        }
+    }
+
+    /**
+     * 设置最大重试次数
+     * @param maxRetryTimes 最大重试次数
+     */
+    public void setMaxRetryTimes(Integer maxRetryTimes) {
+        if (this.maxRetryTimes == null || this.maxRetryTimes == 3) {
+            this.maxRetryTimes = maxRetryTimes;
+        }
     }
 
     /**

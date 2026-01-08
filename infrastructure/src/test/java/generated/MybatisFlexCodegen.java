@@ -25,7 +25,15 @@ public class MybatisFlexCodegen {
     private static final String   USERNAME      = "root";
     private static final String   PASSWORD      = "leonardo123";
     private static final String   PACKAGE       = "generated.repository";
-    private static final String[] tables        = {"log", "event_consume", "event_publish"};
+    private static final String[] tables        = {"event_consume", "event_publish", "file_business", "file_metadata", "log"};
+
+    /**
+     * "event_consume",
+     * "event_publish",
+     * "file_business",
+     * "file_metadata",
+     * "log"
+     */
 
     public static GlobalConfig createGlobalConfigUseStyle1() {
         // 创建配置内容

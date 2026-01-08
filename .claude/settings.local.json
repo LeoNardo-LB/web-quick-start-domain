@@ -7,7 +7,8 @@
       "Bash(mvn clean compile:*)",
       "Bash(java:*)",
       "Bash(mvn:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(ls:*)"
     ]
   }
 }

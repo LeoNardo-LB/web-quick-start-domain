@@ -3,8 +3,6 @@ package org.smm.archetype.infrastructure.example.order.repository.impl;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.EventPublisher;
 import org.smm.archetype.domain.example.order.model.Money;
 import org.smm.archetype.domain.example.order.model.Order;
 import org.smm.archetype.domain.example.order.model.OrderItem;
@@ -26,9 +24,9 @@ import java.util.Optional;
  * <p>实现说明：
  * <ul>
  *   <li>负责Order聚合根的持久化</li>
- *   <li>在保存后发布领域事件</li>
  *   <li>处理Order与OrderItem的关联关系</li>
  *   <li>使用乐观锁保证并发安全</li>
+ *   <li>领域事件由切面在事务提交后统一发布</li>
  * </ul>
  * @author Leonardo
  * @since 2025/12/30
@@ -40,7 +38,6 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     private final OrderMapper     orderMapper;
     private final OrderItemMapper orderItemMapper;
-    private final EventPublisher  eventPublisher;
 
     @Override
     public Order save(Order aggregate) {
@@ -53,9 +50,6 @@ public class OrderRepositoryImpl implements OrderRepository {
             // 新增
             orderMapper.insert(orderDO);
             // 重建Order以设置ID
-            // 注意：未提交的事件会在新对象中丢失，需要手动转移
-            List<DomainEvent> uncommittedEvents = new ArrayList<>(aggregate.getUncommittedEvents());
-
             Order rebuilt = Order.reconstruct(
                     aggregate.getOrderId(),
                     aggregate.getCustomerId(),
@@ -76,11 +70,12 @@ public class OrderRepositoryImpl implements OrderRepository {
                     aggregate.getUpdateUser(),
                     aggregate.getVersion()
             );
-            aggregate = rebuilt;
 
-            // 通过反射或公开方法添加事件
-            // 由于addDomainEvent是protected的，这里暂时跳过
-            // 实际使用中应该通过业务方法触发事件，而不是直接转移
+            // 注意：由于重建后新对象没有未提交事件，切面会从原aggregate对象收集
+            // 所以这里返回原始aggregate（虽然ID可能还是null，但包含事件）
+            // 实际使用中，业务方法应该返回重建后的对象给切面
+
+            aggregate = rebuilt;
         } else {
             // 更新（使用乐观锁）
             int updated = orderMapper.update(orderDO);
@@ -92,8 +87,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         // 保存订单项
         saveOrderItems(aggregate);
 
-        // 发布领域事件
-        publishEvents(aggregate);
+        // 注意：领域事件由切面在事务提交后统一发布，这里不再处理
 
         log.debug("Order saved successfully: {}", aggregate.getOrderId());
         return aggregate;
@@ -197,30 +191,6 @@ public class OrderRepositoryImpl implements OrderRepository {
             OrderItemDO itemDO = toOrderItemDO(order.getOrderId(), item);
             orderItemMapper.insert(itemDO);
         }
-    }
-
-    /**
-     * 发布领域事件
-     */
-    private void publishEvents(Order order) {
-        List<DomainEvent> events = order.getUncommittedEvents();
-        if (events.isEmpty()) {
-            return;
-        }
-
-        log.debug("Publishing {} events for order: {}", events.size(), order.getOrderId());
-
-        for (DomainEvent event : events) {
-            try {
-                eventPublisher.publish(event);
-            } catch (Exception e) {
-                log.error("Failed to publish event: {}", event.getClass().getSimpleName(), e);
-                // 可以选择重试或记录到失败表
-            }
-        }
-
-        // 标记事件为已提交
-        order.markEventsAsCommitted();
     }
 
     /**

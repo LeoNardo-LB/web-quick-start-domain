@@ -1,5 +1,7 @@
 package org.smm.archetype.infrastructure._shared.context;
 
+import cn.hutool.core.bean.BeanUtil;
+
 /**
  *
  *
@@ -11,7 +13,7 @@ public interface Context<T> {
     T getData();
 
     default Context<T> export() {
-        return this;
+        return BeanUtil.toBean(this, this.getClass());
     }
 
 }
