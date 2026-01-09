@@ -46,11 +46,11 @@ public interface ObjectStorageService {
     /**
      * 模糊查询文件
      * @param fileNamePattern 文件名模式（支持通配符）
-     * @param businessType 业务类型
+     * @param businessEntityType 业务实体类型
      * @param businessId 业务ID
      * @return 文件列表
      */
-    List<File> searchFiles(String fileNamePattern, File.BusinessType businessType, String businessId);
+    List<File> searchFiles(String fileNamePattern, File.FileBusinessEntityType businessEntityType, String businessId);
 
     /**
      * 检查文件是否存在

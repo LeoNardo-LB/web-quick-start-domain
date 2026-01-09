@@ -1,6 +1,8 @@
 package org.smm.archetype.domain.example.order.model;
 
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 订单状态枚举
@@ -71,6 +73,29 @@ public enum OrderStatus {
      */
     public boolean canShip() {
         return this == PAID;
+    }
+
+    private static final Logger log = LoggerFactory.getLogger(OrderStatus.class);
+
+    /**
+     * 从字符串转换为订单状态
+     *
+     * <p>如果转换失败，返回默认状态 CREATED
+     * @param value 状态字符串
+     * @return 订单状态枚举
+     */
+    public static OrderStatus fromString(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            log.warn("Empty OrderStatus value, using default: CREATED");
+            return CREATED;
+        }
+
+        try {
+            return OrderStatus.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid OrderStatus: {}, using default: CREATED", value);
+            return CREATED;
+        }
     }
 
 }

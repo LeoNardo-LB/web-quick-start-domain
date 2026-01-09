@@ -90,49 +90,12 @@ public class File extends Entity {
     }
 
     /**
-     * 业务关联信息
-     */
-    @Getter
-    @Setter
-    @Builder(setterPrefix = "set")
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class FileBusiness {
-
-        /**
-         * 业务类型
-         */
-        private BusinessType businessType;
-
-        /**
-         * 业务ID（关联的业务实体ID）
-         */
-        private String businessId;
-
-        /**
-         * 使用场景
-         */
-        private UsageType usageType;
-
-        /**
-         * 备注
-         */
-        private String remark;
-
-        /**
-         * 排序（用于多文件排序）
-         */
-        @Builder.Default
-        private Integer order = 0;
-
-    }
-
-    /**
-     * 业务类型枚举
+     * 业务实体类型枚举
+     * <p>定义文件可以关联的业务实体类型
      */
     @Getter
     @AllArgsConstructor
-    public enum BusinessType {
+    public enum FileBusinessEntityType {
 
         /**
          * 订单相关
@@ -160,6 +123,44 @@ public class File extends Entity {
         OTHER("其他");
 
         private final String description;
+
+    }
+
+    /**
+     * 业务关联信息
+     */
+    @Getter
+    @Setter
+    @Builder(setterPrefix = "set")
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FileBusiness {
+
+        /**
+         * 业务实体类型
+         */
+        private FileBusinessEntityType businessEntityType;
+
+        /**
+         * 业务ID（关联的业务实体ID）
+         */
+        private String businessId;
+
+        /**
+         * 使用场景
+         */
+        private UsageType usageType;
+
+        /**
+         * 备注
+         */
+        private String remark;
+
+        /**
+         * 排序（用于多文件排序）
+         */
+        @Builder.Default
+        private Integer order = 0;
 
     }
 

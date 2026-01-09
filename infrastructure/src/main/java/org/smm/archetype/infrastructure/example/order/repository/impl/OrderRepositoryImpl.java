@@ -267,7 +267,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                 orderDO.getCustomerId(),
                 items,
                 totalAmount,
-                OrderStatus.valueOf(orderDO.getStatus()),
+                OrderStatus.fromString(orderDO.getStatus()),
                 orderDO.getShippingAddress(),
                 orderDO.getPhoneNumber(),
                 orderDO.getPaymentTime(),

@@ -49,9 +49,9 @@ public class MockObjectStorageServiceImpl implements ObjectStorageService {
     }
 
     @Override
-    public List<File> searchFiles(String fileNamePattern, File.BusinessType businessType, String businessId) {
-        log.info("Mock search: fileNamePattern={}, businessType={}, businessId={}",
-                fileNamePattern, businessType, businessId);
+    public List<File> searchFiles(String fileNamePattern, File.FileBusinessEntityType businessEntityType, String businessId) {
+        log.info("Mock search: fileNamePattern={}, businessEntityType={}, businessId={}",
+                fileNamePattern, businessEntityType, businessId);
         // TODO: 实际接入 RustFS
         return Collections.emptyList();
     }

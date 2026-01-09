@@ -2,6 +2,8 @@ package org.smm.archetype.domain._shared.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 事件消费状态枚举
@@ -67,4 +69,28 @@ public enum ConsumeStatus {
     public boolean isSuccess() {
         return this == CONSUMED;
     }
+
+    private static final Logger log = LoggerFactory.getLogger(ConsumeStatus.class);
+
+    /**
+     * 从字符串转换为消费状态
+     *
+     * <p>如果转换失败，返回默认状态 READY
+     * @param value 状态字符串
+     * @return 消费状态枚举
+     */
+    public static ConsumeStatus fromString(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            log.warn("Empty ConsumeStatus value, using default: READY");
+            return READY;
+        }
+
+        try {
+            return ConsumeStatus.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid ConsumeStatus: {}, using default: READY", value);
+            return READY;
+        }
+    }
+
 }

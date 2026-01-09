@@ -231,7 +231,7 @@ public void asyncTask() {
 
 #### 3.1.1 枚举识别规则
 
-**字段语义包含以下关键词时，必须使用枚举**:
+**字段语义包含（但不限于）以下关键词时，必须使用枚举**:
 
 | 关键词       | 示例字段           | 枚举示例               |
 |-----------|----------------|--------------------|
@@ -244,9 +244,11 @@ public void asyncTask() {
 | level     | `logLevel`     | `LogLevelEnum`     |
 | mode      | `paymentMode`  | `PaymentModeEnum`  |
 
+> 需要根据这个规则扩展，主动根据变量名语义及作用进行识别。
+
 #### 3.1.2 枚举转换规则
 
-**外部 → 内部**（反序列化）:
+**外部 → 内部**（反序列化）: 使用自带的`.valudOf(String str)`进行识别
 
 ```java
 // ✅ 正确：带异常处理和默认值
@@ -267,7 +269,7 @@ equals(status)){  // 禁止！
         }
 ```
 
-**内部 → 外部**（序列化）:
+**内部 → 外部**（序列化）: 使用自带的`.name()`进行转换
 
 ```java
 // ✅ 正确：使用枚举的name()
@@ -276,33 +278,57 @@ public String getStatus() {
 }
 ```
 
+**其他情况**: 除非有特殊用途，否则禁止使用重复性描述序列化/反序列化枚举
+
+特殊用途举例：业务中无法获取XxxType类型，只能获取传入的类型，此时需要根据类名获取枚举
+
+```java
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+enum XxxEnum {
+
+    // 这里示例根据类名获取，可以定义一个className来匹配枚举
+    XxxType("xxxHandler")
+
+    private final String className;
+
+    // 根据类名获取枚举
+    public static XxxEnum fromClassName(String className) {
+        return java.util.Arrays.stream(values()).filter(e -> e.className.equals(className)).findFirst().orElse(null);
+    }
+    }
+```
+
 #### 3.1.3 枚举定义位置
 
 **内部枚举**（定义在类内部）:
 
-- ✅ 仅当前类使用
-- ✅ 与当前类强耦合
-- ✅ 不会作为API返回
+- 作为当前类的一部分（类比组合概念，不可拆分）
+- 与当前类强耦合
+- 不会作为API返回
+- 简短的定义名称，如Status、Type、Usage、Scene等
 
 ```java
 public class Product {
 
-    public enum AvailabilityStatus {
+    public enum Status {
         IN_STOCK,
         OUT_OF_STOCK,
         PRE_ORDER
     }
 
-    private AvailabilityStatus availability;
+    private Status availability;
 
 }
 ```
 
 **外部枚举**（独立文件）:
 
-- ✅ 多个类共享
-- ✅ 通用业务概念
-- ✅ 在API中暴露
+- 多个类共享（类比聚合概念，可拆分）
+- 通用业务概念
+- 在API中暴露
+- 详细的定义名称，如OrderStatus，MessageType，BusinessSource等
 
 ```java
 // domain/model/enums/OrderStatus.java
@@ -486,11 +512,11 @@ CREATE TABLE `xxx`
 
 #### 4.2.3 索引命名规范
 
-| 索引类型 | 命名格式 | 示例 |
-|---------|---------|------|
-| 主键 | `PRIMARY` | `PRIMARY KEY (id)` |
-| 唯一索引 | `uk_表名_字段名` | `uk_order_order_no` |
-| 普通索引 | `idx_表名_字段名` | `idx_order_user_id` |
+| 索引类型 | 命名格式             | 示例                         |
+|------|------------------|----------------------------|
+| 主键   | `PRIMARY`        | `PRIMARY KEY (id)`         |
+| 唯一索引 | `uk_表名_字段名`      | `uk_order_order_no`        |
+| 普通索引 | `idx_表名_字段名`     | `idx_order_user_id`        |
 | 复合索引 | `idx_表名_字段1_字段2` | `idx_order_user_id_status` |
 
 ### 4.3 仓储模式
