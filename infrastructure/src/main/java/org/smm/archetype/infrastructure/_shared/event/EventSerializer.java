@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.springframework.stereotype.Component;
 
 /**
  * 事件序列化器
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
  * @since 2026/01/09
  */
 @Slf4j
-@Component
 public class EventSerializer {
 
     private final ObjectMapper objectMapper;

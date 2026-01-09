@@ -5,11 +5,11 @@ import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventStatus;
 import org.smm.archetype.infrastructure._shared.event.DomainSpringEvent;
 import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.generated.entity.EventPublishDO;
+import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
 /**
  * Spring 事件发布器
@@ -23,11 +23,22 @@ import org.springframework.stereotype.Component;
  *   <li>发布成功后更新状态为 PUBLISHED</li>
  *   <li>发布失败则保持 CREATED 状态，由定时任务重试</li>
  * </ol>
+ *
+ * <p>适用于：
+ * <ul>
+ *   <li>单机应用</li>
+ *   <li>开发测试环境</li>
+ *   <li>Kafka 的降级方案</li>
+ * </ul>
+ *
  * @author Leonardo
- * @since 2026/01/09
+ * @since 2026-01-10
  */
 @Slf4j
-@Component
+@ConditionalOnProperty(
+        name = "middleware.event.publisher.type",
+        havingValue = "spring"
+)
 public class SpringEventPublisher extends AbstractEventPublisher<DomainEvent> {
 
     private final ApplicationEventPublisher applicationEventPublisher;

@@ -5,12 +5,11 @@ import org.smm.archetype.adapter.access.web.dto.OrderDTO;
 import org.smm.archetype.adapter.access.web.dto.OrderItemDTO;
 import org.smm.archetype.adapter.access.web.dto.OrderItemRequest;
 import org.smm.archetype.adapter.access.web.dto.PayOrderRequest;
-import org.smm.archetype.app.example.order.command.CreateOrderCommand;
-import org.smm.archetype.app.example.order.command.PayOrderCommand;
-import org.smm.archetype.domain.example.order.model.Money;
-import org.smm.archetype.domain.example.order.model.Order;
-import org.smm.archetype.domain.example.order.model.OrderItem;
-import org.springframework.stereotype.Component;
+import org.smm.archetype.app._example.order.command.CreateOrderCommand;
+import org.smm.archetype.app._example.order.command.PayOrderCommand;
+import org.smm.archetype.domain._example.order.model.Money;
+import org.smm.archetype.domain._example.order.model.Order;
+import org.smm.archetype.domain._example.order.model.OrderItem;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Component
 public class OrderConverter {
 
     /**

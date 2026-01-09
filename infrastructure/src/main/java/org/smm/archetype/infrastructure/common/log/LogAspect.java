@@ -16,7 +16,6 @@ import org.smm.archetype.domain.common.log.handler.stringify.StringifyType;
 import org.smm.archetype.infrastructure._shared.context.executable.ContextRunnable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
@@ -35,7 +34,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Aspect
 @Order
-@Component
 public class LogAspect {
 
     /**

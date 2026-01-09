@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.8</version>
+        <version>3.5.9</version>
     </parent>
     <groupId>org.smm.archetype</groupId>
     <artifactId>web-quick-start-domain</artifactId>
@@ -15,7 +15,6 @@
     <description>DDD Web quick start archetype</description>
     <modules>
         <module>adapter</module>
-        <module>client</module>
         <module>app</module>
         <module>domain</module>
         <module>infrastructure</module>
@@ -31,6 +30,11 @@
         <!--springboot3 使用 2.x；springboot4 使用 3.0.0-->
         <spring-doc.version>2.8.14</spring-doc.version>
         <mybatis-flex.version>1.11.5</mybatis-flex.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <caffeine.version>3.1.8</caffeine.version>
+        <aliyun.sms.version>2.0.1</aliyun.sms.version>
+        <aliyun.email.version>1.0.0</aliyun.email.version>
     </properties>
 
     <dependencies>
@@ -89,6 +93,18 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-core</artifactId>
         </dependency>
+        <!-- MapStruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -101,11 +117,6 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>client</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -167,6 +178,53 @@
                 <artifactId>mybatis-flex-codegen</artifactId>
                 <version>${mybatis-flex.version}</version>
             </dependency>
+
+            <!-- Caffeine本地缓存 -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
+
+            <!-- 阿里云SDK -->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dysmsapi20170525</artifactId>
+                <version>${aliyun.sms.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dm20151115</artifactId>
+                <version>${aliyun.email.version}</version>
+            </dependency>
+
+            <!--rustfs支持的s3协议-->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>s3</artifactId>
+                <version>2.41.4</version>
+            </dependency>
+
+            <!-- 依赖冲突解决：统一版本管理 -->
+            <!-- objenesis：Kryo需要3.4，Mockito需要3.3，统一使用3.4 -->
+            <dependency>
+                <groupId>org.objenesis</groupId>
+                <artifactId>objenesis</artifactId>
+                <version>3.4</version>
+            </dependency>
+            <!-- error_prone_annotations：AssertJ需要2.41.0，Guava传递依赖2.21.1，统一使用2.41.0 -->
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>2.41.0</version>
+            </dependency>
+            <!-- byte-buddy：Mockito需要1.17.8，统一使用1.17.8 -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.17.8</version>
+            </dependency>
+
             <!--基础依赖End-->
         </dependencies>
     </dependencyManagement>
@@ -193,6 +251,16 @@
                             <groupId>com.mybatis-flex</groupId>
                             <artifactId>mybatis-flex-processor</artifactId>
                             <version>${mybatis-flex.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok-mapstruct-binding.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

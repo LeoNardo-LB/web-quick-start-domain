@@ -5,56 +5,65 @@ spring:
     virtual:
       enabled: true
 
+  # Kafka配置
+  kafka:
+    listener:
+      auto-startup: false
+    bootstrap-servers: localhost:9092
+
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/testdb?characterEncoding=utf-8&useInformationSchema=true
     driverClassName: com.mysql.cj.jdbc.Driver
     username: root
     password: leonardo123
+
+  # Redis配置（外部中间件，可选）
   data:
     redis:
       host: 127.0.0.1
       port: 6379
-      password:
+      password: leonardo123
       database: 0
       lettuce:
         pool:
-          # 连接池最大连接数
           max-active: 8
-          # 连接池最大空闲连接数
           max-idle: 8
-          # 连接池最小空闲连接数
           min-idle: 0
-          # 连接池最大阻塞等待时间（-1表示无限制）
           max-wait: -1ms
-      # 连接超时时间
       timeout: 3000ms
-  # h2:
-  #   console:
-  #     settings:
-  #       web-allow-others: true
-  #     enabled: true
-  #     path: /h2-console
-  # jpa:
-  #   hibernate:
-  #     ddl-auto: update
-  #   properties:
-  #     hibernate:
-  #       dialect: org.hibernate.dialect.H2Dialect
-  #   show-sql: true
 
-# 事件配置
+# 事件重试配置
 event:
-  # 事件发布器类型（kafka 或 spring）
-  publisher:
-    type: kafka
-  # 事件重试配置
   retry:
-    # Cron 表达式（默认每分钟执行一次）
     cron: "0 * * * * ?"
-    # 每批次处理的事件数量
     batchSize: 100
-    # 高优先级事件占比（0.8 表示 80%）
     highPriorityRatio: 0.8
+
+# ID 生成器配置
+id:
+  snowflake:
+    datacenter-id: 0
+    worker-id: 0
+
+# 对象存储配置
+middleware:
+  object-storage:
+    # 存储类型：local | rustfs
+    type: local
+    # RustFS 配置
+    rustfs:
+      endpoint: http://localhost:9000
+      access-key: leonardo123
+      secret-key: leonardo123
+      bucket: default
+      connect-timeout: 5s
+      read-timeout: 30s
+    # 本地存储配置
+    local:
+      # 基础路径（可选，默认：用户文件夹/.project/${spring.application.name}/oss）
+      base-path: ${user.home}/.project/${spring.application.name}/oss
+      # 是否使用零拷贝（NIO transferTo/transferFrom）
+      zero-copy: true
 
 server:
   port: 9101
@@ -70,4 +79,3 @@ springdoc:
 
 logging:
   config: classpath:logback-spring.xml
-

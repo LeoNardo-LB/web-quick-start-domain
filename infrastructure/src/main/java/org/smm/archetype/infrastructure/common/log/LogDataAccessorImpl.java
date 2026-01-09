@@ -6,9 +6,8 @@ import org.smm.archetype.domain.common.log.LogAnno;
 import org.smm.archetype.domain.common.log.LogDataAccessor;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyHandler;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyType;
-import org.smm.archetype.infrastructure.common.log.repository.entity.LogDO;
-import org.smm.archetype.infrastructure.common.log.repository.mapper.LogMapper;
-import org.springframework.stereotype.Repository;
+import org.smm.archetype.infrastructure._shared.generated.entity.LogDO;
+import org.smm.archetype.infrastructure._shared.generated.mapper.LogMapper;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -17,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.smm.archetype.infrastructure.common.log.repository.entity.table.LogDOTableDef.LOG_DO;
+import static org.smm.archetype.infrastructure._shared.generated.entity.table.LogDOTableDef.LOG_DO;
 
 /**
  * 日志数据访问器实现
@@ -26,7 +25,6 @@ import static org.smm.archetype.infrastructure.common.log.repository.entity.tabl
  * @author Leonardo
  * @since 2025/12/30
  */
-@Repository
 public class LogDataAccessorImpl implements LogDataAccessor {
 
     private final LogMapper logMapper;

@@ -7,10 +7,9 @@ import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
 import org.smm.archetype.infrastructure._shared.event.EventSerializer;
 import org.smm.archetype.infrastructure._shared.event.handler.EventFailureHandler;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
+import org.smm.archetype.infrastructure._shared.generated.entity.EventConsumeDO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,6 @@ import java.util.concurrent.ExecutorService;
  * @since 2026/01/09
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class EventRetrySchedulerImpl implements EventRetryScheduler {
 
@@ -161,14 +159,61 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
 
         } catch (Exception e) {
             log.error("Error replaying event: eventId={}", eventId, e);
+
+            // 处理重试失败
+            handleReplayFailure(consumeDO, e);
+        }
+    }
+
+    /**
+     * 处理重试失败
+     *
+     * <p>检查重试次数，如果达到最大次数则调用失败处理器，否则更新重试信息。
+     * @param consumeDO 消费记录
+     * @param e         异常
+     */
+    private void handleReplayFailure(EventConsumeDO consumeDO, Exception e) {
+        int currentRetryTimes = consumeDO.getRetryTimes() != null ? consumeDO.getRetryTimes() : 0;
+        int maxRetryTimes = consumeDO.getMaxRetryTimes() != null ? consumeDO.getMaxRetryTimes() : 3;
+
+        if (currentRetryTimes >= maxRetryTimes) {
+            // 达到最大重试次数，标记为失败并调用失败处理器
+            log.error("Event replay failed after max retries: eventId={}, retryTimes={}/{}",
+                    consumeDO.getEventId(), currentRetryTimes, maxRetryTimes);
+
+            consumeDO.setConsumeStatus("FAILED");
+            consumeDO.setErrorMessage("Max retry times exceeded in replay: " + e.getMessage());
+
+            // 更新数据库状态
+            eventConsumeRepository.updateStatusWithVersion(consumeDO);
+
+            // 调用失败处理器
+            handleFailedEvent(consumeDO, e);
+        } else {
+            // 未达到最大重试次数，更新重试信息
+            consumeDO.setConsumeStatus("RETRY");
+            consumeDO.setRetryTimes(currentRetryTimes + 1);
+            consumeDO.setErrorMessage(e.getMessage());
+
+            // 计算下次重试时间（指数退避：1, 5, 15, 30, 60 分钟）
+            int[] delays = {1, 5, 15, 30, 60};
+            int index = Math.min(currentRetryTimes, delays.length - 1);
+            consumeDO.setNextRetryTime(java.time.Instant.now().plusSeconds(delays[index] * 60L));
+
+            // 更新数据库状态
+            eventConsumeRepository.updateStatusWithVersion(consumeDO);
+
+            log.warn("Event replay failed, will retry: eventId={}, retryTimes={}/{}",
+                    consumeDO.getEventId(), currentRetryTimes + 1, maxRetryTimes);
         }
     }
 
     /**
      * 处理失败事件
      * @param consumeDO 消费记录
+     * @param e 原始异常
      */
-    private void handleFailedEvent(EventConsumeDO consumeDO) {
+    private void handleFailedEvent(EventConsumeDO consumeDO, Exception e) {
         try {
             // 反序列化事件
             DomainEvent event = deserializeEvent(consumeDO);
@@ -176,15 +221,15 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
             // 查找对应的失败处理器
             for (EventFailureHandler handler : failureHandlers) {
                 if (handler.supports(event.getEventType())) {
-                    handler.handleFailure(event, consumeDO);
+                    handler.handleFailure(event, consumeDO, e);
                     return;
                 }
             }
 
             log.warn("No failure handler found for event type: {}", event.getEventTypeName());
 
-        } catch (Exception e) {
-            log.error("Error handling failed event: eventId={}", consumeDO.getEventId(), e);
+        } catch (Exception ex) {
+            log.error("Error handling failed event: eventId={}", consumeDO.getEventId(), ex);
         }
     }
 

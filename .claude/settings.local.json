@@ -9,7 +9,17 @@
       "Bash(mvn:*)",
       "Bash(findstr:*)",
       "Bash(ls:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Bash(echo:*)",
+      "Bash(netstat:*)",
+      "Bash(where:*)",
+      "Bash(curl:*)",
+      "mcp__web-search-prime__webSearchPrime",
+      "mcp__zread__get_repo_structure",
+      "mcp__web-reader__webReader",
+      "mcp__zread__read_file",
+      "mcp__zread__search_doc",
+      "mcp__zai-mcp-server__analyze_image"
     ]
   }
 }

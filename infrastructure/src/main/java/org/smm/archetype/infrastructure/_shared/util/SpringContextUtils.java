@@ -3,7 +3,6 @@ package org.smm.archetype.infrastructure._shared.util;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 /**
  * Spring上下文工具类
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
  * 在Spring容器启动时自动注入ApplicationContext对象。
  * 可用于在非Spring管理的类中获取Spring容器中的Bean实例。
  */
-@Component
 public class SpringContextUtils implements ApplicationContextAware {
 
     public static ApplicationContext context;

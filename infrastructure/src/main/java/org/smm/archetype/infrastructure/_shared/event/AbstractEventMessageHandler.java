@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.ConsumeStatus;
 import org.smm.archetype.domain._shared.event.EventMessageHandler;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
+import org.smm.archetype.infrastructure._shared.generated.entity.EventConsumeDO;
+import org.smm.archetype.infrastructure._shared.generated.entity.EventPublishDO;
+import org.smm.archetype.infrastructure._shared.generated.mapper.EventConsumeMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;

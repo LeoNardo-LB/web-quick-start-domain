@@ -5,7 +5,6 @@ import org.smm.archetype.domain.common.log.Log;
 import org.smm.archetype.domain.common.log.LogDataAccessor;
 import org.smm.archetype.domain.common.log.handler.persistence.PersistenceHandler;
 import org.smm.archetype.domain.common.log.handler.persistence.PersistenceType;
-import org.springframework.stereotype.Component;
 
 /**
  * 数据库持久化处理器
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
  * @author Leonardo
  * @since 2025/7/15
  */
-@Component
 @RequiredArgsConstructor
 public class DbPersistenceHandler implements PersistenceHandler {
 

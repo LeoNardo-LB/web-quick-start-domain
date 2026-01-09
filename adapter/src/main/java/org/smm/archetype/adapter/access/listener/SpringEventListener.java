@@ -1,18 +1,17 @@
 package org.smm.archetype.adapter.access.listener;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.adapter.handler.event.EventHandler;
+import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventType;
 import org.smm.archetype.infrastructure._shared.event.DomainSpringEvent;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
 import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.generated.entity.EventConsumeDO;
+import org.smm.archetype.infrastructure._shared.generated.mapper.EventConsumeMapper;
+import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -24,7 +23,6 @@ import java.util.List;
  * @since 2026/01/09
  */
 @Slf4j
-@Component
 public class SpringEventListener extends AbstractEventConsumer<DomainEvent>
         implements org.smm.archetype.adapter.access.listener.EventListener {
 

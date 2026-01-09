@@ -25,7 +25,7 @@ import lombok.Getter;
  * }
  *
  * // 从字符串转换（数据库、HTTP等外部来源）
- * EventType type = EnumUtils.fromString("ORDER_CREATED", EventType.class, EventType.UNKNOWN);
+ * EventType type = EnumUtil.fromString("ORDER_CREATED", EventType.class, EventType.UNKNOWN);
  * }</pre>
  * @author Leonardo
  * @since 2026/01/09

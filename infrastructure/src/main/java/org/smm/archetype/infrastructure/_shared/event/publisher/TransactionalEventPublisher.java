@@ -7,7 +7,6 @@ import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventPublisher;
 import org.smm.archetype.infrastructure._shared.event.DomainEventsCollectionEvent;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -38,7 +37,6 @@ import java.util.List;
  * @since 2025/12/30
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class TransactionalEventPublisher {
 

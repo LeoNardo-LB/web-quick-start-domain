@@ -10,7 +10,6 @@ import org.smm.archetype.domain.common.log.handler.persistence.PersistenceHandle
 import org.smm.archetype.domain.common.log.handler.persistence.PersistenceType;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyHandler;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyType;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
  * 实现将日志信息以文件形式持久化的处理器，通过SLF4J将日志信息输出到日志文件中。
  * 支持多种对象字符串化策略，可根据配置选择合适的字符串化方式。
  */
-@Component
 public class FilePersistenceHandler implements PersistenceHandler {
 
     /**

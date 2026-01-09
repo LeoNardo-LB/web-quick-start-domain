@@ -60,17 +60,27 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
-        <!-- 云服务SDK（可选，根据需要添加）-->
+        <!-- Caffeine本地缓存 -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
+        <!-- AWS S3 SDK（用于 RustFS 对象存储，100% 兼容 S3 协议）-->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+        </dependency>
+
+        <!-- 阿里云SDK（可选，根据需要添加）-->
         <!--
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>dysmsapi20170525</artifactId>
-            <version>2.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>dm20151115</artifactId>
-            <version>1.0.0</version>
         </dependency>
         -->
     </dependencies>

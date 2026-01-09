@@ -8,7 +8,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.smm.archetype.domain._shared.base.AggregateRoot;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +42,6 @@ import java.util.List;
  */
 @Slf4j
 @Aspect
-@Component
 @RequiredArgsConstructor
 public class TransactionEventPublishingAspect {
 

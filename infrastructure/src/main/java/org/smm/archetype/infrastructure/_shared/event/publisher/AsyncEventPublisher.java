@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventPublisher;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -27,7 +26,6 @@ import java.util.concurrent.CompletableFuture;
  * @since 2026/01/09
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class AsyncEventPublisher implements EventPublisher {
 

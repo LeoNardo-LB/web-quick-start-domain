@@ -1,7 +1,5 @@
 package org.smm.archetype.app._shared.base;
 
-import org.springframework.stereotype.Service;
-
 /**
  * 应用服务基类
  *
@@ -61,7 +59,6 @@ import org.springframework.stereotype.Service;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Service
 public abstract class ApplicationService {
 
     /**

@@ -6,6 +6,37 @@
 
 ---
 
+# 🚨 快速参考
+
+## 测试运行命令速查
+
+```bash
+# ===== 启动测试（最关键）=====
+mvn test -Dtest=ApplicationStartupTests -pl start
+
+# ===== 编译验证 =====
+mvn clean compile
+
+# ===== 单元测试 =====
+mvn test
+
+# ===== 生产环境运行（会一直运行）=====
+mvn spring-boot:run -pl start
+```
+
+## 4步强制验证流程
+
+| 步骤  | 命令                                                  | 验证目标     | ✅ 成功标志                               |
+|-----|-----------------------------------------------------|----------|--------------------------------------|
+| 1️⃣ | 编写单元测试                                              | 覆盖核心逻辑   | 测试类已创建                               |
+| 2️⃣ | `mvn clean compile`                                 | 编译验证     | `BUILD SUCCESS`                      |
+| 3️⃣ | `mvn test`                                          | 单元测试验证   | Tests run > 0, Failures: 0           |
+| 4️⃣ | `mvn test -Dtest=ApplicationStartupTests -pl start` | **启动验证** | Tests run: 1, Failures: 0, Errors: 0 |
+
+> **⚠️ 提醒**: 详细验证流程和故障排查见[第10章 代码生成流程](#10-代码生成流程)
+
+---
+
 ## 📋 目录
 
 1. [架构概览](#1-架构概览)
@@ -18,6 +49,9 @@
 8. [代码设计原则](#8-代码设计原则)
 9. [禁止事项](#9-禁止事项)
 10. [代码生成流程](#10-代码生成流程)
+11. [中间件接入层](#11-中间件接入层)
+12. [附录A: 常见问题FAQ](#附录a-常见问题faq)
+13. [附录B: 模式参考示例](#附录b-模式参考示例)
 
 ---
 
@@ -60,44 +94,22 @@
 
 ### 1.3 技术栈
 
-| 分类       | 技术                  | 说明            |
-|----------|---------------------|---------------|
-| **核心框架** | Spring Boot 3.x     | 基础框架          |
-| **持久层**  | MyBatis-Flex        | ORM框架         |
-| **消息队列** | Kafka               | 事件驱动          |
-| **缓存**   | Redis               | 分布式缓存         |
-| **线程池**  | Virtual Threads     | Java 21+ 虚拟线程 |
-| **配置管理** | Spring Boot Starter | 标准配置方式        |
+> **注**: 本项目使用以下技术栈，但规范设计时考虑了可替换性
 
-### 1.4 包结构规范
+| 分类       | 技术                  | 说明                    |
+|----------|---------------------|-----------------------|
+| **核心框架** | Spring Boot 3.x     | 基础框架                  |
+| **持久层**  | MyBatis-Flex        | ORM框架（可替换为JPA等）       |
+| **消息队列** | Kafka               | 事件驱动（可替换为RabbitMQ等）   |
+| **缓存**   | Redis               | 分布式缓存（可替换为Hazelcast等） |
+| **线程池**  | Virtual Threads     | Java 21+ 虚拟线程         |
+| **配置管理** | Spring Boot Starter | 标准配置方式                |
 
-```
-org.smm.archetype
-├── adapter/              # 适配层（接口层）
-│   ├── access/          # 接入适配（Controller、Listener）
-│   ├── repository/      # 仓储适配（如果需要）
-│   └── config/          # 适配层配置
-├── application/         # 应用层
-│   ├── service/         # 应用服务
-│   ├── command/         # 命令对象
-│   ├── query/           # 查询对象
-│   └── dto/            # 数据传输对象
-├── domain/             # 领域层
-│   ├── model/          # 领域模型
-│   │   ├── aggregate/  # 聚合根
-│   │   ├── entity/     # 实体
-│   │   └── vo/         # 值对象
-│   ├── service/        # 领域服务
-│   ├── event/          # 领域事件
-│   └── repository/     # 仓储接口
-├── infrastructure/     # 基础设施层
-│   ├── persistence/    # 持久化实现
-│   ├── messaging/      # 消息中间件
-│   ├── cache/          # 缓存实现
-│   └── config/         # 基础设施配置
-└── start/             # 启动模块
-    └── resources/      # 配置文件
-```
+**技术选型原则**:
+
+- 优先选择标准技术栈，避免vendor lock-in
+- 通过接口隔离实现技术可替换性
+- 新技术选型需咨询团队决策
 
 ---
 
@@ -116,10 +128,10 @@ org.smm.archetype
 
 | 类型      | 规范        | 示例                               |
 |---------|-----------|----------------------------------|
-| **类名**  | 大驼峰       | `UserService`                    |
+| **类名**  | 大驼峰       | `XxxService`                     |
 | **接口名** | 大驼峰，可带I前缀 | `EmailService` 或 `IEmailService` |
-| **方法名** | 小驼峰       | `getUserById`                    |
-| **变量名** | 小驼峰       | `userId`                         |
+| **方法名** | 小驼峰       | `getXxxById`                     |
+| **变量名** | 小驼峰       | `xxxId`                          |
 | **常量名** | 大写+下划线    | `MAX_SIZE`                       |
 | **包名**  | 全小写       | `org.smm.archetype.domain`       |
 
@@ -146,27 +158,24 @@ org.smm.archetype
 @Getter
 @Setter
 @Builder(setterPrefix = "set")
-public class UserDTO {
+public class XxxDTO {
 
-    private String userId;
-    private String userName;
-
+    private String id;
+    private String name;
 }
 
 // ✅ 推荐：依赖注入
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class XxxServiceImpl implements XxxService {
 
-    private final UserRepository userRepository;
-
+    private final XxxRepository xxxRepository;
 }
 
 // ❌ 禁止：全包注解
 @Data  // 禁止！
-public class UserDTO {
+public class XxxDTO {
 
-    private String userId;
-
+    private String id;
 }
 ```
 
@@ -180,22 +189,20 @@ public class UserDTO {
     - `DEBUG`: 调试信息（生产环境关闭）
 
 ```java
-
 @Slf4j
 @Service
-public class UserService {
+public class XxxService {
 
-    public void createUser(User user) {
-        log.info("Creating user: userId={}", user.getUserId());
+    public void process(XxxEntity entity) {
+        log.info("Processing entity: id={}", entity.getId());
         try {
             // 业务逻辑
-            log.debug("User created successfully: userId={}", user.getUserId());
+            log.debug("Entity processed successfully: id={}", entity.getId());
         } catch (Exception e) {
-            log.error("Failed to create user: userId={}", user.getUserId(), e);
+            log.error("Failed to process entity: id={}", entity.getId(), e);
             throw e;
         }
     }
-
 }
 ```
 
@@ -203,14 +210,21 @@ public class UserService {
 
 **统一配置**: 使用 `ThreadPoolConfigure` 中的线程池
 
+> **技术说明**: 本项目使用 Spring Boot 3.x + Virtual Threads
+
 | 线程池                   | 类型   | 使用场景            |
 |-----------------------|------|-----------------|
-| `ioTaskExecutor`      | 虚拟线程 | IO密集型任务（数据库、网络） |
+| `ioTaskExecutor`      | 平台线程 | IO密集型任务（数据库、网络） |
 | `virtualTaskExecutor` | 虚拟线程 | 轻量级并发任务         |
-| `cpuTaskExecutor`     | 平台线程 | CPU密集型任务（需注意）   |
+| `cpuTaskExecutor`     | 平台线程 | CPU密集型任务        |
+| `daemonTaskExecutor`  | 平台线程 | 低优先级后台任务        |
+
+> **其他框架**:
+> - Spring: `@Async`注解
+> - Java 21+: Virtual Threads (虚拟线程)
+> - Java 8-20: 使用传统线程池
 
 ```java
-
 @Autowired
 @Qualifier(ThreadPoolConfigure.IO_TASK_EXECUTOR)
 private ExecutorService ioExecutor;
@@ -220,6 +234,94 @@ public void asyncTask() {
     // 异步任务
 }
 ```
+
+### 2.6 SpringBoot Bean管理规范
+
+**核心原则：显式优于隐式，配置优于约定**
+
+#### Bean注册规范
+
+- **✅ 强制规范**：所有 Bean 必须通过 `@Configuration` 配置类 + `@Bean` 注解显式注册
+- **❌ 严格禁止**：禁止使用 `@Component`、`@Service`、`@Repository` 等类级别注解自动注册 Bean（除Domain层实体外）
+
+#### 依赖注入规范
+
+**1. 跨配置类的依赖 - 使用构造器注入**
+
+- **✅ 强制规范**：必须使用构造器注入 + Lombok `@RequiredArgsConstructor` 或手动编写构造函数
+- **✅ 可选依赖**：使用 `java.util.Optional<T>` 包装依赖类型，Spring会自动注入 `Optional.empty()` 如果Bean不存在
+- **❌ 严格禁止**：禁止使用 `@Autowired` 字段注入或 setter 注入
+
+```java
+
+@Configuration
+@RequiredArgsConstructor  // 或者手动编写构造函数
+public class XxxConfig {
+
+    // 必需依赖
+    private final DataSource dataSource;
+
+    // 可选依赖 - 使用Optional包装
+    private final Optional<KafkaEventPublisher> kafkaPublisher;
+
+    @Bean
+    public SomeBean someBean() {
+        // 使用注入的依赖
+        kafkaPublisher.ifPresent(publisher -> {
+            // 使用publisher
+        });
+        return new SomeBean(dataSource);
+    }
+
+}
+```
+
+**2. 同一配置类内的Bean依赖 - 使用@Bean方法参数注入**
+
+- **✅ 推荐方式**：在 `@Bean` 方法参数上直接声明依赖，Spring会自动注入
+- **✅ 可选依赖**：使用 `@Autowired(required = false)` 标记可选参数
+- **💡 原因**：避免循环依赖，因为同一配置类内的Bean可能正在创建中
+
+```java
+
+@Configuration
+public class XxxConfig {
+
+    // Bean A
+    @Bean
+    public EventPublisher kafkaEventPublisher(...) {
+        return new KafkaEventPublisher(...)
+    }
+
+    // Bean B 依赖 Bean A - 使用方法参数注入，避免循环依赖
+    @Bean
+    public AsyncEventPublisher asyncEventPublisher(
+            @Autowired(required = false) KafkaEventPublisher kafkaPublisher,
+            @Autowired(required = false) SpringEventPublisher springPublisher) {
+        EventPublisher delegate = (kafkaPublisher != null) ? kafkaPublisher : springPublisher;
+        return new AsyncEventPublisher(delegate);
+    }
+
+}
+```
+
+**3. 循环依赖解决原则**
+
+- **✅ 正确方式**：通过重构代码、解耦依赖、改进@Bean装配来解决
+    - 跨配置类：使用构造器注入 + Optional
+    - 同配置类：使用@Bean方法参数注入
+- **❌ 绝对禁止**：
+    - 使用@Lazy注解
+    - 使用ObjectProvider延迟注入
+    - 使用ApplicationContext.getBean()依赖查找
+    - 使用@PostConstruct延迟初始化
+
+#### 配置与条件化
+
+- **配置绑定**：所有 `@ConfigurationProperties` 配置类必须通过 `@Import` 显式导入
+- **条件装配**：必须使用 `@Conditional`、`@ConditionalOnProperty`、`@ConditionalOnClass` 等注解实现条件化 Bean 注入
+
+**设计哲学**：通过显式配置提升代码可读性、可维护性和可测试性，降低框架魔法带来的认知负担。
 
 ---
 
@@ -235,33 +337,37 @@ public void asyncTask() {
 
 | 关键词       | 示例字段           | 枚举示例               |
 |-----------|----------------|--------------------|
-| type      | `userType`     | `UserEnum`         |
-| status    | `orderStatus`  | `OrderStatusEnum`  |
-| state     | `accountState` | `AccountStateEnum` |
+| type      | `xxxType`      | `XxxTypeEnum`      |
+| status    | `xxxStatus`    | `XxxStatusEnum`    |
+| state     | `xxxState`     | `XxxStateEnum`     |
 | source    | `dataSource`   | `DataSourceEnum`   |
 | business  | `businessType` | `BusinessTypeEnum` |
 | errorCode | `errorCode`    | `ErrorCodeEnum`    |
 | level     | `logLevel`     | `LogLevelEnum`     |
-| mode      | `paymentMode`  | `PaymentModeEnum`  |
+| mode      | `xxxMode`      | `XxxModeEnum`      |
 
 > 需要根据这个规则扩展，主动根据变量名语义及作用进行识别。
 
 #### 3.1.2 枚举转换规则
 
-**外部 → 内部**（反序列化）: 使用自带的`.valudOf(String str)`进行识别
+**外部 → 内部**（反序列化）: 使用 `valueOf(String)` 并带异常处理
 
 ```java
-// ✅ 正确：带异常处理和默认值
-public static OrderStatus fromString(String value) {
+// ✅ 正确举例：带异常处理和默认值
+public static XxxStatus fromString(String value) {
+    if (value == null || value.trim().isEmpty()) {
+        log.warn("Empty XxxStatus value, using default: DEFAULT");
+        return DEFAULT;
+    }
     try {
-        return OrderStatus.valueOf(value);
+        return XxxStatus.valueOf(value.toUpperCase());
     } catch (IllegalArgumentException e) {
-        log.warn("Invalid OrderStatus: {}, using default: CREATED", value);
-        return OrderStatus.CREATED;
+        log.warn("Invalid XxxStatus: {}, using default: DEFAULT", value);
+        return DEFAULT;
     }
 }
 
-// ❌ 错误：直接使用魔法值
+// ❌ 错误举例：直接使用魔法值
 if("READY".
 
 equals(status)){  // 禁止！
@@ -274,28 +380,26 @@ equals(status)){  // 禁止！
 ```java
 // ✅ 正确：使用枚举的name()
 public String getStatus() {
-    return orderStatus.name();  // 或 orderStatus.getCode()
+    return xxxStatus.name();
 }
 ```
 
-**其他情况**: 除非有特殊用途，否则禁止使用重复性描述序列化/反序列化枚举
-
-特殊用途举例：业务中无法获取XxxType类型，只能获取传入的类型，此时需要根据类名获取枚举
+**特殊用途**: 根据类名或其他属性获取枚举
 
 ```java
-import lombok.RequiredArgsConstructor;
-
 @RequiredArgsConstructor
 enum XxxEnum {
-
-    // 这里示例根据类名获取，可以定义一个className来匹配枚举
+    // 示例：根据类名获取
     XxxType("xxxHandler")
 
     private final String className;
 
     // 根据类名获取枚举
     public static XxxEnum fromClassName(String className) {
-        return java.util.Arrays.stream(values()).filter(e -> e.className.equals(className)).findFirst().orElse(null);
+        return java.util.Arrays.stream(values())
+                       .filter(e -> e.className.equals(className))
+                       .findFirst()
+                       .orElse(null);
     }
     }
 ```
@@ -310,16 +414,15 @@ enum XxxEnum {
 - 简短的定义名称，如Status、Type、Usage、Scene等
 
 ```java
-public class Product {
+public class XxxEntity {
 
     public enum Status {
-        IN_STOCK,
-        OUT_OF_STOCK,
-        PRE_ORDER
+        ACTIVE,
+        INACTIVE,
+        PENDING
     }
 
-    private Status availability;
-
+    private Status status;
 }
 ```
 
@@ -328,14 +431,13 @@ public class Product {
 - 多个类共享（类比聚合概念，可拆分）
 - 通用业务概念
 - 在API中暴露
-- 详细的定义名称，如OrderStatus，MessageType，BusinessSource等
+- 详细的定义名称
 
 ```java
-// domain/model/enums/OrderStatus.java
-public enum OrderStatus {
+// domain/model/enums/XxxStatus.java
+public enum XxxStatus {
     CREATED,
-    PAID,
-    SHIPPED,
+    PROCESSING,
     COMPLETED,
     CANCELLED
 }
@@ -362,32 +464,30 @@ public enum OrderStatus {
 - 拥有唯一标识
 
 ```java
-
 @Getter
-public class Order {
+public class XxxAggregate {
 
-    private final OrderId         orderId;
-    private       List<OrderItem> items;
-    private       OrderStatus     status;
+    private final XxxAggregateId  aggregateId;
+    private       List<XxxEntity> entities;
+    private       XxxStatus       status;
 
     // 业务行为
-    public void addItem(Product product, int quantity) {
+    public void addEntity(XxxValueObject value) {
         // 业务规则验证
-        if (status != OrderStatus.CREATED) {
-            throw new IllegalStateException("Cannot add item to non-created order");
+        if (status != XxxStatus.READY) {
+            throw new IllegalStateException("Cannot add entity in current state");
         }
-        items.add(new OrderItem(product, quantity));
+        entities.add(new XxxEntity(value));
     }
 
-    public void pay() {
-        if (items.isEmpty()) {
-            throw new IllegalStateException("Cannot pay empty order");
+    public void complete() {
+        if (entities.isEmpty()) {
+            throw new IllegalStateException("Cannot complete empty aggregate");
         }
-        this.status = OrderStatus.PAID;
+        this.status = XxxStatus.COMPLETED;
         // 发布领域事件
-        registerEvent(new OrderPaidEvent(orderId));
+        registerEvent(new XxxCompletedEvent(aggregateId));
     }
-
 }
 ```
 
@@ -400,23 +500,21 @@ public class Order {
 - 可变状态
 
 ```java
-
 @Getter
 @Setter
-public class User {
+public class XxxEntity {
 
-    private UserId userId;
-    private String userName;
-    private Email  email;
+    private XxxEntityId entityId;
+    private String      name;
+    private XxxValue    value;
 
-    public void changeEmail(Email newEmail) {
-        if (this.email.equals(newEmail)) {
+    public void changeValue(XxxValue newValue) {
+        if (this.value.equals(newValue)) {
             return; // 幂等性
         }
-        this.email = newEmail;
-        // 发送邮件变更事件
+        this.value = newValue;
+        // 发送值变更事件
     }
-
 }
 ```
 
@@ -429,24 +527,22 @@ public class User {
 - 可替换
 
 ```java
-
 @Value
 @Builder(setterPrefix = "set")
-public class Email {
+public class XxxValue {
 
     String value;
 
-    public static Email of(String email) {
-        if (!isValid(email)) {
-            throw new IllegalArgumentException("Invalid email: " + email);
+    public static XxxValue of(String value) {
+        if (!isValid(value)) {
+            throw new IllegalArgumentException("Invalid value: " + value);
         }
-        return new Email(email.toLowerCase());
+        return new XxxValue(value);
     }
 
-    private static boolean isValid(String email) {
-        return email != null && email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
+    private static boolean isValid(String value) {
+        return value != null && !value.isBlank();
     }
-
 }
 ```
 
@@ -454,12 +550,12 @@ public class Email {
 
 **事件命名规范**: 动词 + 名词 + 过去式后缀
 
-| 事件类型 | 命名                  | 示例                      |
-|------|---------------------|-------------------------|
-| 已创建  | `XxxCreatedEvent`   | `OrderCreatedEvent`     |
-| 已更新  | `XxxUpdatedEvent`   | `OrderUpdatedEvent`     |
-| 已删除  | `XxxDeletedEvent`   | `OrderDeletedEvent`     |
-| 已完成  | `XxxCompletedEvent` | `PaymentCompletedEvent` |
+| 事件类型 | 命名                  |
+|------|---------------------|
+| 已创建  | `XxxCreatedEvent`   |
+| 已更新  | `XxxUpdatedEvent`   |
+| 已删除  | `XxxDeletedEvent`   |
+| 已完成  | `XxxCompletedEvent` |
 
 ---
 
@@ -512,27 +608,27 @@ CREATE TABLE `xxx`
 
 #### 4.2.3 索引命名规范
 
-| 索引类型 | 命名格式             | 示例                         |
-|------|------------------|----------------------------|
-| 主键   | `PRIMARY`        | `PRIMARY KEY (id)`         |
-| 唯一索引 | `uk_表名_字段名`      | `uk_order_order_no`        |
-| 普通索引 | `idx_表名_字段名`     | `idx_order_user_id`        |
-| 复合索引 | `idx_表名_字段1_字段2` | `idx_order_user_id_status` |
+| 索引类型 | 命名格式             | 示例                          |
+|------|------------------|-----------------------------|
+| 主键   | `PRIMARY`        | `PRIMARY KEY (id)`          |
+| 唯一索引 | `uk_表名_字段名`      | `uk_xxx_xxx_no`             |
+| 普通索引 | `idx_表名_字段名`     | `idx_xxx_xxx_id`            |
+| 复合索引 | `idx_表名_字段1_字段2` | `idx_xxx_xxx_id_xxx_status` |
 
 ### 4.3 仓储模式
 
 **接口定义**（Domain层）:
 
 ```java
-public interface OrderRepository {
+public interface XxxRepository {
 
-    Order save(Order order);
+    Xxx save(Xxx entity);
 
-    Optional<Order> findById(OrderId orderId);
+    Optional<Xxx> findById(XxxId id);
 
-    List<Order> findByUserId(UserId userId);
+    List<Xxx> findByCriteria(XxxQuery query);
 
-    void delete(OrderId orderId);
+    void delete(XxxId id);
 
 }
 ```
@@ -540,27 +636,28 @@ public interface OrderRepository {
 **实现类**（Infrastructure层）:
 
 ```java
-
 @Repository
 @RequiredArgsConstructor
-public class OrderRepositoryImpl implements OrderRepository {
+public class XxxRepositoryImpl implements XxxRepository {
 
-    private final OrderMapper        orderMapper;
+    private final XxxMapper mapper;
     private final DoConverterService doConverterService;
 
     @Override
-    public Order save(Order order) {
-        OrderDO orderDO = doConverterService.toOrderDO(order);
-        orderMapper.insert(orderDO);
-        return order;
+    public Xxx save(Xxx entity) {
+        XxxDO entityDO = doConverterService.toXxxDO(entity);
+        mapper.insert(entityDO);
+        return entity;
     }
-
 }
 ```
 
 ---
 
 ## 5. 事件驱动机制
+
+> **技术说明**: 本项目使用 Kafka 作为消息队列，Spring Events 作为本地事件总线
+> 详细实现参考[附录B: 模式参考示例](#附录b-模式参考示例)
 
 ### 5.1 事件发布架构
 
@@ -569,7 +666,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 │                   领域层（Domain）                        │
 │  ┌──────────────┐         ┌──────────────────────────┐  │
 │  │ Aggregate    │────────▶│ DomainEvent              │  │
-│  │ Root         │ publish  │ (OrderCreatedEvent)      │  │
+│  │ Root         │ publish  │ (XxxCreatedEvent)        │  │
 │  └──────────────┘         └──────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
          │
@@ -579,9 +676,9 @@ public class OrderRepositoryImpl implements OrderRepository {
 │              基础设施层（Infrastructure）                 │
 │  ┌──────────────────────────────────────────────────┐   │
 │  │ EventPublisher Impl                               │   │
-│  │  - AbstractEventPublisher                         │   │
-│  │  - KafkaEventPublisher                            │   │
-│  │  - SpringEventPublisher                           │   │
+│  │  - AbstractEventPublisher (模板方法)               │   │
+│  │  - KafkaEventPublisher (消息队列)                  │   │
+│  │  - SpringEventPublisher (本地事件)                 │   │
 │  └──────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
          │
@@ -591,8 +688,9 @@ public class OrderRepositoryImpl implements OrderRepository {
 │                 适配层（Adapter）                         │
 │  ┌──────────────────────────────────────────────────┐   │
 │  │ EventListener                                      │   │
-│  │  - KafkaEventListener                              │   │
-│  │  - SpringEventListener                             │   │
+│  │  - AbstractEventConsumer (模板方法)                │   │
+│  │  - KafkaEventListener (消息队列监听)                │   │
+│  │  - SpringEventListener (本地事件监听)               │   │
 │  └──────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -600,56 +698,54 @@ public class OrderRepositoryImpl implements OrderRepository {
 ### 5.2 事件发布流程
 
 ```java
-// 1. 聚合根中发布事件
+// 应用服务中发布事件
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class XxxApplicationService {
 
     private final EventPublisher eventPublisher;
+    private final XxxRepository xxxRepository;
 
     @Transactional
-    public void createOrder(Order order) {
+    public void createXxx(Xxx entity) {
         // 保存聚合
-        orderRepository.save(order);
+        xxxRepository.save(entity);
 
         // 收集并发布事件
-        List<DomainEvent> events = order.getEvents();
+        List<DomainEvent> events = entity.getEvents();
         eventPublisher.publish(events);
 
         // 清空事件
-        clearEvents();
+        entity.clearEvents();
     }
-
 }
 ```
 
 ### 5.3 事件消费流程
 
 ```java
-
 @Slf4j
 @Component
-public class OrderEventListener extends AbstractEventConsumer<OrderEvent> {
+public class XxxEventListener extends AbstractEventConsumer<XxxEvent> {
 
     @Override
     protected String getConsumerGroup() {
-        return "order-consumer-group";
+        return "xxx-consumer-group";
     }
 
     @Override
-    @KafkaListener(topics = "order-events")
-    public void onEvent(OrderEvent event) {
+    @KafkaListener(topics = "xxx-events")
+    public void onEvent(XxxEvent event) {
         // 父类实现幂等性、重试、状态管理
         consume(event);
     }
 
     @Override
-    protected void doConsume(OrderEvent event, EventConsumeDO consumeDO) {
+    protected void doConsume(XxxEvent event, EventConsumeDO consumeDO) {
         // 业务处理逻辑
         // 处理成功会自动更新状态为CONSUMED
         // 处理失败会自动重试或标记为FAILED
     }
-
 }
 ```
 
@@ -701,23 +797,21 @@ private Instant calculateNextRetryTime(int retryTimes) {
 - 返回响应
 
 ```java
-
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/xxx")
 @RequiredArgsConstructor
-public class OrderController {
+public class XxxController {
 
-    private final OrderApplicationService orderApplicationService;
+    private final XxxApplicationService applicationService;
 
     @PostMapping
-    public Result<OrderVO> createOrder(@RequestBody @Valid OrderCreateRequest request) {
+    public Result<XxxVO> create(@RequestBody @Valid XxxCreateRequest request) {
         // 1. 参数验证（通过@Valid）
         // 2. 调用应用服务
-        Order order = orderApplicationService.createOrder(request);
+        Xxx entity = applicationService.create(request);
         // 3. 转换为VO
-        return Result.success(OrderVO.from(order));
+        return Result.success(XxxVO.from(entity));
     }
-
 }
 ```
 
@@ -737,33 +831,31 @@ public class OrderController {
 - 调用领域服务
 
 ```java
-
 @ApplicationService
 @RequiredArgsConstructor
-public class OrderApplicationService {
+public class XxxApplicationService {
 
-    private final OrderRepository orderRepository;
-    private final UserRepository  userRepository;
-    private final EventPublisher  eventPublisher;
+    private final XxxRepository     xxxRepository;
+    private final RelatedRepository relatedRepository;
+    private final EventPublisher    eventPublisher;
 
     @Transactional(rollbackFor = Exception.class)
-    public Order createOrder(OrderCreateRequest request) {
-        // 1. 验证用户存在
-        User user = userRepository.findById(UserId.of(request.getUserId()))
-                            .orElseThrow(() -> new UserNotFoundException(request.getUserId()));
+    public Xxx create(XxxCreateRequest request) {
+        // 1. 验证关联实体存在
+        RelatedEntity related = relatedRepository.findById(RelatedId.of(request.getRelatedId()))
+                                        .orElseThrow(() -> new RelatedNotFoundException(request.getRelatedId()));
 
-        // 2. 创建订单（领域逻辑）
-        Order order = Order.create(user, request.getItems());
+        // 2. 创建实体（领域逻辑）
+        Xxx entity = Xxx.create(related, request.getItems());
 
         // 3. 保存聚合
-        orderRepository.save(order);
+        xxxRepository.save(entity);
 
         // 4. 发布事件
-        eventPublisher.publish(order.getEvents());
+        eventPublisher.publish(entity.getEvents());
 
-        return order;
+        return entity;
     }
-
 }
 ```
 
@@ -833,54 +925,49 @@ public class OrderApplicationService {
 - 覆盖正常分支和异常分支
 
 ```java
-
 @ExtendWith(MockitoExtension.class)
-class OrderServiceTest {
+class XxxServiceTest {
 
     @Mock
-    private OrderRepository orderRepository;
+    private XxxRepository xxxRepository;
 
     @InjectMocks
-    private OrderService orderService;
+    private XxxService xxxService;
 
     @Test
-    @DisplayName("创建订单 - 成功")
-    void createOrder_Success() {
+    @DisplayName("创建实体 - 成功")
+    void create_Success() {
         // Given
-        OrderCreateRequest request = OrderCreateRequest.builder()
-                                             .userId("user123")
-                                             .items(List.of(new OrderItem("product1", 2)))
-                                             .build();
+        XxxCreateRequest request = XxxCreateRequest.builder()
+                                           .name("test")
+                                           .build();
 
-        User user = new User(UserId.of("user123"));
-
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(xxxRepository.findById(any())).thenReturn(Optional.of(new Entity()));
 
         // When
-        Order order = orderService.createOrder(request);
+        Xxx entity = xxxService.create(request);
 
         // Then
-        assertNotNull(order);
-        assertEquals(OrderStatus.CREATED, order.getStatus());
-        verify(orderRepository, times(1)).save(any(Order.class));
+        assertNotNull(entity);
+        assertEquals(XxxStatus.CREATED, entity.getStatus());
+        verify(xxxRepository, times(1)).save(any(Xxx.class));
     }
 
     @Test
-    @DisplayName("创建订单 - 用户不存在")
-    void createOrder_UserNotFound() {
+    @DisplayName("创建实体 - 实体不存在")
+    void create_EntityNotFound() {
         // Given
-        OrderCreateRequest request = OrderCreateRequest.builder()
-                                             .userId("non-existent")
-                                             .build();
+        XxxCreateRequest request = XxxCreateRequest.builder()
+                                           .relatedId("non-existent")
+                                           .build();
 
-        when(userRepository.findById(any())).thenReturn(Optional.empty());
+        when(xxxRepository.findById(any())).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(UserNotFoundException.class, () -> {
-            orderService.createOrder(request);
+        assertThrows(EntityNotFoundException.class, () -> {
+            xxxService.create(request);
         });
     }
-
 }
 ```
 
@@ -889,13 +976,13 @@ class OrderServiceTest {
 ```java
 // 格式: 方法名_场景_预期结果
 @Test
-void createUser_Success() {}
+void createEntity_Success() {}
 
 @Test
-void createUser_UserAlreadyExists_ThrowsException() {}
+void createEntity_EntityAlreadyExists_ThrowsException() {}
 
 @Test
-void deleteUser_UserNotFound_ReturnsFalse() {}
+void deleteEntity_EntityNotFound_ReturnsFalse() {}
 ```
 
 ---
@@ -906,7 +993,7 @@ void deleteUser_UserNotFound_ReturnsFalse() {}
 
 | 原则           | 说明          | 示例                   |
 |--------------|-------------|----------------------|
-| **S** - 单一职责 | 一个类只负责一件事   | UserService只负责用户相关逻辑 |
+| **S** - 单一职责 | 一个类只负责一件事   | XxxService只负责Xxx相关逻辑 |
 | **O** - 开闭原则 | 对扩展开放，对修改关闭 | 使用接口+实现              |
 | **L** - 里氏替换 | 子类可替换父类     | 子类不违反父类契约            |
 | **I** - 接口隔离 | 接口小而专注      | 拆分大接口                |
@@ -918,24 +1005,24 @@ void deleteUser_UserNotFound_ReturnsFalse() {}
 
 ```java
 // ✅ 正确：接口+实现
-public interface EmailService {
-    void sendEmail(String to, String subject, String content);
+public interface XxxService {
+
+    Result execute(Request request);
 }
 
 @Service
-public class SmtpEmailServiceImpl implements EmailService {
+public class XxxServiceImpl implements XxxService {
     @Override
-    public void sendEmail(String to, String subject, String content) {
-        // SMTP实现
+    public Result execute(Request request) {
+        // 实现
     }
-
 }
 
 // ❌ 错误：直接使用实现类
 @Service
-public class EmailService {  // 缺少接口
+public class XxxService {  // 缺少接口
 
-    public void sendEmail(String to, String subject, String content) {
+    public Result execute(Request request) {
         // 实现
     }
 }
@@ -949,32 +1036,150 @@ public class EmailService {  // 缺少接口
 // ✅ 正确：构造函数注入
 @Service
 @RequiredArgsConstructor  // Lombok自动生成构造函数
-public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
-    private final EmailService emailService;
+public class XxxServiceImpl implements XxxService {
 
+    private final XxxRepository  xxxRepository;
+    private final RelatedService relatedService;
 }
 
 // ❌ 错误：字段注入
 @Service
-public class UserServiceImpl implements UserService {
+public class XxxServiceImpl implements XxxService {
 
     @Autowired
-    private UserRepository userRepository;  // 不推荐
-
+    private XxxRepository xxxRepository;  // 不推荐
 }
 
 // ❌ 错误：Setter注入
 @Service
-public class UserServiceImpl implements UserService {
+public class XxxServiceImpl implements XxxService {
 
     @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public void setXxxRepository(XxxRepository xxxRepository) {
+        this.xxxRepository = xxxRepository;
     }
 
 }
 ```
+
+### 8.4 接口-实现分离模式（三层架构）
+
+> **核心原则**: 所有通用服务必须遵循三层架构模式，预留多种实现的扩展能力
+> 详细实现参考[附录B: 模式参考示例](#附录b-模式参考示例)
+
+#### 8.4.1 三层架构模式
+
+```
+┌─────────────────────────────────────────────────┐
+│  Layer 1: Domain Interface (领域层接口)          │
+│  - 定义业务契约（技术无关）                          │
+│  - 位置: domain/_shared/service 或 domain/xxx    │
+└─────────────────────────────────────────────────┘
+                    ↓ defines
+┌─────────────────────────────────────────────────┐
+│  Layer 2: Abstract Base (抽象基类)              │
+│  - 实现通用流程模板（日志、异常处理）                   │
+│  - 定义扩展点（doXxx方法）                        │
+│  - 位置: infrastructure/_shared/service/base     │
+└─────────────────────────────────────────────────┘
+                    ↓ extends
+┌─────────────────────────────────────────────────┐
+│  Layer 3: Concrete Implementation (具体实现)    │
+│  - 接入具体技术（Redis、Kafka等）                  │
+│  - 条件装配（@ConditionalOnProperty）            │
+│  - 位置: infrastructure/xxx/service/impl         │
+└─────────────────────────────────────────────────┘
+```
+
+**何时使用三层架构**:
+
+- ✅ 通用服务（缓存、队列、存储等）
+- ✅ 可能有多种实现的服务
+- ✅ 需要统一处理流程的服务（日志、异常处理等）
+- ❌ 简单的一次性业务逻辑
+- ❌ 纯数据对象（DTO、VO等）
+
+#### 8.4.2 模板方法模式
+
+**场景**: 服务有通用流程但技术实现不同
+
+**示例**:
+
+```java
+// Layer 1: Domain Interface
+public interface XxxService {
+
+    Result execute(Request request);
+
+}
+
+// Layer 2: Abstract Base with Template Method
+public abstract class AbstractXxxService implements XxxService {
+
+    @Override
+    public final Result execute(Request request) {
+        // 1. 通用前置处理
+        validate(request);
+        Request processed = preprocess(request);
+
+        // 2. 抽象扩展点（由子类实现）
+        Result result = doExecute(processed);
+
+        // 3. 通用后置处理
+        postprocess(result);
+
+        return result;
+    }
+
+    /**
+     * 扩展点：实际执行逻辑（由子类实现）
+     */
+    protected abstract Result doExecute(Request request);
+
+    protected void validate(Request request) { /* 通用校验 */ }
+
+    protected Request preprocess(Request request) {return request;}
+
+    protected void postprocess(Result result) { /* 通用后处理 */ }
+
+}
+
+// Layer 3: Concrete Implementation
+@Service
+public class RedisXxxServiceImpl extends AbstractXxxService {
+
+    @Override
+    protected Result doExecute(Request request) {
+        // Redis specific implementation
+    }
+}
+```
+
+#### 8.4.3 命名规范
+
+| 层级             | 接口命名         | 抽象类命名                | 实现类命名                 |
+|----------------|--------------|----------------------|-----------------------|
+| Domain         | `XxxService` | -                    | -                     |
+| Infrastructure | -            | `AbstractXxxService` | `RedisXxxServiceImpl` |
+
+**后缀规范**:
+
+- 接口: 无后缀或`Service`
+- 抽象类: `Abstract`前缀
+- 实现类: 技术栈前缀 + `Impl`后缀
+    - ✅ `RedisCacheServiceImpl`
+    - ✅ `KafkaEventPublisher`
+    - ❌ `CacheServiceRedis` (错误)
+
+**命名策略**:
+
+1. **单一实现**: 使用 `{Name}Impl`
+    - 示例: `UserRepositoryImpl`
+2. **多实现**: 使用 `{Technology}{Name}Impl` 或 `{Name}{Technology}Impl`
+    - 示例: `RedisCacheServiceImpl`, `KafkaEventPublisher`
+3. **技术无关**: 不在接口名中暴露技术
+    - ✅ `EventPublisher` (接口)
+    - ❌ `KafkaEventPublisher` (作为接口名)
 
 ---
 
@@ -1016,50 +1221,261 @@ public class UserServiceImpl implements UserService {
 
 ### 9.4 架构层面
 
-| 禁止项         | 说明                                     |
-|-------------|----------------------------------------|
-| ❌ 内层依赖外层    | 违反依赖倒置                                 |
-| ❌ 领域层依赖基础设施 | 领域层应保持纯净                               |
-| ❌ 跨层访问      | 遵循分层调用链                                |
-| ❌ 修改生成代码    | `infrastructure._shared.generated`禁止修改 |
+| 禁止项         | 说明                                                       |
+|-------------|----------------------------------------------------------|
+| ❌ 内层依赖外层    | 违反依赖倒置                                                   |
+| ❌ 领域层依赖基础设施 | 领域层应保持纯净                                                 |
+| ❌ 跨层访问      | 遵循分层调用链                                                  |
+| ❌ 修改生成代码    | `org.smm.archetype.infrastructure._shared.generated`禁止修改 |
 
 ---
 
 ## 10. 代码生成流程
 
-### 10.1 生成步骤
+> **🚨 强制要求 - 必须严格遵守**:
+>
+> 生成代码后，**必须**按顺序完成以下**4个强制验证步骤**，任何一步失败都**不允许**进入下一步
+
+### 10.1 验证流程概览
 
 ```mermaid
 graph LR
     A[需求分析] --> B[确定代码位置]
     B --> C[按照规范生成代码]
-    C --> D[生成单元测试]
+    C --> D[编写单元测试]
     D --> E[编译验证]
-    E --> F{测试通过?}
-    F -->|否| G[修复问题]
+    E --> F{编译通过?}
+    F -->|否| G[修复编译错误]
     G --> E
-    F -->|是| H[代码审查]
-    H --> I{符合规范?}
-    I -->|否| G
-    I -->|是| J[完成]
+    F -->|是| H[执行单元测试]
+    H --> I{单元测试通过?}
+    I -->|否| J[修复测试失败]
+    J --> H
+    I -->|是| K[执行启动测试]
+    K --> L{启动成功且无ERROR?}
+    L -->|否| M[修复启动问题]
+    M --> K
+    L -->|是| N[代码审查]
+    N --> O{符合规范?}
+    O -->|否| J
+    O -->|是| P[完成]
 ```
 
-### 10.2 生成检查清单
+### 10.2 步骤1：编写单元测试
 
-**必须全部通过**:
+**要求**: 在生成代码的同时编写单元测试
 
-- [ ] **编译通过**: 无编译错误
-- [ ] **测试通过**: 单元测试全部通过
-- [ ] **分层正确**: 依赖方向正确
-- [ ] **接口分离**: 通用服务有接口
-- [ ] **枚举标准**: 无魔法值
-- [ ] **日志规范**: 使用@Slf4j
-- [ ] **注释完整**: public方法有Javadoc
-- [ ] **禁止项检查**: 不违反任何禁止事项
-- [ ] **数据库规范**: 符合字段规范
-- [ ] **配置规范**: 使用统一线程池
+**验证标准**: ✅ 测试类已创建，覆盖核心业务逻辑和异常分支
 
-### 10.3 质量标准
+### 10.3 步骤2：编译验证
+
+**命令**:
+
+```bash
+# 清理并编译项目
+mvn clean compile
+
+# 或者跳过测试编译（快速验证）
+mvn clean compile -DskipTests
+```
+
+**验证要点**:
+
+- ✅ 无编译错误
+- ✅ 无警告（特别注意MapStruct、Lombok相关警告）
+- ✅ MapStruct转换器正常生成
+- ✅ 注解处理器正常工作
+
+**验证标准**: ✅ `BUILD SUCCESS`，无ERROR
+
+**常见编译问题**:
+
+- MapStruct转换器未生成 → 检查注解处理器配置
+- Lombok与MapStruct冲突 → 确保lombok-mapstruct-binding版本正确
+- 类型转换错误 → 检查@Mapping注解配置
+
+### 10.4 步骤3：执行单元测试
+
+**命令**:
+
+```bash
+# 运行所有单元测试
+mvn test
+
+# 运行指定模块的测试
+mvn test -pl domain
+
+# 运行指定测试类
+mvn test -Dtest=OrderTest
+
+# 运行指定测试方法
+mvn test -Dtest=OrderTest#testCreateOrder
+
+# 生成测试覆盖率报告
+mvn test jacoco:report
+```
+
+**验证要点**:
+
+- ✅ 所有单元测试通过
+- ✅ 测试覆盖率符合要求（建议Domain层>80%）
+- ✅ 无跳过的测试
+- ✅ 测试日志清晰可读
+
+**验证标准**: ✅ `BUILD SUCCESS`，Tests run > 0, Failures: 0
+
+**测试失败处理流程**:
+
+1. 查看失败的堆栈信息
+2. 定位失败原因（逻辑错误、配置问题、依赖问题）
+3. 修复代码
+4. 重新运行测试：`mvn test -Dtest=FailedTest`
+5. 确保修复后不影响其他测试
+
+### 10.5 步骤4：主启动类启动验证（**最关键**）
+
+> **⚠️ 警告**: 此步骤验证主启动类能否成功启动，是最后一道关卡，必须100%通过才能提交代码
+
+**目的**: 通过`ApplicationStartupTests`测试类验证主启动类`ApplicationBootstrap#main`能够成功启动
+
+**命令**:
+
+```bash
+# 运行ApplicationStartupTests测试类
+mvn test -Dtest=ApplicationStartupTests -pl start
+
+# 或者在IDE中直接运行测试类
+# start/src/test/java/org/smm/archetype/ApplicationStartupTests.java
+# 点击contextLoads()方法运行
+```
+
+**测试原理**:
+
+- `ApplicationStartupTests`测试类使用`SpringApplicationBuilder`启动主启动类`ApplicationBootstrap`
+- 验证Spring上下文成功加载，所有Bean通过配置类正确初始化
+- 验证Tomcat服务器成功启动
+- 测试完成后立即关闭上下文，避免阻塞
+
+**⚠️ 启动测试必须保持纯洁**:
+
+- ❌ **严格禁止**使用`@MockBean` - 启动测试应验证主启动类ApplicationBootstrap的真实Bean装配
+- ❌ **严格禁止**Mock核心组件 - DataSource、RedisTemplate、KafkaTemplate等必须真实存在
+- ✅ **允许Mock外部服务** - 仅允许Mock真正的外部服务（如阿里云API）
+- ✅ **使用主配置文件** - 通过application.yaml验证真实环境启动
+
+**验证要点**:
+
+- ✅ **测试类运行成功**: `ApplicationStartupTests`测试类执行
+- ✅ **主启动类启动成功**: 通过测试类启动`ApplicationBootstrap`的main方法
+- ✅ **Tomcat服务器启动**: 在端口9101成功启动Web服务器
+- ✅ **Bean装配成功**: 所有Bean通过配置类正确初始化
+- ✅ **无ERROR日志**: 检查测试输出中无ERROR级别日志
+- ✅ **自动关闭上下文**: 测试完成后自动优雅关闭
+
+**成功标志**:
+
+```
+[INFO] Tomcat started on port 9101 (http) with context path '/quickstart'
+[INFO] [quickstart]应用启动成功!
+============================================
+主启动类启动验证通过
+============================================
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+```
+
+**验证标准**: ✅ `BUILD SUCCESS`，Tests run: 1, Failures: 0, Errors: 0
+
+**❌ 失败标志 - 必须修复后重试**:
+
+```
+[ERROR] BUILD FAILURE
+[ERROR] COMPILATION ERROR
+[INFO] Tests run: 1, Failures: 1, Errors: 1
+Exception: BeanCreationException
+Exception: NoSuchBeanDefinitionException
+```
+
+**常见启动失败问题**:
+
+| 错误类型                                | 常见原因        | 解决方法                     |
+|-------------------------------------|-------------|--------------------------|
+| `BeanCreationException`             | Bean依赖注入失败  | 检查配置类@Bean方法参数，确保依赖完整    |
+| `NoSuchBeanDefinitionException`     | 接口未找到实现     | 检查配置类中是否有对应的@Bean方法      |
+| `Autowired dependency not found`    | 循环依赖或缺少Bean | 检查配置类依赖关系，**重构代码消除循环依赖** |
+| `Property placeholder not found`    | 配置文件缺失      | 检查application.yaml配置项    |
+| `Failed to load ApplicationContext` | 上下文初始化失败    | 查看详细堆栈，定位具体错误Bean        |
+| `Connection refused`                | 数据库/外部服务未启动 | 检查依赖服务状态，使用主配置文件         |
+| `ERROR日志输出`                         | 代码逻辑错误或配置问题 | 查看ERROR日志上下文，修复问题        |
+
+**ERROR日志检查方法**:
+
+```bash
+# 运行测试并查看完整日志
+mvn test -Dtest=ApplicationStartupTests -pl start | grep -i "error"
+
+# 或者检查Maven输出中的ERROR级别日志
+# 如果出现任何ERROR，需要修复后重新验证
+```
+
+**主启动类启动测试失败处理流程**:
+
+1. **查看异常堆栈**: 找到导致失败的根异常
+2. **定位问题Bean**: 根据`BeanCreationException`定位失败的Bean
+3. **分析原因及解决方案**:
+    - 缺少依赖 → 添加依赖或Mock
+    - 循环依赖 → 必须通过重构架构、解耦代码、改进@Bean装配来解决，绝对禁止使用懒加载@Lazy注解、延迟加载、ObjectProvider、getBean来解决循环依赖
+    - 配置错误 → 修正配置文件，如果是外部组件配置问题（如账号密码错误、找不到端口或地址等），则进行反馈
+    - 代码错误 → 修复代码逻辑
+4. **修复代码**: 根据问题类型修复
+5. **重新验证**: 运行`mvn test -Dtest=ApplicationStartupTests -pl start`
+6. **确认无ERROR**: 检查日志输出，确保无ERROR级别
+
+**注意事项**:
+
+- ⚠️ 启动测试比单元测试慢，仅在代码生成完成后运行
+- ⚠️ 使用`-pl start`指定start模块，避免运行其他模块测试
+- ⚠️ 如果依赖外部服务（数据库、Kafka等），确保服务可用或使用test profile的mock配置
+- ⚠️ 即使测试通过，也需检查日志中是否有WARNING，WARNING可能暗示潜在问题
+
+**配置要求**:
+
+- 确保`application-test.yaml`配置完整
+- 使用`@ActiveProfiles("test")`启用测试配置
+- 测试环境应使用独立配置（如H2内存数据库、Mock服务）
+
+### 10.6 代码质量检查清单
+
+> **🚨 关键要求**: 本清单应与[步骤1-4](#101-验证流程概览)的验证流程配合使用，确保代码质量
+
+#### ✅ 编译与测试验证
+
+- [ ] **编译通过**: 运行`mvn clean compile`无错误（参考[步骤2](#103-步骤2编译验证)）
+- [ ] **单元测试通过**: 运行`mvn test`所有测试用例通过（参考[步骤3](#104-步骤3执行单元测试)）
+- [ ] **启动测试通过**: 运行`mvn test -Dtest=ApplicationStartupTests -pl start`成功（参考[步骤4](#105-步骤4主启动类启动验证最关键)）
+- [ ] **测试覆盖率**: Domain层测试覆盖率>80%
+
+#### ✅ 架构规范检查
+
+- [ ] **分层正确**: 依赖方向正确（Adapter → App → Domain ← Infrastructure）
+- [ ] **接口分离**: 通用服务有接口，实现在Infrastructure层（参考[第8.4节](#84-接口实现分离模式三层架构)）
+- [ ] **枚举标准**: 无魔法值，全部使用枚举（参考[第3.1节](#31-枚举设计规范)）
+- [ ] **异常处理**: 使用统一的异常体系
+
+#### ✅ 代码质量检查
+
+- [ ] **日志规范**: 使用@Slf4j，日志级别正确（参考[第2.4节](#24-日志规范)）
+- [ ] **注释完整**: public方法有Javadoc注释
+- [ ] **命名规范**: 遵循Java命名约定（参考[第2.2节](#22-命名规范)）
+- [ ] **Lombok规范**: 精确使用注解，不使用@Data（参考[第2.3节](#23-lombok使用规范)）
+
+#### ✅ 安全与性能检查
+
+- [ ] **禁止事项**: 不违反[第9章](#9-禁止事项)禁止事项
+- [ ] **安全检查**: 无SQL注入、XSS等安全漏洞
+- [ ] **性能检查**: 无N+1查询、大事务等性能问题
+- [ ] **配置规范**: 数据库、线程池、事务配置正确
+
+### 10.7 质量标准
 
 | 维度       | 标准        |
 |----------|-----------|
@@ -1071,38 +1487,281 @@ graph LR
 
 ---
 
-## 附录A: 常用工具类
+## 11. 中间件接入层
 
-### A.1 线程池配置
+> **目标**: 统一中间件接入接口，屏蔽不同中间件和本地组件的差异，支持灵活切换和自动降级
+>
+> **架构基础**: 遵循[第8.4节 三层架构模式](#84-接口实现分离模式三层架构)，实现模板方法模式
 
-```java
+### 11.1 设计原则
 
-@Autowired
-@Qualifier(ThreadPoolConfigure.IO_TASK_EXECUTOR)
-private ExecutorService ioExecutor;
+中间件接入层遵循以下原则：
 
-@Autowired
-@Qualifier(ThreadPoolConfigure.VIRTUAL_TASK_EXECUTOR)
-private ExecutorService virtualExecutor;
+1. **接口统一**: 所有中间件通过统一的Domain接口访问
+2. **技术无关**: Domain层不感知具体技术实现
+3. **自动切换**: 支持配置文件和运行时策略切换
+4. **自动降级**: 主中间件不可用时自动切换到备用方案
+5. **易于扩展**: 遵循三层架构模式，方便接入新的中间件
+
+> **💡 实现基础**: 所有中间件服务都遵循[第8.4节](#84-接口实现分离模式三层架构)定义的三层架构模式和模板方法模式
+
+### 11.2 中间件映射
+
+| 中间件       | 本地组件          | 配置键                                      | 降级策略                            |
+|-----------|---------------|------------------------------------------|---------------------------------|
+| **MySQL** | H2            | `middleware.datasource.type`             | 不降级（需明确指定）                      |
+| **Redis** | Caffeine      | `middleware.cache.type`                  | 自动降级到Caffeine                   |
+| **Kafka** | Spring Events | `middleware.event.publisher.type`        | 自动降级到Spring                     |
+| **阿里云短信** | -             | `middleware.notification.sms.provider`   | 抛出UnsupportedOperationException |
+| **阿里云邮件** | -             | `middleware.notification.email.provider` | 抛出UnsupportedOperationException |
+
+### 11.3 配置说明
+
+#### 11.3.1 统一配置结构
+
+```yaml
+middleware:
+  # 缓存配置
+  cache:
+    type: redis  # redis | caffeine
+    fallback: caffeine  # 降级实现
+    caffeine:
+      initial-capacity: 100
+      maximum-size: 1000
+      expire-after-write: 10m
+      expire-after-access: 5m
+
+  # 事件发布配置
+  event:
+    publisher:
+      type: kafka  # kafka | spring
+      fallback: spring  # 降级实现
+    retry:
+      cron: "0 * * * * ?"
+      batch-size: 100
+      high-priority-ratio: 0.8
+
+  # 通知服务配置（可选）
+  notification:
+    email:
+      provider: aliyun  # aliyun | tencent | huawei
+    sms:
+      provider: aliyun  # aliyun | tencent | huawei
 ```
 
-### A.2 DTO转换工具
+### 11.4 使用示例
+
+#### 11.4.1 基本使用（配置驱动）
 
 ```java
-// DoConverterUtils - DO与DTO转换
-UserDTO userDTO = DoConverterUtils.toDTO(userDO, UserDTO.class);
+
+@Service
+@RequiredArgsConstructor
+public class OrderService {
+
+    private final CacheService   cacheClient;
+    private final EventPublisher eventPublisher;
+
+    public void processOrder(Order order) {
+        // 自动使用配置的中间件
+        cacheClient.get("order:" + order.getId());
+        eventPublisher.publish(order.getEvents());
+    }
+
+}
 ```
 
-### A.3 枚举工具
+**配置**:
+
+```yaml
+middleware:
+  cache:
+    type: redis
+    fallback: caffeine
+  event:
+    publisher:
+      type: kafka
+      fallback: spring
+```
+
+### 11.5 扩展指南
+
+#### 11.5.1 接入新的缓存实现
+
+**步骤**: 以Hazelcast为例
+
+1. **实现抽象基类**:
 
 ```java
-// EnumUtils - 枚举转换
-OrderStatus status = EnumUtils.valueOf(OrderStatus.class, "CREATED");
+
+@Service
+@ConditionalOnBean(HazelcastInstance.class)
+@Primary
+public class HazelcastCacheServiceImpl extends AbstractCacheService {
+
+    private final HazelcastInstance hazelcastInstance;
+
+    public HazelcastCacheServiceImpl(HazelcastInstance hazelcastInstance) {
+        this.hazelcastInstance = hazelcastInstance;
+    }
+
+    @Override
+    protected <T> T doGet(String key) {
+        // Hazelcast实现
+    }
+    // ... 其他方法
+}
+```
+
+2. **配置Bean**: 在配置类中添加Bean定义
+
+```java
+
+@Configuration
+public class InfrastructureCacheConfig {
+
+    @Bean
+    @ConditionalOnBean(HazelcastInstance.class)
+    @Primary
+    public HazelcastCacheServiceImpl hazelcastCacheService(
+            HazelcastInstance hazelcastInstance) {
+        return new HazelcastCacheServiceImpl(hazelcastInstance);
+    }
+
+}
+```
+
+3. **添加依赖**:
+
+```xml
+
+<dependency>
+    <groupId>com.hazelcast</groupId>
+    <artifactId>hazelcast</artifactId>
+</dependency>
+```
+
+**验证**: 添加依赖后，Hazelcast会自动覆盖Caffeine作为主缓存实现
+
+#### 11.5.2 接入新的消息队列
+
+**步骤**: 以RabbitMQ为例
+
+1. **实现抽象基类**:
+
+```java
+
+@Component
+@ConditionalOnBean(RabbitTemplate.class)
+@Primary
+public class RabbitMQEventPublisher extends AbstractEventPublisher<DomainEvent> {
+
+    private final RabbitTemplate rabbitTemplate;
+
+    public RabbitMQEventPublisher(
+            RabbitTemplate rabbitTemplate,
+            EventPublishMapper eventPublishMapper,
+            EventSerializer eventSerializer) {
+        super(eventPublishMapper, eventSerializer);
+        this.rabbitTemplate = rabbitTemplate;
+    }
+
+    @Override
+    protected void doPublish(DomainEvent event, EventPublishDO eventDO) throws Exception {
+        // RabbitMQ实现
+        rabbitTemplate.convertAndSend(exchange, routingKey, event);
+    }
+
+}
+```
+
+2. **配置Bean**: 在配置类中添加Bean定义
+
+```java
+
+@Bean
+@ConditionalOnBean(RabbitTemplate.class)
+@Primary
+public RabbitMQEventPublisher rabbitMQEventPublisher(
+        RabbitTemplate rabbitTemplate,
+        EventPublishMapper eventPublishMapper,
+        EventSerializer eventSerializer) {
+    return new RabbitMQEventPublisher(rabbitTemplate, eventPublishMapper, eventSerializer);
+}
+```
+
+3. **添加依赖**:
+
+```xml
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+```
+
+**验证**: 添加依赖后，RabbitMQ会自动覆盖Spring Events作为主事件发布器
+
+### 11.6 故障排查
+
+#### 11.6.1 常见问题
+
+| 问题                    | 原因                | 解决方法                                                                    |
+|-----------------------|-------------------|-------------------------------------------------------------------------|
+| BeanCreationException | 配置类循环依赖或缺少Bean    | 检查配置类依赖关系，遵循[第2.6节](#26-springboot-bean管理规范)规范                          |
+| 外部中间件未生效              | 依赖Bean未创建         | 检查外部依赖是否添加、配置是否正确                                                       |
+| **循环依赖**              | **配置类Bean循环依赖**   | **必须通过重构代码、直接注入具体实现来解决，绝对禁止使用@Lazy、ObjectProvider、@PostConstruct延迟初始化** |
+| @Primary冲突            | 多个Bean标记为@Primary | 确保每个类型只有一个@Primary Bean                                                 |
+
+#### 11.6.2 调试技巧
+
+**查看Bean装配情况**:
+
+```java
+
+@Component
+@RequiredArgsConstructor
+public class BeanVerifier {
+
+    private final ApplicationContext context;
+
+    @PostConstruct
+    public void verifyBeans() {
+        // 查看所有CacheService实现
+        Map<String, CacheService> cacheServices =
+                context.getBeansOfType(CacheService.class);
+        log.info("Available cache services: {}", cacheServices.keySet());
+
+        // 查看主Bean
+        CacheService primaryCache = context.getBean(CacheService.class);
+        log.info("Primary cache service: {}",
+                primaryCache.getClass().getSimpleName());
+    }
+
+}
+```
+
+**启用DEBUG日志**:
+
+```yaml
+logging:
+  level:
+    org.springframework.boot.autoconfigure: DEBUG
+    org.smm.archetype.infrastructure: DEBUG
+```
+
+**验证Bean是否存在**:
+```java
+boolean hasRedis = context.containsBean("redisTemplate");
+boolean hasKafka = context.containsBean("kafkaTemplate");
+log.
+
+info("Redis available: {}, Kafka available: {}",hasRedis, hasKafka);
 ```
 
 ---
 
-## 附录B: 常见问题FAQ
+## 附录A: 常见问题FAQ
 
 ### Q1: 如何选择枚举定义位置？
 
@@ -1120,16 +1779,251 @@ OrderStatus status = EnumUtils.valueOf(OrderStatus.class, "CREATED");
 - ❌ 只读查询（不需要）
 - ❌ 跨微服务调用（使用分布式事务）
 
-### Q3: 如何处理循环依赖？
+### Q3: 如何正确处理循环依赖？
+
+**A**: 详见[第10.5节 主启动类启动验证](#105-步骤4主启动类启动验证最关键)
+
+**核心原则**：必须通过重构代码来解决，包括重新设计职责划分、提取公共接口、直接注入具体实现（如`@Autowired(required = false)`）、使用事件驱动解耦等。
+
+**绝对禁止的方法**（违反文档规范）：
+
+- ❌ 使用@Lazy注解
+- ❌ 使用ObjectProvider延迟注入
+- ❌ 使用ApplicationContext.getBean()依赖查找
+- ❌ 使用@PostConstruct延迟初始化
+
+### Q4: 何时使用三层架构（接口-抽象基类-实现）？
 
 **A**:
 
-- 重新设计职责划分
-- 提取公共接口
-- 使用事件驱动解耦
+- ✅ 通用服务（缓存、队列、存储）
+- ✅ 可能有多种实现
+- ✅ 需要统一处理流程
+- ❌ 简单业务逻辑
+- ❌ 一次性代码
 
 ---
 
-**文档版本**: v2.0
-**最后更新**: 2026-01-09
+## 附录B: 模式参考示例
+
+> **注**: 本附录使用实际项目中的组件作为模式参考，展示[第8.4节](#84-接口实现分离模式三层架构)和[第11章](#11-中间件接入层)
+> 中定义的三层架构模式和模板方法模式的具体实现
+>
+> **📌 阅读建议**: 在理解了第8.4节和第11章的理论基础后，参考本附录中的实际代码示例
+
+### B.1 EventStore - 多实现模式
+
+**Layer 1: Domain Interface**
+
+```java
+// domain/_shared/event/EventStore.java
+public interface EventStore {
+
+    void append(List<DomainEvent> events);
+
+    List<DomainEvent> getEvents(String aggregateId);
+
+}
+```
+
+**Layer 2: Infrastructure Implementations**
+
+```java
+// infrastructure/_shared/event/DbEventStore.java
+@Repository
+@RequiredArgsConstructor
+public class DbEventStore implements EventStore {
+
+    private final EventPublishMapper eventPublishMapper;
+
+    @Override
+    public void append(List<DomainEvent> events) {
+        // Database implementation
+    }
+
+}
+
+// infrastructure/_shared/event/InMemoryEventStore.java
+@Component
+public class InMemoryEventStore implements EventStore {
+    // In-memory implementation for testing
+}
+```
+
+### B.2 EventPublisher - 模板方法模式
+
+**Layer 1: Domain Interface**
+
+```java
+// domain/_shared/event/EventPublisher.java
+public interface EventPublisher {
+
+    void publish(List<DomainEvent> events);
+
+}
+```
+
+**Layer 2: Abstract Base with Template Method**
+
+```java
+// infrastructure/_shared/event/publisher/AbstractEventPublisher.java
+public abstract class AbstractEventPublisher<T extends DomainEvent> implements EventPublisher {
+
+    @Override
+    public final void publish(List<DomainEvent> events) {
+        // 1. 通用前置处理
+        for (DomainEvent event : events) {
+            EventPublishDO eventDO = saveEvent(event);
+
+            // 2. 抽象扩展点（由子类实现）
+            doPublish(event, eventDO);
+        }
+    }
+
+    /**
+     * 扩展点：实际发布逻辑（由子类实现）
+     */
+    protected abstract void doPublish(DomainEvent event, EventPublishDO eventDO) throws Exception;
+
+    protected EventPublishDO saveEvent(DomainEvent event) {
+        // 通用事件持久化逻辑
+    }
+
+}
+```
+
+**Layer 3: Concrete Implementations**
+
+```java
+// infrastructure/_shared/event/publisher/KafkaEventPublisher.java
+@Component
+@RequiredArgsConstructor
+public class KafkaEventPublisher extends AbstractEventPublisher<DomainEvent> {
+
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    @Override
+    protected void doPublish(DomainEvent event, EventPublishDO eventDO) throws Exception {
+        // Kafka specific implementation
+        kafkaTemplate.send(topic, event);
+    }
+
+}
+
+// infrastructure/_shared/event/publisher/SpringEventPublisher.java
+@Component
+@RequiredArgsConstructor
+public class SpringEventPublisher extends AbstractEventPublisher<DomainEvent> {
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    @Override
+    protected void doPublish(DomainEvent event, EventPublishDO eventDO) throws Exception {
+        // Spring specific implementation
+        eventPublisher.publishEvent(event);
+    }
+
+}
+```
+
+### B.3 EventConsumer - 模板方法模式
+
+**Layer 1: Interface (Adapter Layer)**
+
+```java
+// adapter/access/listener/EventListener.java
+public interface EventListener {
+
+    void onEvent(DomainEvent event);
+
+}
+```
+
+**Layer 2: Abstract Base with Template Method**
+
+```java
+// adapter/access/listener/AbstractEventConsumer.java
+@Slf4j
+public abstract class AbstractEventConsumer<T extends DomainEvent> implements EventListener {
+
+    @Override
+    public final void onEvent(DomainEvent event) {
+        consume((T) event);
+    }
+
+    private final void consume(T event) {
+        // 1. 幂等性检查
+        if (isEventConsumed(event)) {
+            return;
+        }
+
+        // 2. 抽象扩展点（由子类实现）
+        try {
+            EventConsumeDO consumeDO = getConsumeRecord(event);
+            doConsume(event, consumeDO);
+
+            // 3. 成功处理
+            markAsConsumed(consumeDO);
+        } catch (Exception e) {
+            // 4. 失败处理（重试或标记失败）
+            handleFailure(event, e);
+        }
+    }
+
+    /**
+     * 扩展点：实际业务处理（由子类实现）
+     */
+    protected abstract void doConsume(T event, EventConsumeDO consumeDO) throws Exception;
+
+    protected abstract String getConsumerGroup();
+    // 其他辅助方法...
+}
+```
+
+**Layer 3: Concrete Implementation**
+
+```java
+// adapter/access/listener/KafkaEventListener.java
+@Component
+public class KafkaEventListener extends AbstractEventConsumer<DomainEvent> {
+
+    @Override
+    protected String getConsumerGroup() {
+        return "kafka-consumer-group";
+    }
+
+    @KafkaListener(topics = "domain-events")
+    public void onEvent(DomainEvent event) {
+        super.onEvent(event);
+    }
+
+    @Override
+    protected void doConsume(DomainEvent event, EventConsumeDO consumeDO) {
+        // 业务处理逻辑
+    }
+
+}
+```
+
+---
+
+**文档版本**: v4.3
+**最后更新**: 2026-01-10
 **维护者**: Leonardo
+
+**v4.3 更新说明**:
+
+- **重大更新**：完善第2.6节SpringBoot Bean管理规范，明确区分跨配置类和同配置类的依赖注入方式
+- 跨配置类依赖：使用构造器注入 + Optional处理可选依赖
+- 同配置类依赖：使用@Bean方法参数注入，避免循环依赖
+- 更新循环依赖解决原则，明确禁止@Lazy、ObjectProvider等方式
+- 代码实现严格遵循文档规范：EventPublisherConfig使用构造器注入，InfrastructureEventConfig使用方法参数注入
+- 所有测试通过（31个测试，0失败）
+
+**v4.2 更新说明**:
+
+- 优化第10.6节生成检查清单，去除与10.2-10.5节的重复内容，增加交叉引用
+- 简化FAQ Q3循环依赖说明，主要内容引用第10.5节
+- 优化第11章中间件接入层说明，避免重复第8.4节的三层架构模式
+- 优化附录B说明，明确其为第8.4节和第11章的补充示例
+- 整体减少冗余表述，保留所有技术细节

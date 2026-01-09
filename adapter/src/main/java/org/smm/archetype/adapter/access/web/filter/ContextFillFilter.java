@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.smm.archetype.infrastructure._shared.context.ContextHolder;
 import org.smm.archetype.infrastructure._shared.context.impl.AccessContext;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -17,7 +16,6 @@ import java.io.IOException;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Component
 public class ContextFillFilter extends OncePerRequestFilter {
 
     @Override

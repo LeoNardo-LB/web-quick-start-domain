@@ -14,10 +14,6 @@
         <!--系统依赖-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
             <artifactId>infrastructure</artifactId>
         </dependency>
     </dependencies>

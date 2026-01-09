@@ -2,7 +2,6 @@ package org.smm.archetype.infrastructure.common.log;
 
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyHandler;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyType;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.StringJoiner;
  * 实现基于JDK默认toString方法的对象字符串化处理器，支持处理数组和集合类型的对象。
  * 对于null值返回"null"字符串，对于数组和集合作递归处理，其他对象直接调用toString方法。
  */
-@Component
 public class JdkStringifyHandler implements StringifyHandler {
 
     /**

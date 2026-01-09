@@ -8,12 +8,13 @@ import org.smm.archetype.adapter.access.web.converter.OrderConverter;
 import org.smm.archetype.adapter.access.web.dto.CreateOrderRequest;
 import org.smm.archetype.adapter.access.web.dto.OrderDTO;
 import org.smm.archetype.adapter.access.web.dto.PayOrderRequest;
-import org.smm.archetype.app.example.order.command.PayOrderCommand;
-import org.smm.archetype.app.example.order.query.GetOrderQuery;
-import org.smm.archetype.app.example.order.query.SearchOrdersQuery;
-import org.smm.archetype.app.example.order.service.OrderApplicationService;
-import org.smm.archetype.domain.example.order.model.Order;
-import org.smm.archetype.domain.example.order.model.OrderStatus;
+import org.smm.archetype.app._example.order.command.CancelOrderCommand;
+import org.smm.archetype.app._example.order.command.PayOrderCommand;
+import org.smm.archetype.app._example.order.query.GetOrderQuery;
+import org.smm.archetype.app._example.order.query.SearchOrdersQuery;
+import org.smm.archetype.app._example.order.service.OrderApplicationService;
+import org.smm.archetype.domain._example.order.model.Order;
+import org.smm.archetype.domain._example.order.model.OrderStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -151,7 +152,7 @@ public class OrderController {
         log.info("Cancelling order: {}, reason: {}", orderId, reason);
 
         // 1. 构造Command
-        var command = org.smm.archetype.app.example.order.command.CancelOrderCommand.builder()
+        var command = CancelOrderCommand.builder()
                               .orderId(orderId)
                               .reason(reason)
                               .build();

@@ -2,7 +2,7 @@ package org.smm.archetype.infrastructure._shared.event.handler;
 
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventType;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
+import org.smm.archetype.infrastructure._shared.generated.entity.EventConsumeDO;
 
 /**
  * 事件失败处理器接口
@@ -25,8 +25,9 @@ public interface EventFailureHandler {
      * 处理失败事件
      * @param event     领域事件
      * @param consumeDO 消费记录
+     * @param e
      */
-    void handleFailure(DomainEvent event, EventConsumeDO consumeDO);
+    void handleFailure(DomainEvent event, EventConsumeDO consumeDO, Exception e);
 
     /**
      * 判断是否支持该事件类型

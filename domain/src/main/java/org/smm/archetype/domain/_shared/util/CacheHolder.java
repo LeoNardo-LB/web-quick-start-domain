@@ -1,6 +1,6 @@
 package org.smm.archetype.domain._shared.util;
 
-import org.smm.archetype.domain._shared.service.CacheService;
+import org.smm.archetype.domain._shared.client.CacheClient;
 
 import java.time.Duration;
 import java.util.List;
@@ -16,11 +16,11 @@ public class CacheHolder {
     /**
      * 获取包装类
      * @param type         业务类型
-     * @param cacheService 缓存服务
+     * @param cacheClient 缓存服务
      * @return 包装类
      */
-    public static BizCache of(Type type, CacheService cacheService) {
-        return new BizCache(type, cacheService);
+    public static BizCache of(Type type, CacheClient cacheClient) {
+        return new BizCache(type, cacheClient);
     }
 
     /**
@@ -43,58 +43,58 @@ public class CacheHolder {
     /**
      * 业务缓存
      * @param type         业务类型
-     * @param cacheService 缓存服务
+     * @param cacheClient 缓存服务
      */
-    public record BizCache(Type type, CacheService cacheService) implements CacheService {
+    public record BizCache(Type type, CacheClient cacheClient) implements CacheClient {
 
         @Override
         public <T> T get(String key) {
-            return cacheService.get(type.buildKey(key));
+            return cacheClient.get(type.buildKey(key));
         }
 
         @Override
         public <T> List<T> getList(String key) {
-            return cacheService.getList(type.buildKey(key));
+            return cacheClient.getList(type.buildKey(key));
         }
 
         @Override
         public <T> List<T> getList(String key, int beginIdx, int endIdx) {
-            return cacheService.getList(type.buildKey(key), beginIdx, endIdx);
+            return cacheClient.getList(type.buildKey(key), beginIdx, endIdx);
         }
 
         @Override
         public void put(String key, Object value) {
-            cacheService.put(type.buildKey(key), value);
+            cacheClient.put(type.buildKey(key), value);
         }
 
         @Override
         public void put(String key, Object value, Duration duration) {
-            cacheService.put(type.buildKey(key), value, duration);
+            cacheClient.put(type.buildKey(key), value, duration);
         }
 
         @Override
         public void append(String key, Object value) {
-            cacheService.append(type.buildKey(key), value);
+            cacheClient.append(type.buildKey(key), value);
         }
 
         @Override
         public void delete(String key) {
-            cacheService.delete(type.buildKey(key));
+            cacheClient.delete(type.buildKey(key));
         }
 
         @Override
         public Boolean hasKey(String key) {
-            return cacheService.hasKey(type.buildKey(key));
+            return cacheClient.hasKey(type.buildKey(key));
         }
 
         @Override
         public Boolean expire(String key, long timeout, TimeUnit unit) {
-            return cacheService.expire(type.buildKey(key), timeout, unit);
+            return cacheClient.expire(type.buildKey(key), timeout, unit);
         }
 
         @Override
         public Long getExpire(String key) {
-            return cacheService.getExpire(type.buildKey(key));
+            return cacheClient.getExpire(type.buildKey(key));
         }
 
     }

@@ -4,12 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventStatus;
 import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.generated.entity.EventPublishDO;
+import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -26,11 +26,21 @@ import java.util.concurrent.CompletableFuture;
  *   <li>发送失败则保持 CREATED 状态，由定时任务重试</li>
  * </ol>
  *
+ * <p>适用于：
+ * <ul>
+ *   <li>分布式应用</li>
+ *   <li>生产环境</li>
+ *   <li>需要事件解耦的场景</li>
+ * </ul>
+ *
  * @author Leonardo
- * @since 2026/01/09
+ * @since 2026-01-10
  */
 @Slf4j
-@Component
+@ConditionalOnProperty(
+        name = "middleware.event.publisher.type",
+        havingValue = "kafka"
+)
 public class KafkaEventPublisher extends AbstractEventPublisher<DomainEvent> {
 
     private final KafkaTemplate<String, String> kafkaTemplate;

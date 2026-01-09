@@ -1,6 +1,6 @@
 package org.smm.archetype.adapter.access.listener;
 
-import org.smm.archetype.adapter.handler.event.EventHandler;
+import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventType;
 

@@ -1,16 +1,15 @@
 package org.smm.archetype.adapter.access.listener;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.adapter.handler.event.EventHandler;
+import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventType;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
 import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.generated.entity.EventConsumeDO;
+import org.smm.archetype.infrastructure._shared.generated.mapper.EventConsumeMapper;
+import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -22,7 +21,6 @@ import java.util.List;
  * @since 2026/01/09
  */
 @Slf4j
-@Component
 public class KafkaEventListener extends AbstractEventConsumer<DomainEvent> implements EventListener {
 
     public KafkaEventListener(
@@ -45,7 +43,7 @@ public class KafkaEventListener extends AbstractEventConsumer<DomainEvent> imple
     }
 
     @Override
-    @KafkaListener(topics = "domain-events")
+    @KafkaListener(topics = "domain-events", groupId = "kafka-consumer-group")
     public void onEvent(DomainEvent event) {
         log.debug("Received event from Kafka: eventId={}", event.getEventId());
         consume(event);
@@ -55,7 +53,7 @@ public class KafkaEventListener extends AbstractEventConsumer<DomainEvent> imple
      * 监听 Kafka 消息（字符串格式）
      * @param message JSON 格式的事件消息
      */
-    @KafkaListener(topics = "domain-events")
+    @KafkaListener(topics = "domain-events", groupId = "kafka-consumer-group")
     public void onMessage(String message) {
         try {
             log.debug("Received message from Kafka: {}", message);

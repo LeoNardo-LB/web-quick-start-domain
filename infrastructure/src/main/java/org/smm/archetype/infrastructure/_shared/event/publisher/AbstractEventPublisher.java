@@ -7,8 +7,8 @@ import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventPublisher;
 import org.smm.archetype.domain._shared.event.EventStatus;
 import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.generated.entity.EventPublishDO;
+import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
