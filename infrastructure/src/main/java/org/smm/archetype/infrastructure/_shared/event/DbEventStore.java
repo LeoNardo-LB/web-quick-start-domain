@@ -8,6 +8,7 @@ import org.smm.archetype.domain._shared.event.EventStatus;
 import org.smm.archetype.domain._shared.event.EventStore;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ import java.util.List;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
+@Primary
 public class DbEventStore implements EventStore {
 
     private final EventPublishMapper eventPublishMapper;
@@ -114,7 +116,7 @@ public class DbEventStore implements EventStore {
         eventDO.setEventId(event.getEventId());
         eventDO.setAggregateId(event.getAggregateId());
         eventDO.setAggregateType(event.getAggregateType());
-        eventDO.setType(event.getEventType());
+        eventDO.setType(event.getEventTypeName());
         eventDO.setPriority(event.getPriority().name());
         eventDO.setOccurredOn(event.getOccurredOn());
         eventDO.setData(eventSerializer.serialize(event));

@@ -8,7 +8,8 @@
       "Bash(java:*)",
       "Bash(mvn:*)",
       "Bash(findstr:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(del:*)"
     ]
   }
 }

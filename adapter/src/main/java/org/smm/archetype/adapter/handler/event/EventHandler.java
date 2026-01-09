@@ -1,6 +1,7 @@
-package org.smm.archetype.domain._shared.event;
+package org.smm.archetype.adapter.handler.event;
 
 import org.smm.archetype.domain._shared.base.DomainEvent;
+import org.smm.archetype.domain._shared.event.EventType;
 
 /**
  * 事件处理器（Event Handler）接口
@@ -32,6 +33,11 @@ import org.smm.archetype.domain._shared.base.DomainEvent;
  *     public boolean canHandle(DomainEvent event) {
  *         return event instanceof OrderCreatedEvent;
  *     }
+ *
+ *     @Override
+ *     public EventType getEventType() {
+ *         return EventType.ORDER_CREATED;
+ *     }
  * }
  * }</pre>
  * @param <T> 事件类型
@@ -52,5 +58,19 @@ public interface EventHandler<T extends DomainEvent> {
      * @return 如果可以处理返回true
      */
     boolean canHandle(DomainEvent event);
+
+    /**
+     * 获取支持的事件类型
+     * @return 事件类型枚举
+     */
+    EventType getEventType();
+
+    /**
+     * 获取处理器优先级
+     * @return 优先级数值，默认0
+     */
+    default int getPriority() {
+        return 0;
+    }
 
 }

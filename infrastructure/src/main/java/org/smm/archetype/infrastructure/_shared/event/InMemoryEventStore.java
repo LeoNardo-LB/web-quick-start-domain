@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure._shared.component.event;
+package org.smm.archetype.infrastructure._shared.event;
 
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.base.DomainEvent;

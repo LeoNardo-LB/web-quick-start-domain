@@ -2,6 +2,7 @@ package org.smm.archetype.domain._shared.base;
 
 import lombok.Getter;
 import org.smm.archetype.domain._shared.event.EventPriority;
+import org.smm.archetype.domain._shared.event.EventType;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -49,9 +50,9 @@ public abstract class DomainEvent extends ValueObject {
     private final Instant occurredOn;
 
     /**
-     * 事件类型（类名的简单名称）
+     * 事件类型
      */
-    private final String eventType;
+    private final EventType eventType;
 
     /**
      * 聚合根ID（事件所属的聚合根）
@@ -77,7 +78,8 @@ public abstract class DomainEvent extends ValueObject {
     protected DomainEvent() {
         this.eventId = generateEventId();
         this.occurredOn = Instant.now();
-        this.eventType = this.getClass().getSimpleName();
+        // 从类对象推断事件类型
+        this.eventType = EventType.fromClass(this.getClass());
     }
 
     /**
@@ -98,6 +100,14 @@ public abstract class DomainEvent extends ValueObject {
         if (this.maxRetryTimes == null || this.maxRetryTimes == 3) {
             this.maxRetryTimes = maxRetryTimes;
         }
+    }
+
+    /**
+     * 获取事件类型名称（用于数据库存储和序列化）
+     * @return 事件类型名称
+     */
+    public String getEventTypeName() {
+        return eventType != null ? eventType.getEventClassName() : null;
     }
 
     /**

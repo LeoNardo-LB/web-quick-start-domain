@@ -215,7 +215,7 @@ public abstract class AbstractEventMessageHandler<T extends DomainEvent> impleme
      */
     protected void onMaxRetriesExceeded(T event, Exception e) {
         log.error("Max retries exceeded for event: {}, type={}",
-                event.getEventId(), event.getEventType());
+                event.getEventId(), event.getEventTypeName());
         // 默认实现：记录日志，子类可以重写发送告警等
     }
 

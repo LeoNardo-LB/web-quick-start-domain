@@ -32,14 +32,17 @@ public class ThreadPoolConfigure implements AsyncConfigurer {
      * IO密集型线程池
      */
     public static final String IO_TASK_EXECUTOR      = "ioTaskExecutor";
+
     /**
      * 虚拟线程池
      */
     public static final String VIRTUAL_TASK_EXECUTOR = "virtualTaskExecutor";
+
     /**
      * CPU密集型线程池
      */
     public static final String CPU_TASK_EXECUTOR     = "cpuTaskExecutor";
+
     /**
      * 守护线程池
      */

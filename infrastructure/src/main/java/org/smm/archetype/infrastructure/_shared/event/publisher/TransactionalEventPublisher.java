@@ -1,10 +1,11 @@
-package org.smm.archetype.infrastructure._shared.component.event;
+package org.smm.archetype.infrastructure._shared.event.publisher;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.base.AggregateRoot;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventPublisher;
+import org.smm.archetype.infrastructure._shared.event.DomainEventsCollectionEvent;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;

@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure._shared.component.event;
+package org.smm.archetype.infrastructure._shared.event;
 
 import lombok.Getter;
 import org.smm.archetype.domain._shared.base.AggregateRoot;

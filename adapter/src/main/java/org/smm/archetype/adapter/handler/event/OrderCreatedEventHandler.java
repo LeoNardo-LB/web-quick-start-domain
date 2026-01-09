@@ -1,9 +1,10 @@
-package org.smm.archetype.infrastructure.example.order.handler;
+package org.smm.archetype.adapter.handler.event;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.EventHandler;
+import org.smm.archetype.domain._shared.event.EventType;
 import org.smm.archetype.domain.example.order.event.OrderCreatedEvent;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +15,11 @@ import org.springframework.stereotype.Component;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OrderCreatedEventHandler implements EventHandler<OrderCreatedEvent> {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderCreatedEventHandler.class);
 
     @Override
     public void handle(OrderCreatedEvent event) {
@@ -47,6 +49,11 @@ public class OrderCreatedEventHandler implements EventHandler<OrderCreatedEvent>
     @Override
     public boolean canHandle(DomainEvent event) {
         return event instanceof OrderCreatedEvent;
+    }
+
+    @Override
+    public EventType getEventType() {
+        return EventType.ORDER_CREATED;
     }
 
 }
