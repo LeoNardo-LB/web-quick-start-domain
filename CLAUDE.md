@@ -323,6 +323,145 @@ public class XxxConfig {
 
 **设计哲学**：通过显式配置提升代码可读性、可维护性和可测试性，降低框架魔法带来的认知负担。
 
+### 2.7 Maven依赖管理规范
+
+**核心原则**: 所有依赖的版本必须统一在根POM的`<dependencyManagement>`中管理，子模块引用依赖时不得显式声明版本号
+
+#### 2.7.1 依赖管理架构
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  根POM (pom.xml)                        │
+│  <dependencyManagement>                                 │
+│   ├─ 系统模块依赖（domain、infrastructure等）            │
+│   ├─ 第三方库依赖（Guava、Hutool、MyBatis-Flex等）      │
+│   ├─ Spring Boot管理依赖（显式声明版本）                 │
+│   └─ 依赖冲突解决（objenesis、byte-buddy等）            │
+└─────────────────────────────────────────────────────────┘
+                    ↓ 依赖版本管理
+┌─────────────────────────────────────────────────────────┐
+│               子模块POM (domain/pom.xml等)               │
+│  <dependencies>                                         │
+│   ├─ 只声明groupId和artifactId                          │
+│   ├─ 禁止声明version                                    │
+│   └─ 版本由根POM统一管理                                 │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### 2.7.2 根POM依赖管理规范
+
+**必须在根POM的`<dependencyManagement>`中管理的依赖类型**:
+
+1. **系统内模块依赖**:
+   ```xml
+   <dependency>
+       <groupId>${project.groupId}</groupId>
+       <artifactId>domain</artifactId>
+       <version>${project.version}</version>
+   </dependency>
+   ```
+
+2. **第三方库依赖**（非Spring Boot管理）:
+   ```xml
+   <dependency>
+       <groupId>com.google.guava</groupId>
+       <artifactId>guava</artifactId>
+       <version>33.5.0-jre</version>
+   </dependency>
+   ```
+
+3. **Spring Boot管理依赖**（显式声明版本以增强可控性）:
+   ```xml
+   <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-web</artifactId>
+       <version>3.5.9</version>
+   </dependency>
+   ```
+
+4. **依赖冲突解决**:
+   ```xml
+   <!-- 优先使用较新版本 -->
+   <dependency>
+       <groupId>org.objenesis</groupId>
+       <artifactId>objenesis</artifactId>
+       <version>3.4</version>
+   </dependency>
+   ```
+
+#### 2.7.3 子模块依赖声明规范
+
+**✅ 正确示例**（不声明版本）:
+```xml
+<dependencies>
+    <dependency>
+        <groupId>${project.parent.groupId}</groupId>
+        <artifactId>domain</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+    </dependency>
+</dependencies>
+```
+
+**❌ 禁止示例**（显式声明版本）:
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>33.5.0-jre</version>  <!-- 禁止！版本应在根POM中管理 -->
+    </dependency>
+</dependencies>
+```
+
+#### 2.7.4 添加新依赖的流程
+
+**步骤1**: 在根POM的`<dependencyManagement>`中添加依赖版本管理
+```xml
+<dependencyManagement>
+    <dependencies>
+        <!-- 添加新依赖 -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>example-library</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+
+**步骤2**: 在需要使用的子模块中添加依赖（不声明版本）
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.example</groupId>
+        <artifactId>example-library</artifactId>
+    </dependency>
+</dependencies>
+```
+
+#### 2.7.5 依赖冲突解决原则
+
+1. **优先使用较新版本**: 当发生依赖冲突时，优先选择较新版本
+2. **显式声明**: 在根POM中显式声明版本，避免隐式依赖传递
+3. **统一管理**: 所有同类依赖使用相同版本（如Jackson 2.19.4）
+4. **定期审查**: 定期运行`mvn dependency:tree -Dverbose`检查依赖冲突
+
+#### 2.7.6 验证清单
+
+添加依赖后必须验证：
+- [ ] 根POM的`<dependencyManagement>`中已声明版本
+- [ ] 子模块POM中未声明版本号
+- [ ] 运行`mvn clean compile`编译成功
+- [ ] 运行`mvn dependency:tree`无依赖冲突警告
+- [ ] 更新CLAUDE.md文档（如果是新的依赖类型）
+
 ---
 
 ## 3. 领域建模规范
