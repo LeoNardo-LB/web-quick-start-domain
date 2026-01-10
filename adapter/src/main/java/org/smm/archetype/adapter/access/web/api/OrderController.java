@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.adapter._shared.result.BaseResult;
-import org.smm.archetype.adapter.access.web.converter.OrderConverter;
+import org.smm.archetype.adapter.access.web.converter.OrderDTOConverter;
 import org.smm.archetype.adapter.access.web.dto.CreateOrderRequest;
 import org.smm.archetype.adapter.access.web.dto.OrderDTO;
 import org.smm.archetype.adapter.access.web.dto.PayOrderRequest;
@@ -43,7 +43,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderApplicationService orderApplicationService;
-    private final OrderConverter          orderConverter;
+    private final OrderDTOConverter orderDTOConverter;
 
     /**
      * 创建订单
@@ -57,7 +57,7 @@ public class OrderController {
         log.info("Creating order for customer: {}", request.getCustomerId());
 
         // 1. Request -> Command
-        var command = orderConverter.toCommand(request);
+        var command = orderDTOConverter.toCommand(request);
 
         // 2. 调用应用服务
         Long orderId = orderApplicationService.createOrder(command);
@@ -86,7 +86,7 @@ public class OrderController {
         Order order = orderApplicationService.getOrder(query);
 
         // 3. 转换为DTO
-        OrderDTO dto = orderConverter.toDTO(order);
+        OrderDTO dto = orderDTOConverter.toDTO(order);
 
         return ResponseEntity.ok(BaseResult.success(dto));
     }
@@ -113,7 +113,7 @@ public class OrderController {
         List<Order> orders = orderApplicationService.searchOrders(query);
 
         // 3. 转换为DTO列表
-        List<OrderDTO> dtos = orderConverter.toDTOList(orders);
+        List<OrderDTO> dtos = orderDTOConverter.toDTOList(orders);
 
         return ResponseEntity.ok(BaseResult.success(dtos));
     }

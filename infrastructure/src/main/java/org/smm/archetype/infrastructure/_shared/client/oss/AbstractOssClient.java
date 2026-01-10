@@ -303,10 +303,10 @@ public abstract class AbstractOssClient implements OssClient {
      */
     protected void saveFileMetadata(String fileName, String md5, String contentType, long size, String path) {
         FileMetadataDO metadata = FileMetadataDO.builder()
-                                          .md5(md5)
-                                          .contentType(contentType)
-                                          .size(size)
-                                          .path(path)
+                                          .setMd5(md5)
+                                          .setContentType(contentType)
+                                          .setSize(size)
+                                          .setPath(path)
                                           .build();
 
         metadataMapper.insert(metadata);

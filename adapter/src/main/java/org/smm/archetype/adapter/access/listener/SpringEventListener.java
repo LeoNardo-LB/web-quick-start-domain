@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +23,10 @@ public class SpringEventListener extends AbstractEventConsumer<DomainEvent>
         implements org.smm.archetype.adapter.access.listener.EventListener {
 
     public SpringEventListener(
-            EventConsumeMapper eventConsumeMapper,
             EventConsumeRepository eventConsumeRepository,
-            EventPublishMapper eventPublishMapper,
+            EventPublishRepository eventPublishRepository,
             List<EventHandler<DomainEvent>> eventHandlers) {
-        super(eventConsumeMapper, eventConsumeRepository, eventPublishMapper, eventHandlers);
+        super(eventConsumeRepository, eventPublishRepository, eventHandlers);
     }
 
     @Override

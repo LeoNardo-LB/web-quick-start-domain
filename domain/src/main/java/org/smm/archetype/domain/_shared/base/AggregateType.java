@@ -1,4 +1,4 @@
-package org.smm.archetype.domain._shared.event;
+package org.smm.archetype.domain._shared.base;
 
 import lombok.Getter;
 import org.slf4j.Logger;

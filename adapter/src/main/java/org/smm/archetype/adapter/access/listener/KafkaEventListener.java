@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +25,10 @@ import java.util.List;
 public class KafkaEventListener extends AbstractEventConsumer<DomainEvent> implements EventListener {
 
     public KafkaEventListener(
-            EventConsumeMapper eventConsumeMapper,
             EventConsumeRepository eventConsumeRepository,
-            EventPublishMapper eventPublishMapper,
+            EventPublishRepository eventPublishRepository,
             List<EventHandler<DomainEvent>> eventHandlers) {
-        super(eventConsumeMapper, eventConsumeRepository, eventPublishMapper, eventHandlers);
+        super(eventConsumeRepository, eventPublishRepository, eventHandlers);
     }
 
     @Override

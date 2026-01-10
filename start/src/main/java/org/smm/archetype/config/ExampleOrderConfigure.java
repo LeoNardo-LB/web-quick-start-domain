@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure._example.order.config;
+package org.smm.archetype.config;
 
 import org.smm.archetype.domain._example.order.repository.OrderRepository;
 import org.smm.archetype.infrastructure._example.order.repository.converter.OrderConverter;
@@ -10,14 +10,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Infrastructure层订单示例模块配置
+ * 订单示例模块配置
  *
  * <p>负责创建订单领域仓储实现的Bean。
  * @author Leonardo
  * @since 2026-01-10
  */
 @Configuration
-public class InfrastructureExampleOrderConfig {
+public class ExampleOrderConfigure {
 
     /**
      * 订单仓储实现

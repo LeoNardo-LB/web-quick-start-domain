@@ -17,12 +17,14 @@ import org.smm.archetype.domain._example.order.model.OrderItem;
 import java.util.List;
 
 /**
- * 订单DTO转换器
+ * 订单DTO转换器（Adapter层）
+ *
+ * <p>负责请求DTO与领域对象之间的转换。
  * @author Leonardo
  * @since 2025/12/30
  */
 @Mapper(componentModel = "spring")
-public interface OrderConverter {
+public interface OrderDTOConverter {
 
     /**
      * CreateOrderRequest转CreateOrderCommand

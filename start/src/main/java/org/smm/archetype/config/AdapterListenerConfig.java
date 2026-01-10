@@ -5,8 +5,7 @@ import org.smm.archetype.adapter.access.listener.SpringEventListener;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +26,8 @@ public class AdapterListenerConfig {
      * Spring事件监听器
      *
      * <p>监听Spring本地事件。
-     * @param eventConsumeMapper     事件消费Mapper
      * @param eventConsumeRepository 事件消费仓储
-     * @param eventPublishMapper     事件发布Mapper
+     * @param eventPublishRepository 事件发布仓储
      * @param eventHandlers          所有事件处理器
      * @return Spring事件监听器
      */
@@ -40,20 +38,18 @@ public class AdapterListenerConfig {
             havingValue = "spring"
     )
     public SpringEventListener springEventListener(
-            final EventConsumeMapper eventConsumeMapper,
             final EventConsumeRepository eventConsumeRepository,
-            final EventPublishMapper eventPublishMapper,
+            final EventPublishRepository eventPublishRepository,
             final List<EventHandler<DomainEvent>> eventHandlers) {
-        return new SpringEventListener(eventConsumeMapper, eventConsumeRepository, eventPublishMapper, eventHandlers);
+        return new SpringEventListener(eventConsumeRepository, eventPublishRepository, eventHandlers);
     }
 
     /**
      * Kafka事件监听器
      *
      * <p>监听Kafka消息队列事件。
-     * @param eventConsumeMapper     事件消费Mapper
      * @param eventConsumeRepository 事件消费仓储
-     * @param eventPublishMapper     事件发布Mapper
+     * @param eventPublishRepository 事件发布仓储
      * @param eventHandlers          所有事件处理器
      * @return Kafka事件监听器
      */
@@ -64,11 +60,10 @@ public class AdapterListenerConfig {
             havingValue = "kafka"
     )
     public KafkaEventListener kafkaEventListener(
-            final EventConsumeMapper eventConsumeMapper,
             final EventConsumeRepository eventConsumeRepository,
-            final EventPublishMapper eventPublishMapper,
+            final EventPublishRepository eventPublishRepository,
             final List<EventHandler<DomainEvent>> eventHandlers) {
-        return new KafkaEventListener(eventConsumeMapper, eventConsumeRepository, eventPublishMapper, eventHandlers);
+        return new KafkaEventListener(eventConsumeRepository, eventPublishRepository, eventHandlers);
     }
 
 }

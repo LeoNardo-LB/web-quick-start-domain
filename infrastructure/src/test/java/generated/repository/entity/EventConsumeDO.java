@@ -1,13 +1,11 @@
-package org.smm.archetype.infrastructure._shared.generated.repository.entity;
+package generated.repository.entity;
 
 import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.smm.archetype.infrastructure._shared.dal.BaseDO;
 import org.smm.archetype.infrastructure._shared.dal.BaseDOFillListener;
 
@@ -17,17 +15,14 @@ import java.time.Instant;
 
 /**
  * 事件消费表 实体类。
- *
  * @author Administrator
- * @since 2026-01-10
+ * @since 2026-01-11
  */
-@Getter
-@Setter
-@Builder(setterPrefix = "set")
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Table(value = "event_consume", onInsert = BaseDOFillListener.class, onUpdate = BaseDOFillListener.class)
 public class EventConsumeDO extends BaseDO implements Serializable {
 

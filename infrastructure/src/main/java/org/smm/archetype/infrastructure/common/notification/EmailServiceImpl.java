@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.common.notification.EmailRequest;
 import org.smm.archetype.domain.common.notification.EmailResult;
 import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
@@ -46,7 +45,6 @@ import java.util.UUID;
  * @since 2026/01/10
  */
 @Slf4j
-@Service
 public class EmailServiceImpl extends AbstractEmailService {
 
     /**

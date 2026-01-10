@@ -1,15 +1,13 @@
 package org.smm.archetype.adapter.access.listener;
 
-import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.ConsumeStatus;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
+import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
 
 import java.time.Instant;
 import java.util.List;
@@ -41,19 +39,16 @@ import java.util.List;
 @Slf4j
 public abstract class AbstractEventConsumer<T extends DomainEvent> implements EventConsumer<T> {
 
-    protected final EventConsumeMapper              eventConsumeMapper;
     protected final EventConsumeRepository          eventConsumeRepository;
-    protected final EventPublishMapper              eventPublishMapper;
+    protected final EventPublishRepository eventPublishRepository;
     protected final List<EventHandler<DomainEvent>> eventHandlers;
 
     protected AbstractEventConsumer(
-            EventConsumeMapper eventConsumeMapper,
             EventConsumeRepository eventConsumeRepository,
-            EventPublishMapper eventPublishMapper,
+            EventPublishRepository eventPublishRepository,
             List<EventHandler<DomainEvent>> eventHandlers) {
-        this.eventConsumeMapper = eventConsumeMapper;
         this.eventConsumeRepository = eventConsumeRepository;
-        this.eventPublishMapper = eventPublishMapper;
+        this.eventPublishRepository = eventPublishRepository;
         this.eventHandlers = eventHandlers;
     }
 
@@ -181,7 +176,7 @@ public abstract class AbstractEventConsumer<T extends DomainEvent> implements Ev
         consumeDO.setCreateTime(Instant.now());
         consumeDO.setVersion(0L);
 
-        eventConsumeMapper.insert(consumeDO);
+        eventConsumeRepository.insert(consumeDO);
 
         log.debug("Consume record created: eventId={}, status=READY", event.getEventId());
         return consumeDO;
@@ -305,10 +300,7 @@ public abstract class AbstractEventConsumer<T extends DomainEvent> implements Ev
      * @return 最大重试次数，不存在则返回 null
      */
     private Integer getMaxRetryTimes(String eventId) {
-        EventPublishDO eventDO = eventPublishMapper.selectOneByQuery(
-                QueryWrapper.create()
-                        .where("event_id = ?", eventId)
-        );
+        EventPublishDO eventDO = eventPublishRepository.findByEventId(eventId);
 
         return eventDO != null ? eventDO.getMaxRetryTimes() : null;
     }

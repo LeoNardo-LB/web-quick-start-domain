@@ -15,6 +15,16 @@ import java.time.Instant;
 
 /**
  * MybatisFlex 代码生成器，默认在当前目录下生成 repository 包，包含 Mapper与DO对象
+ *
+ * ⚠️ 重要提示：
+ * 1. 生成器默认使用@Data注解，违反项目编码规范（代码编写规范.md 第1.3节）
+ * 2. 生成代码后，必须手动将@Data替换为精确的Lombok注解：
+ *    - @Getter
+ *    - @Setter
+ *    - @Builder(setterPrefix = "set")
+ *    - @EqualsAndHashCode(callSuper = true)
+ *    - @ToString(callSuper = true)
+ * 3. 已修改的DO类：EventConsumeDO, EventPublishDO, LogDO, FileMetadataDO, FileBusinessDO
  */
 public class MybatisFlexCodegenTest {
 
