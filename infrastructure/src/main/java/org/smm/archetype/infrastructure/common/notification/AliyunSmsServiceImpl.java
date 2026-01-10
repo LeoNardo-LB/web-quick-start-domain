@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.common.notification.SmsRequest;
 import org.smm.archetype.domain.common.notification.SmsResult;
 import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
-import org.smm.archetype.infrastructure.config.properties.AliyunProperties;
 
 /**
  * 阿里云短信服务实现
@@ -23,11 +22,21 @@ import org.smm.archetype.infrastructure.config.properties.AliyunProperties;
 @Slf4j
 public class AliyunSmsServiceImpl extends AbstractSmsService {
 
-    private final AliyunProperties aliyunProperties;
-    private final Client           smsClient;
+    private final String accessKeyId;
+    private final String accessKeySecret;
+    private final String regionId;
+    private final String signName;
+    private final Client smsClient;
 
-    public AliyunSmsServiceImpl(AliyunProperties aliyunProperties) {
-        this.aliyunProperties = aliyunProperties;
+    public AliyunSmsServiceImpl(
+            String accessKeyId,
+            String accessKeySecret,
+            String regionId,
+            String signName) {
+        this.accessKeyId = accessKeyId;
+        this.accessKeySecret = accessKeySecret;
+        this.regionId = regionId;
+        this.signName = signName;
         this.smsClient = createSmsClient();
     }
 
@@ -46,7 +55,7 @@ public class AliyunSmsServiceImpl extends AbstractSmsService {
             // 设置签名名称（优先使用请求中的签名，否则使用配置的默认签名）
             String signName = request.getSignName() != null && !request.getSignName().isBlank()
                                       ? request.getSignName()
-                                      : aliyunProperties.getSms().getSignName();
+                                      : this.signName;
             sendSmsRequest.setSignName(signName);
 
             // 设置模板代码
@@ -103,9 +112,9 @@ public class AliyunSmsServiceImpl extends AbstractSmsService {
      */
     private Client createSmsClient() {
         Config config = new Config()
-                                .setAccessKeyId(aliyunProperties.getAccessKeyId())
-                                .setAccessKeySecret(aliyunProperties.getAccessKeySecret())
-                                .setRegionId(aliyunProperties.getRegionId());
+                                .setAccessKeyId(accessKeyId)
+                                .setAccessKeySecret(accessKeySecret)
+                                .setRegionId(regionId);
 
         try {
             return new Client(config);

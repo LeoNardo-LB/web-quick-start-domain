@@ -1,15 +1,17 @@
-package org.smm.archetype.infrastructure.config.properties;
+package org.smm.archetype.config.properties;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * 阿里云服务配置属性
+ *
+ * <p>注意：此配置类通过AliyunNotificationConfigure中的@EnableConfigurationProperties启用
  * @author Leonardo
  * @since 2026/01/10
  */
-@Component
+@Getter
 @ConfigurationProperties(prefix = "aliyun")
 public class AliyunProperties {
 
@@ -17,59 +19,35 @@ public class AliyunProperties {
      * 短信服务配置
      */
     private final Sms sms = new Sms();
+
     /**
      * 邮件服务配置
      */
     private final Email email = new Email();
+
     /**
      * 访问密钥ID
      */
+    @Setter
     private String accessKeyId;
+
     /**
      * 访问密钥Secret
      */
+    @Setter
     private String accessKeySecret;
+
     /**
      * 区域ID（默认：cn-hangzhou）
      */
+    @Setter
     private String regionId = "cn-hangzhou";
-
-    public String getAccessKeyId() {
-        return accessKeyId;
-    }
-
-    public void setAccessKeyId(String accessKeyId) {
-        this.accessKeyId = accessKeyId;
-    }
-
-    public String getAccessKeySecret() {
-        return accessKeySecret;
-    }
-
-    public void setAccessKeySecret(String accessKeySecret) {
-        this.accessKeySecret = accessKeySecret;
-    }
-
-    public String getRegionId() {
-        return regionId;
-    }
-
-    public void setRegionId(String regionId) {
-        this.regionId = regionId;
-    }
-
-    public Sms getSms() {
-        return sms;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
 
     /**
      * 短信服务配置
      */
-    @Data
+    @Getter
+    @Setter
     public static class Sms {
 
         /**
@@ -82,7 +60,8 @@ public class AliyunProperties {
     /**
      * 邮件服务配置
      */
-    @Data
+    @Getter
+    @Setter
     public static class Email {
 
         /**

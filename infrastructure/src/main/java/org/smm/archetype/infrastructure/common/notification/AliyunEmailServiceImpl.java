@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.common.notification.EmailRequest;
 import org.smm.archetype.domain.common.notification.EmailResult;
 import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
-import org.smm.archetype.infrastructure.config.properties.AliyunProperties;
 
 /**
  * 阿里云邮件服务实现
@@ -22,11 +21,28 @@ import org.smm.archetype.infrastructure.config.properties.AliyunProperties;
 @Slf4j
 public class AliyunEmailServiceImpl extends AbstractEmailService {
 
-    private final AliyunProperties aliyunProperties;
-    private final Client           emailClient;
+    private final String accessKeyId;
+    private final String accessKeySecret;
+    private final String regionId;
+    private final String fromAddress;
+    private final String fromAlias;
+    private final String accountName;
+    private final Client emailClient;
 
-    public AliyunEmailServiceImpl(AliyunProperties aliyunProperties) {
-        this.aliyunProperties = aliyunProperties;
+    public AliyunEmailServiceImpl(
+            String accessKeyId,
+            String accessKeySecret,
+            String regionId,
+            String fromAddress,
+            String fromAlias,
+            String accountName,
+            String replyToAddress) {
+        this.accessKeyId = accessKeyId;
+        this.accessKeySecret = accessKeySecret;
+        this.regionId = regionId;
+        this.fromAddress = fromAddress;
+        this.fromAlias = fromAlias;
+        this.accountName = accountName;
         this.emailClient = createEmailClient();
     }
 
@@ -36,9 +52,9 @@ public class AliyunEmailServiceImpl extends AbstractEmailService {
             SingleSendMailRequest sendMailRequest = new SingleSendMailRequest();
 
             // 设置发信地址（必填）
-            String accountName = aliyunProperties.getEmail().getAccountName();
+            String accountName = this.accountName;
             if (accountName == null || accountName.isBlank()) {
-                accountName = aliyunProperties.getEmail().getFromAddress();
+                accountName = fromAddress;
             }
             if (accountName == null || accountName.isBlank()) {
                 throw new IllegalArgumentException("Account name or from address must be configured");
@@ -46,7 +62,7 @@ public class AliyunEmailServiceImpl extends AbstractEmailService {
             sendMailRequest.setAccountName(accountName);
 
             // 设置发信人别名（可选）
-            String fromAlias = aliyunProperties.getEmail().getFromAlias();
+            String fromAlias = this.fromAlias;
             if (fromAlias != null && !fromAlias.isBlank()) {
                 sendMailRequest.setFromAlias(fromAlias);
             }
@@ -112,9 +128,9 @@ public class AliyunEmailServiceImpl extends AbstractEmailService {
      */
     private Client createEmailClient() {
         Config config = new Config()
-                                .setAccessKeyId(aliyunProperties.getAccessKeyId())
-                                .setAccessKeySecret(aliyunProperties.getAccessKeySecret())
-                                .setRegionId(aliyunProperties.getRegionId());
+                                .setAccessKeyId(accessKeyId)
+                                .setAccessKeySecret(accessKeySecret)
+                                .setRegionId(regionId);
 
         try {
             return new Client(config);

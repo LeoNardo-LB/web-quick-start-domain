@@ -1,9 +1,6 @@
 package org.smm.archetype.config;
 
 import lombok.RequiredArgsConstructor;
-import org.smm.archetype.app._shared.event.OrderCancelledEventHandler;
-import org.smm.archetype.app._shared.event.OrderCreatedEventHandler;
-import org.smm.archetype.app._shared.event.OrderPaidEventHandler;
 import org.smm.archetype.config.properties.EventProperties;
 import org.smm.archetype.config.properties.KafkaProperties;
 import org.smm.archetype.config.properties.RetryDelayProperties;
@@ -237,33 +234,6 @@ public class EventConfigure implements AsyncConfigurer {
         executor.setThreadNamePrefix("event-async-");
         executor.initialize();
         return executor;
-    }
-
-    /**
-     * 订单已创建事件处理器
-     * @return 订单已创建事件处理器
-     */
-    @Bean
-    public OrderCreatedEventHandler orderCreatedEventHandler() {
-        return new OrderCreatedEventHandler();
-    }
-
-    /**
-     * 订单已支付事件处理器
-     * @return 订单已支付事件处理器
-     */
-    @Bean
-    public OrderPaidEventHandler orderPaidEventHandler() {
-        return new OrderPaidEventHandler();
-    }
-
-    /**
-     * 订单已取消事件处理器
-     * @return 订单已取消事件处理器
-     */
-    @Bean
-    public OrderCancelledEventHandler orderCancelledEventHandler() {
-        return new OrderCancelledEventHandler();
     }
 
 }
