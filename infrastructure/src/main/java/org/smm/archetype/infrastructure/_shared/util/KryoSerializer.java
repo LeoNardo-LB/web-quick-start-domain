@@ -17,6 +17,8 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.time.Duration;
@@ -414,8 +416,8 @@ public final class KryoSerializer {
         @Override
         public URL read(Kryo kryo, Input input, Class<? extends URL> type) {
             try {
-                return new URL(input.readString());
-            } catch (MalformedURLException e) {
+                return new URI(input.readString()).toURL();
+            } catch (MalformedURLException | URISyntaxException e) {
                 throw new RuntimeException(e);
             }
         }

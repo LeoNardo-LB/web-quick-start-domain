@@ -1,16 +1,21 @@
 package org.smm.archetype.adapter.access.schedule;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.adapter.access.listener.EventListener;
+import org.smm.archetype.app._shared.event.EventFailureHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
+import org.smm.archetype.domain._shared.event.EventConsumeRecord;
+import org.smm.archetype.infrastructure._shared.event.EventConsumeRecordConverter;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
-import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.event.handler.EventFailureHandler;
-import org.smm.archetype.infrastructure._shared.generated.entity.EventConsumeDO;
-import org.springframework.beans.factory.annotation.Value;
+import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -32,19 +37,79 @@ import java.util.concurrent.ExecutorService;
  * @since 2026/01/09
  */
 @Slf4j
-@RequiredArgsConstructor
 public class EventRetrySchedulerImpl implements EventRetryScheduler {
 
-    private final EventConsumeRepository    eventConsumeRepository;
-    private final List<EventListener>       eventListeners;
-    private final EventSerializer           eventSerializer;
-    private final List<EventFailureHandler> failureHandlers;
+    private final EventConsumeRepository      eventConsumeRepository;
+    private final List<EventListener>         eventListeners;
+    private final List<EventFailureHandler>   failureHandlers;
+    private final ExecutorService             virtualThreadExecutor;
+    private final EventConsumeRecordConverter recordConverter;
+    private final EventPublishRepository      eventPublishRepository;
 
-    @Value("${event.retry.batchSize:100}")
-    private int batchSize;
+    /**
+     * 每批次处理数量
+     */
+    private final int batchSize;
 
-    @Value("${event.retry.highPriorityRatio:0.8}")
-    private double highPriorityRatio;
+    /**
+     * 高优先级事件占比
+     */
+    private final double highPriorityRatio;
+
+    /**
+     * 最大重试次数
+     */
+    private final int maxRetryTimes;
+
+    /**
+     * 重试延迟时间列表（分钟）
+     */
+    private final List<Integer> retryDelays;
+
+    /**
+     * JSON序列化器
+     */
+    private final ObjectMapper objectMapper;
+
+    /**
+     * 构造器
+     * @param eventConsumeRepository 事件消费仓储
+     * @param eventListeners         所有事件监听器
+     * @param failureHandlers        所有失败处理器
+     * @param virtualThreadExecutor  虚拟线程池
+     * @param recordConverter        消费记录转换器
+     * @param eventPublishRepository 事件发布仓储
+     * @param batchSize              每批次处理数量
+     * @param highPriorityRatio      高优先级事件占比
+     * @param maxRetryTimes          最大重试次数
+     * @param retryDelays            重试延迟时间列表（分钟）
+     */
+    public EventRetrySchedulerImpl(
+            final EventConsumeRepository eventConsumeRepository,
+            final List<EventListener> eventListeners,
+            final List<EventFailureHandler> failureHandlers,
+            final ExecutorService virtualThreadExecutor,
+            final EventConsumeRecordConverter recordConverter,
+            final EventPublishRepository eventPublishRepository,
+            final int batchSize,
+            final double highPriorityRatio,
+            final int maxRetryTimes,
+            final List<Integer> retryDelays) {
+        this.eventConsumeRepository = eventConsumeRepository;
+        this.eventListeners = eventListeners;
+        this.failureHandlers = failureHandlers;
+        this.virtualThreadExecutor = virtualThreadExecutor;
+        this.recordConverter = recordConverter;
+        this.eventPublishRepository = eventPublishRepository;
+        this.batchSize = batchSize;
+        this.highPriorityRatio = highPriorityRatio;
+        this.maxRetryTimes = maxRetryTimes;
+        this.retryDelays = new ArrayList<>(retryDelays); // 防御性拷贝
+
+        // 初始化 ObjectMapper
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
+    }
 
     /**
      * 定时调度方法
@@ -83,8 +148,9 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
         ExecutorService virtualTaskExecutor = getExecutorService();
 
         List<CompletableFuture<Void>> futures = events.stream()
-                                                        .map(event -> CompletableFuture.runAsync(() -> replayEvent(event),
-                                                                virtualTaskExecutor))
+                                                        .map(event -> CompletableFuture.runAsync(
+                                                                () -> replayEvent(event), virtualTaskExecutor)
+                                                        )
                                                         .toList();
 
         // 等待所有任务完成
@@ -174,7 +240,9 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
      */
     private void handleReplayFailure(EventConsumeDO consumeDO, Exception e) {
         int currentRetryTimes = consumeDO.getRetryTimes() != null ? consumeDO.getRetryTimes() : 0;
-        int maxRetryTimes = consumeDO.getMaxRetryTimes() != null ? consumeDO.getMaxRetryTimes() : 3;
+        int maxRetryTimes = consumeDO.getMaxRetryTimes() != null
+                                    ? consumeDO.getMaxRetryTimes()
+                                    : this.maxRetryTimes;
 
         if (currentRetryTimes >= maxRetryTimes) {
             // 达到最大重试次数，标记为失败并调用失败处理器
@@ -195,10 +263,9 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
             consumeDO.setRetryTimes(currentRetryTimes + 1);
             consumeDO.setErrorMessage(e.getMessage());
 
-            // 计算下次重试时间（指数退避：1, 5, 15, 30, 60 分钟）
-            int[] delays = {1, 5, 15, 30, 60};
-            int index = Math.min(currentRetryTimes, delays.length - 1);
-            consumeDO.setNextRetryTime(java.time.Instant.now().plusSeconds(delays[index] * 60L));
+            // 使用配置的延迟时间
+            int delayMinutes = getRetryDelay(currentRetryTimes);
+            consumeDO.setNextRetryTime(java.time.Instant.now().plus(delayMinutes, ChronoUnit.MINUTES));
 
             // 更新数据库状态
             eventConsumeRepository.updateStatusWithVersion(consumeDO);
@@ -210,18 +277,21 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
 
     /**
      * 处理失败事件
-     * @param consumeDO 消费记录
-     * @param e 原始异常
+     * @param consumeDO 消费记录DO对象
+     * @param e         原始异常
      */
     private void handleFailedEvent(EventConsumeDO consumeDO, Exception e) {
         try {
             // 反序列化事件
             DomainEvent event = deserializeEvent(consumeDO);
 
+            // 将EventConsumeDO转换为EventConsumeRecord（Domain层值对象）
+            EventConsumeRecord consumeRecord = recordConverter.from(consumeDO);
+
             // 查找对应的失败处理器
             for (EventFailureHandler handler : failureHandlers) {
                 if (handler.supports(event.getEventType())) {
-                    handler.handleFailure(event, consumeDO, e);
+                    handler.handleFailure(event, consumeRecord, e);
                     return;
                 }
             }
@@ -242,12 +312,37 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
         // 从 event_publish 表查询事件类型和事件数据
         // EventConsumeDO 只存储 eventId，需要查询 event_publish 表获取完整信息
 
-        // 简化实现：假设可以从 eventPublishMapper 查询
-        // TODO: 实现从 event_publish 表查询事件类型和数据的逻辑
-        String eventType = DomainEvent.class.getName();
-        String eventData = "{}";
+        EventPublishDO eventPublishDO = eventPublishRepository.findByEventId(consumeDO.getEventId());
 
-        return eventSerializer.deserialize(eventData, eventType);
+        if (eventPublishDO == null) {
+            log.error("Event not found in event_publish table: eventId={}", consumeDO.getEventId());
+            throw new IllegalStateException("Event not found: " + consumeDO.getEventId());
+        }
+
+        // 从event_publish表获取事件类型和数据
+        String eventType = eventPublishDO.getType();
+        String eventData = eventPublishDO.getData();
+
+        return deserializeEvent(eventData, eventType);
+    }
+
+    /**
+     * 将JSON字符串反序列化为领域事件
+     * @param json      JSON字符串
+     * @param eventType 事件类型
+     * @return 领域事件
+     */
+    private DomainEvent deserializeEvent(String json, String eventType) {
+        try {
+            Class<?> eventClass = Class.forName(eventType);
+            return (DomainEvent) objectMapper.readValue(json, eventClass);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to deserialize event: type={}, json={}", eventType, json, e);
+            throw new RuntimeException("Event deserialization failed", e);
+        } catch (ClassNotFoundException e) {
+            log.error("Event class not found: type={}", eventType, e);
+            throw new RuntimeException("Event class not found: " + eventType, e);
+        }
     }
 
     /**
@@ -271,8 +366,21 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
      * @return ExecutorService
      */
     private ExecutorService getExecutorService() {
-        // TODO: 从 ThreadPoolConfigure 注入虚拟线程池
-        return java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor();
+        // 从ThreadPoolConfigure注入的虚拟线程池
+        return virtualThreadExecutor;
+    }
+
+    /**
+     * 获取指定重试次数的延迟时间
+     * @param retryTimes 当前重试次数（从0开始）
+     * @return 延迟时间（分钟）
+     */
+    private int getRetryDelay(int retryTimes) {
+        if (retryDelays == null || retryDelays.isEmpty()) {
+            return 1; // 默认1分钟
+        }
+        int index = Math.min(retryTimes, retryDelays.size() - 1);
+        return retryDelays.get(index);
     }
 
 }

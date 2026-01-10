@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smm.archetype.domain._example.order.event.OrderCancelledEvent;
 import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.EventType;
 
 /**
  * 订单取消事件处理器
@@ -35,11 +34,6 @@ public class OrderCancelledEventHandler implements EventHandler<OrderCancelledEv
     @Override
     public boolean canHandle(DomainEvent event) {
         return event instanceof OrderCancelledEvent;
-    }
-
-    @Override
-    public EventType getEventType() {
-        return EventType.ORDER_CANCELLED;
     }
 
 }

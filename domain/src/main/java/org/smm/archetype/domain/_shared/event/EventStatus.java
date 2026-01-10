@@ -1,6 +1,5 @@
 package org.smm.archetype.domain._shared.event;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -12,7 +11,6 @@ import lombok.Getter;
  * @since 2026/01/09
  */
 @Getter
-@AllArgsConstructor
 public enum EventStatus {
 
     /**
@@ -37,6 +35,13 @@ public enum EventStatus {
      * 状态描述
      */
     private final String description;
+
+    /**
+     * 构造函数
+     */
+    EventStatus(String description) {
+        this.description = description;
+    }
 
     /**
      * 判断是否可以发布

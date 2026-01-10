@@ -1,14 +1,13 @@
 package org.smm.archetype.infrastructure._shared.client.oss.impl;
 
+import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.client.IdClient;
-import org.smm.archetype.domain.common.file.File;
+import org.smm.archetype.domain.common.file.FileMetadata;
+import org.smm.archetype.domain.common.file.FileMetadata.Status;
 import org.smm.archetype.infrastructure._shared.client.oss.AbstractOssClient;
-import org.smm.archetype.infrastructure._shared.generated.entity.FileBusinessDO;
-import org.smm.archetype.infrastructure._shared.generated.entity.FileMetadataDO;
-import org.smm.archetype.infrastructure._shared.generated.mapper.FileBusinessMapper;
-import org.smm.archetype.infrastructure._shared.generated.mapper.FileMetadataMapper;
-import org.smm.archetype.infrastructure.common.file.config.OssProperties;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileMetadataDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.FileMetadataMapper;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -27,9 +26,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 
-import static org.smm.archetype.infrastructure._shared.generated.entity.table.FileBusinessDOTableDef.FILE_BUSINESS_DO;
-import static org.smm.archetype.infrastructure._shared.generated.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
+import static org.smm.archetype.infrastructure._shared.generated.repository.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
 
 /**
  * RustFS 对象存储服务实现
@@ -49,38 +48,33 @@ import static org.smm.archetype.infrastructure._shared.generated.entity.table.Fi
 public class RustFsOssClientImpl extends AbstractOssClient {
 
     private final S3Client s3Client;
-    private final String   bucket;
+    private final String bucket;
 
     /**
      * 构造 RustFS 对象存储服务
-     * @param properties     对象存储配置
+     * @param endpoint       RustFS服务器地址
+     * @param accessKey      Access Key
+     * @param secretKey      Secret Key
+     * @param bucket         Bucket名称
      * @param metadataMapper 文件元数据 Mapper
-     * @param businessMapper 文件业务 Mapper
      * @param idClient       ID 生成服务
      */
     public RustFsOssClientImpl(
-            OssProperties properties,
+            String endpoint,
+            String accessKey,
+            String secretKey,
+            String bucket,
             FileMetadataMapper metadataMapper,
-            FileBusinessMapper businessMapper,
             IdClient idClient) {
 
-        super(properties, metadataMapper, businessMapper, idClient);
-
-        OssProperties.RustFs rustfsConfig = properties.getRustfs();
-        this.bucket = rustfsConfig.getBucket();
+        super(metadataMapper, idClient);
+        this.bucket = bucket;
 
         // 创建 S3 Client（参考 RustFS 官方文档）
         this.s3Client = S3Client.builder()
-                                .endpointOverride(URI.create(rustfsConfig.getEndpoint()))
+                                .endpointOverride(URI.create(endpoint))
                                 .region(Region.US_EAST_1) // RustFS 不校验 region
-                                .credentialsProvider(
-                                        StaticCredentialsProvider.create(
-                                                AwsBasicCredentials.create(
-                                                        rustfsConfig.getAccessKey(),
-                                                        rustfsConfig.getSecretKey()
-                                                )
-                                        )
-                                )
+                                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
                                 .forcePathStyle(true) // 关键配置！RustFS 需启用 Path-Style
                                 .build();
 
@@ -104,10 +98,13 @@ public class RustFsOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected String doUpload(byte[] contentBytes, String fileName, String contentType, String fileId) throws Exception {
-        // 生成 S3 key：yyyy/MM/fileId-fileName
+    protected String doUpload(byte[] contentBytes, String fileName, String contentType) throws Exception {
+        // 生成 S3 key：yyyy/MM/timestamp-fileName
         String datePath = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM"));
-        String key = datePath + "/" + fileId + "-" + fileName;
+
+        // 使用纳秒时间戳作为文件标识（与 LocalOssClientImpl 保持一致）
+        String timestamp = String.valueOf(System.nanoTime());
+        String key = datePath + "/" + timestamp + "-" + fileName;
 
         // 上传文件到 RustFS
         PutObjectRequest putRequest = PutObjectRequest.builder()
@@ -123,7 +120,7 @@ public class RustFsOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected InputStream doDownload(String filePath, String fileId) throws Exception {
+    protected InputStream doDownload(String filePath) throws Exception {
         // filePath 就是 S3 key
         GetObjectRequest getRequest = GetObjectRequest.builder()
                                               .bucket(bucket)
@@ -136,7 +133,7 @@ public class RustFsOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected void doDelete(String filePath, String fileId) throws Exception {
+    protected void doDelete(String filePath) throws Exception {
         // filePath 就是 S3 key
         DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
                                                     .bucket(bucket)
@@ -182,121 +179,58 @@ public class RustFsOssClientImpl extends AbstractOssClient {
 
     /**
      * 搜索文件（RustFS 不支持元数据搜索，只能从数据库查询）
-     * @param fileNamePattern    文件名模式（支持 SQL LIKE）
-     * @param businessEntityType 业务实体类型
-     * @param businessId         业务ID
+     * @param fileNamePattern 文件名模式（支持 SQL LIKE）
      * @return 文件列表
      */
     @Override
-    protected java.util.List<org.smm.archetype.domain.common.file.File> doSearchFiles(
-            String fileNamePattern,
-            org.smm.archetype.domain.common.file.File.FileBusinessEntityType businessEntityType,
-            String businessId) {
+    protected List<FileMetadata> doSearchFiles(String fileNamePattern) {
 
-        log.debug("Searching files in database: pattern={}, businessType={}, businessId={}",
-                fileNamePattern, businessEntityType, businessId);
+        log.debug("Searching files in database: pattern={}", fileNamePattern);
 
         // 从数据库查询（RustFS 本身不支持元数据搜索）
-        // 查询文件业务关联表
-        java.util.List<FileBusinessDO> businessDOList = businessMapper.selectListByCondition(
-                FILE_BUSINESS_DO.BUSINESS_ID.eq(businessId)
-                        .and(FILE_BUSINESS_DO.TYPE.eq(businessEntityType.name()))
-        );
+        QueryWrapper query = QueryWrapper.create()
+                                     .select()
+                                     .from(FILE_METADATA_DO);
 
-        if (businessDOList.isEmpty()) {
-            return java.util.Collections.emptyList();
-        }
-
-        // 获取文件ID列表
-        java.util.List<String> fileIds = businessDOList.stream()
-                                                 .map(FileBusinessDO::getFileId)
-                                                 .toList();
-
-        // 查询文件元数据表
-        var metadataCondition = FILE_METADATA_DO.FILE_ID.in(fileIds);
-        java.util.List<FileMetadataDO> metadataDOList = metadataMapper.selectListByCondition(metadataCondition);
-
-        // 按文件名过滤
+        // 如果有文件名模式，添加模糊查询
         if (fileNamePattern != null && !fileNamePattern.isBlank()) {
-            final String pattern = fileNamePattern;
-            metadataDOList = metadataDOList.stream()
-                                     .filter(metadata -> {
-                                         // 从 businessDOList 中找到对应的 FileBusinessDO
-                                         return businessDOList.stream()
-                                                        .filter(b -> b.getFileId().equals(metadata.getFileId()))
-                                                        .anyMatch(b -> b.getName() != null && b.getName().matches(".*" + pattern + ".*"));
-                                     })
-                                     .toList();
+            String sqlPattern = fileNamePattern.replace("*", "%").replace("?", "_");
+            query.where(FILE_METADATA_DO.PATH.like(sqlPattern));
         }
 
-        // 组装结果
+        List<FileMetadataDO> metadataDOList = metadataMapper.selectListByQuery(query);
+
+        // 转换为 FileMetadata 领域对象
         return metadataDOList.stream()
-                       .map(metadata -> {
-                           FileBusinessDO business = businessDOList.stream()
-                                                             .filter(b -> b.getFileId().equals(metadata.getFileId()))
-                                                             .findFirst()
-                                                             .orElse(null);
-
-                           if (business == null) {
-                               return null;
-                           }
-
-                           return convertToFile(metadata, business);
-                       })
-                       .filter(java.util.Objects::nonNull)
+                       .map(this::convertToFile)
                        .toList();
     }
 
     /**
-     * 转换为 File 领域对象
+     * 转换为 FileMetadata 领域对象
      */
-    private File convertToFile(FileMetadataDO metadataDO, FileBusinessDO businessDO) {
-
-        File.FileBuilder fileBuilder = File.builder()
-                                               .setFileId(metadataDO.getFileId())
-                                               .setFilePath(metadataDO.getPath())
-                                               .setFileUrl(metadataDO.getUrl())
-                                               .setMd5(metadataDO.getMd5())
-                                               .setContentType(metadataDO.getContentType())
-                                               .setFileSize(metadataDO.getSize())
-                                               .setStatus(File.FileStatus.ACTIVE)
-                                               .setCreateTime(metadataDO.getCreateTime())
-                                               .setUpdateTime(metadataDO.getUpdateTime());
-
-        // 如果有业务关联信息，则设置
-        if (businessDO != null) {
-            fileBuilder.setFileName(businessDO.getName())
-                    .setFileBusiness(File.FileBusiness.builder()
-                                             .setBusinessEntityType(toBusinessEntityType(businessDO.getType()))
-                                             .setBusinessId(businessDO.getBusinessId())
-                                             .setUsageType(toUsageType(businessDO.getUsage()))
-                                             .setOrder(businessDO.getSort())
-                                             .build());
+    private FileMetadata convertToFile(FileMetadataDO metadataDO) {
+        // 从path中提取文件名
+        String fileName = metadataDO.getPath();
+        if (fileName != null && fileName.contains("/")) {
+            fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+            // 移除时间戳前缀（如果存在）
+            if (fileName.contains("-")) {
+                fileName = fileName.substring(fileName.indexOf("-") + 1);
+            }
         }
 
-        return fileBuilder.build();
-    }
-
-    /**
-     * 转换业务实体类型
-     */
-    private File.FileBusinessEntityType toBusinessEntityType(String type) {
-        try {
-            return File.FileBusinessEntityType.valueOf(type);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * 转换使用类型
-     */
-    private File.UsageType toUsageType(String usage) {
-        try {
-            return File.UsageType.valueOf(usage);
-        } catch (Exception e) {
-            return null;
-        }
+        return FileMetadata.builder()
+                       .setFileName(fileName)
+                       .setFilePath(metadataDO.getPath())
+                       .setFileUrl(metadataDO.getUrl())
+                       .setMd5(metadataDO.getMd5())
+                       .setContentType(metadataDO.getContentType())
+                       .setFileSize(metadataDO.getSize())
+                       .setStatus(Status.ACTIVE)
+                       .setCreateTime(metadataDO.getCreateTime())
+                       .setUpdateTime(metadataDO.getUpdateTime())
+                       .build();
     }
 
     /**

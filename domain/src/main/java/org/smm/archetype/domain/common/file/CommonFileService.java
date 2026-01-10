@@ -1,13 +1,13 @@
 package org.smm.archetype.domain.common.file;
 
+import org.smm.archetype.domain.common.file.FileBusiness.Type;
+import org.smm.archetype.domain.common.file.FileBusiness.Usage;
+
 import java.io.InputStream;
 import java.util.List;
 
 /**
- * 对象存储服务接口
- *
- * <p>提供文件上传、下载、删除、生成URL等基础能力。
- *
+ * 通用文件服务，整合OssClient、业务文件对象、文件元数据对象
  * @author Leonardo
  * @since 2026/01/09
  */
@@ -15,54 +15,38 @@ public interface CommonFileService {
 
     /**
      * 上传文件
-     * @param inputStream 文件流
-     * @param fileName    文件名
-     * @param contentType MIME类型
-     * @return 文件路径
+     * @param inputStream 文件输入流
+     * @param fileMetadata    文件元信息
      */
-    String upload(InputStream inputStream, String fileName, String contentType);
+    void uploadFile(InputStream inputStream, FileMetadata fileMetadata, FileBusiness fileBusiness);
 
-    /**
-     * 下载文件
-     * @param filePath 文件路径
-     * @return 文件流
-     */
-    InputStream download(String filePath);
-
-    /**
-     * 删除文件
-     * @param filePath 文件路径
-     */
-    void delete(String filePath);
-
-    /**
-     * 生成访问URL
-     * @param filePath      文件路径
-     * @param expireSeconds 过期时间（秒），0表示永久有效
-     * @return 访问URL
-     */
-    String generateUrl(String filePath, long expireSeconds);
-
-    /**
-     * 模糊查询文件
-     * @param fileNamePattern    文件名模式（支持通配符）
-     * @param businessEntityType 业务实体类型
-     * @param businessId         业务ID
+    /**5
+     * 列出业务文件
+     * @param businessId 业务ID
+     * @param type       业务实体类型
+     * @param usage      使用场景
      * @return 文件列表
      */
-    List<File> searchFiles(String fileNamePattern, File.FileBusinessEntityType businessEntityType, String businessId);
+    List<FileBusiness> listFileBusinesss(String businessId, Type type, Usage usage);
 
     /**
-     * 检查文件是否存在
-     * @param filePath 文件路径
-     * @return true-存在，false-不存在
+     * 获取业务文件
+     * @param id 文件ID
      */
-    boolean exists(String filePath);
+    FileBusiness getFileBusiness(String id);
 
     /**
-     * 获取文件大小
-     * @param filePath 文件路径
-     * @return 文件大小（字节）
+     * 获取文件
+     * @param id 元文件ID
+     * @return 元文件
      */
-    long getFileSize(String filePath);
+    FileMetadata getFileMeta(String id);
+
+    /**
+     * 获取文件URL
+     * @param fileMetaId 文件元信息ID
+     * @return 文件URL
+     */
+    String getFileUrl(String fileMetaId);
+
 }

@@ -1,10 +1,6 @@
 package org.smm.archetype.adapter.access.listener;
 
-import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.EventType;
-
-import java.util.List;
 
 /**
  * 事件监听器接口
@@ -22,17 +18,5 @@ public interface EventListener {
      * @param event 领域事件
      */
     void onEvent(DomainEvent event);
-
-    /**
-     * 获取支持的事件类型
-     * @return 事件类型枚举
-     */
-    EventType getEventType();
-
-    /**
-     * 获取事件处理器列表
-     * @return 事件处理器列表
-     */
-    List<EventHandler<DomainEvent>> getEventHandlers();
 
 }

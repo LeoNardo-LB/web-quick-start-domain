@@ -1,12 +1,14 @@
 package org.smm.archetype.infrastructure._shared.event.publisher;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventStatus;
 import org.smm.archetype.infrastructure._shared.event.DomainSpringEvent;
-import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.entity.EventPublishDO;
-import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
@@ -42,13 +44,15 @@ import org.springframework.scheduling.annotation.Async;
 public class SpringEventPublisher extends AbstractEventPublisher<DomainEvent> {
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ObjectMapper objectMapper;
 
     public SpringEventPublisher(
             ApplicationEventPublisher applicationEventPublisher,
-            EventPublishMapper eventPublishMapper,
-            EventSerializer eventSerializer) {
-        super(eventPublishMapper, eventSerializer);
+            EventPublishMapper eventPublishMapper) {
+        super(eventPublishMapper);
         this.applicationEventPublisher = applicationEventPublisher;
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Override
@@ -67,6 +71,23 @@ public class SpringEventPublisher extends AbstractEventPublisher<DomainEvent> {
             // 发布失败，保持 CREATED 状态，由定时任务重试
             log.error("Failed to publish event via Spring: eventId={}", event.getEventId(), e);
             throw e;
+        }
+    }
+
+    /**
+     * 序列化领域事件为JSON字符串
+     *
+     * <p>实现父类的抽象方法，用于持久化事件到数据库。
+     * @param event 领域事件
+     * @return JSON字符串
+     */
+    @Override
+    protected String serializeEvent(DomainEvent event) {
+        try {
+            return objectMapper.writeValueAsString(event);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize event: {}", event.getEventId(), e);
+            throw new RuntimeException("Event serialization failed", e);
         }
     }
 

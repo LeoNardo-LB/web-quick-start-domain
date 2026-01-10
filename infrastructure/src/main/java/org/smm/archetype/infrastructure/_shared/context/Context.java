@@ -12,7 +12,7 @@ public interface Context<T> {
 
     T getData();
 
-    default Context<T> export() {
+    default Context<?> export() {
         return BeanUtil.toBean(this, this.getClass());
     }
 

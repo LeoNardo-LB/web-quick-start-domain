@@ -3,9 +3,8 @@ package org.smm.archetype.infrastructure._shared.event.publisher;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventStatus;
-import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.entity.EventPublishDO;
-import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -43,14 +42,16 @@ import java.util.concurrent.CompletableFuture;
 )
 public class KafkaEventPublisher extends AbstractEventPublisher<DomainEvent> {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, DomainEvent> kafkaTemplate;
+    private final String                             topicPrefix;
 
     public KafkaEventPublisher(
-            KafkaTemplate<String, String> kafkaTemplate,
+            KafkaTemplate<String, DomainEvent> kafkaTemplate,
             EventPublishMapper eventPublishMapper,
-            EventSerializer eventSerializer) {
-        super(eventPublishMapper, eventSerializer);
+            String topicPrefix) {
+        super(eventPublishMapper);
         this.kafkaTemplate = kafkaTemplate;
+        this.topicPrefix = topicPrefix;
     }
 
     @Override
@@ -58,11 +59,11 @@ public class KafkaEventPublisher extends AbstractEventPublisher<DomainEvent> {
     protected void doPublish(DomainEvent event, EventPublishDO eventDO) throws Exception {
         String topic = getTopic(event);
         String key = event.getAggregateId();
-        String value = eventSerializer.serialize(event);
 
         log.debug("Sending event to Kafka: topic={}, eventId={}", topic, event.getEventId());
 
-        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, key, value);
+        // Spring Kafka会自动序列化DomainEvent并添加__TypeId__ header
+        CompletableFuture<SendResult<String, DomainEvent>> future = kafkaTemplate.send(topic, key, event);
 
         // 异步处理发送结果
         future.whenComplete((result, ex) -> {
@@ -86,10 +87,29 @@ public class KafkaEventPublisher extends AbstractEventPublisher<DomainEvent> {
      * @return Kafka 主题
      */
     private String getTopic(DomainEvent event) {
-        // 根据事件类型决定主题
-        // 也可以根据优先级：高优先级事件发到高优先级主题
         String eventTypeName = event.getEventTypeName();
-        return "domain-events"; // 可以配置为：domain-events.{priority}
+        return topicPrefix + eventTypeName;
+    }
+
+    /**
+     * 序列化领域事件为JSON字符串
+     *
+     * <p>实现父类的抽象方法，用于持久化事件到数据库。
+     * @param event 领域事件
+     * @return JSON字符串
+     */
+    @Override
+    protected String serializeEvent(DomainEvent event) {
+        // 注意：这里仍然需要序列化为JSON用于数据库持久化
+        // 但Kafka发送使用Spring Kafka的自动序列化
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+            return mapper.writeValueAsString(event);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            log.error("Failed to serialize event: {}", event.getEventId(), e);
+            throw new RuntimeException("Event serialization failed", e);
+        }
     }
 
 }

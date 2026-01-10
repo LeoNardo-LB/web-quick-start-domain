@@ -72,17 +72,17 @@
             <artifactId>s3</artifactId>
         </dependency>
 
-        <!-- 阿里云SDK（可选，根据需要添加）-->
-        <!--
+        <!-- 阿里云SDK（短信服务）-->
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>dysmsapi20170525</artifactId>
         </dependency>
+
+        <!-- 阿里云SDK（邮件推送服务）-->
         <dependency>
             <groupId>com.aliyun</groupId>
-            <artifactId>dm20151115</artifactId>
+            <artifactId>dm20151123</artifactId>
         </dependency>
-        -->
     </dependencies>
 
 </project>

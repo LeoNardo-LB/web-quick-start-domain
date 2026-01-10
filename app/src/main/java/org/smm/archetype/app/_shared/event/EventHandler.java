@@ -1,7 +1,6 @@
 package org.smm.archetype.app._shared.event;
 
 import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.EventType;
 
 /**
  * 事件处理器（Event Handler）接口
@@ -19,7 +18,6 @@ import org.smm.archetype.domain._shared.event.EventType;
  * <p>使用示例：
  * <pre>{@code
  * // 处理订单创建事件
- * @Component
  * public class OrderCreatedEventHandler implements EventHandler<OrderCreatedEvent> {
  *     private final NotificationService notificationService;
  *
@@ -58,12 +56,6 @@ public interface EventHandler<T extends DomainEvent> {
      * @return 如果可以处理返回true
      */
     boolean canHandle(DomainEvent event);
-
-    /**
-     * 获取支持的事件类型
-     * @return 事件类型枚举
-     */
-    EventType getEventType();
 
     /**
      * 获取处理器优先级

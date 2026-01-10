@@ -1,6 +1,5 @@
 package org.smm.archetype.domain._shared.event;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -31,7 +30,6 @@ import lombok.Getter;
  * @since 2026/01/09
  */
 @Getter
-@AllArgsConstructor
 public enum EventType {
 
     /**
@@ -109,6 +107,18 @@ public enum EventType {
      * 事件优先级
      */
     private final EventPriority priority;
+
+    /**
+     * 构造函数
+     * @param eventClassName 事件类名
+     * @param description    事件描述
+     * @param priority       事件优先级
+     */
+    EventType(String eventClassName, String description, EventPriority priority) {
+        this.eventClassName = eventClassName;
+        this.description = description;
+        this.priority = priority;
+    }
 
     /**
      * 根据事件类名获取事件类型

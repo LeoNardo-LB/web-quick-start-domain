@@ -3,22 +3,24 @@ package org.smm.archetype.adapter.access.listener;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.EventType;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
-import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.entity.EventConsumeDO;
-import org.smm.archetype.infrastructure._shared.generated.mapper.EventConsumeMapper;
-import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * Kafka 事件监听器
  *
- * <p>监听 Kafka 消息队列中的领域事件，并调用 EventHandler 处理。
+ * <p>监听 Kafka 消息队列中的领域事件，使用 Spring Kafka 的自动反序列化功能。
+ *
+ * <p>Spring Kafka 的 JsonDeserializer 会根据消息中的 __TypeId__ header
+ * 自动将 JSON 消息反序列化为对应的 DomainEvent 子类型。
+ *
  * @author Leonardo
- * @since 2026/01/09
+ * @since 2026/01/10
  */
 @Slf4j
 public class KafkaEventListener extends AbstractEventConsumer<DomainEvent> implements EventListener {
@@ -27,9 +29,8 @@ public class KafkaEventListener extends AbstractEventConsumer<DomainEvent> imple
             EventConsumeMapper eventConsumeMapper,
             EventConsumeRepository eventConsumeRepository,
             EventPublishMapper eventPublishMapper,
-            EventSerializer eventSerializer,
             List<EventHandler<DomainEvent>> eventHandlers) {
-        super(eventConsumeMapper, eventConsumeRepository, eventPublishMapper, eventSerializer, eventHandlers);
+        super(eventConsumeMapper, eventConsumeRepository, eventPublishMapper, eventHandlers);
     }
 
     @Override
@@ -42,69 +43,23 @@ public class KafkaEventListener extends AbstractEventConsumer<DomainEvent> imple
         return "KafkaEventListener";
     }
 
+    /**
+     * 处理Kafka消息
+     *
+     * <p>Spring Kafka 会自动根据 __TypeId__ header 反序列化为具体的 DomainEvent 子类型。
+     * @param event 领域事件（已自动反序列化）
+     */
     @Override
-    @KafkaListener(topics = "domain-events", groupId = "kafka-consumer-group")
+    @KafkaListener(
+            topics = "${middleware.kafka.consumer.topics}",
+            groupId = "${middleware.kafka.consumer.group-id}",
+            containerFactory = "kafkaListenerContainerFactory"
+    )
+    @Transactional(rollbackFor = Exception.class)
     public void onEvent(DomainEvent event) {
-        log.debug("Received event from Kafka: eventId={}", event.getEventId());
+        log.debug("Received event from Kafka: eventId={}, type={}",
+                event.getEventId(), event.getClass().getSimpleName());
         consume(event);
     }
 
-    /**
-     * 监听 Kafka 消息（字符串格式）
-     * @param message JSON 格式的事件消息
-     */
-    @KafkaListener(topics = "domain-events", groupId = "kafka-consumer-group")
-    public void onMessage(String message) {
-        try {
-            log.debug("Received message from Kafka: {}", message);
-
-            // 反序列化为 DomainEvent
-            DomainEvent event = deserializeMessage(message);
-
-            // 调用 consume 方法
-            consume(event);
-
-        } catch (Exception e) {
-            log.error("Error processing Kafka message: {}", message, e);
-        }
-    }
-
-    @Override
-    protected void doConsume(DomainEvent event, EventConsumeDO consumeDO) throws Exception {
-        // 调用对应的 EventHandler 处理事件
-        for (EventHandler<DomainEvent> handler : eventHandlers) {
-            if (handler.canHandle(event)) {
-                log.debug("Delegating to handler: eventId={}, handler={}",
-                        event.getEventId(), handler.getClass().getSimpleName());
-                handler.handle(event);
-                return;
-            }
-        }
-
-        log.warn("No handler found for event: eventId={}, type={}",
-                event.getEventId(), event.getEventTypeName());
-    }
-
-    @Override
-    public EventType getEventType() {
-        return EventType.UNKNOWN; // 支持所有事件类型
-    }
-
-    @Override
-    public List<EventHandler<DomainEvent>> getEventHandlers() {
-        return eventHandlers;
-    }
-
-    /**
-     * 反序列化消息为 DomainEvent
-     * @param message JSON 消息
-     * @return DomainEvent
-     */
-    private DomainEvent deserializeMessage(String message) {
-        // TODO: 从消息中提取事件类型和事件数据
-        // 简化实现：假设消息是完整的 JSON，包含类型信息
-        return eventSerializer.deserialize(message, DomainEvent.class.getName());
-    }
-
 }
-

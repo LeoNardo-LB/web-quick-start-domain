@@ -1,6 +1,6 @@
 package org.smm.archetype.domain._shared.client;
 
-import org.smm.archetype.domain.common.file.File;
+import org.smm.archetype.domain.common.file.FileMetadata;
 
 import java.io.InputStream;
 import java.util.List;
@@ -44,12 +44,10 @@ public interface OssClient {
 
     /**
      * 模糊查询文件
-     * @param fileNamePattern    文件名模式（支持通配符）
-     * @param businessEntityType 业务实体类型
-     * @param businessId         业务ID
+     * @param fileNamePattern 文件名模式（支持通配符）
      * @return 文件列表
      */
-    List<File> searchFiles(String fileNamePattern, File.FileBusinessEntityType businessEntityType, String businessId);
+    List<FileMetadata> searchFiles(String fileNamePattern);
 
     /**
      * 检查文件是否存在

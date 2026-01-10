@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smm.archetype.domain._example.order.event.OrderPaidEvent;
 import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.EventType;
 
 /**
  * 订单支付事件处理器
@@ -36,11 +35,6 @@ public class OrderPaidEventHandler implements EventHandler<OrderPaidEvent> {
     @Override
     public boolean canHandle(DomainEvent event) {
         return event instanceof OrderPaidEvent;
-    }
-
-    @Override
-    public EventType getEventType() {
-        return EventType.ORDER_PAID;
     }
 
 }

@@ -1,6 +1,5 @@
 package org.smm.archetype.domain._shared.event;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -12,7 +11,6 @@ import lombok.Getter;
  * @since 2026/01/09
  */
 @Getter
-@AllArgsConstructor
 public enum EventPriority {
 
     /**
@@ -33,6 +31,14 @@ public enum EventPriority {
      * 优先级描述
      */
     private final String description;
+
+    /**
+     * 构造函数
+     * @param description 优先级描述
+     */
+    EventPriority(String description) {
+        this.description = description;
+    }
 
     /**
      * 判断是否为高优先级

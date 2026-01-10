@@ -20,7 +20,6 @@ public @interface LogAnno {
 
     /**
      * 业务名称
-     *
      * 标识当前业务操作的名称，用于日志记录和分类。
      */
     String value() default "";

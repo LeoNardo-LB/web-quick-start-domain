@@ -3,8 +3,8 @@ package org.smm.archetype.infrastructure._shared.event;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.infrastructure._shared.generated.entity.EventConsumeDO;
-import org.smm.archetype.infrastructure._shared.generated.mapper.EventConsumeMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
 
 import java.time.Instant;
 import java.util.List;

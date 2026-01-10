@@ -1,14 +1,12 @@
 package org.smm.archetype.infrastructure._shared.event.publisher;
 
 import com.mybatisflex.core.query.QueryWrapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventPublisher;
 import org.smm.archetype.domain._shared.event.EventStatus;
-import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.entity.EventPublishDO;
-import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -29,11 +27,13 @@ import java.util.List;
  * @since 2026/01/09
  */
 @Slf4j
-@RequiredArgsConstructor
 public abstract class AbstractEventPublisher<T extends DomainEvent> implements EventPublisher {
 
     protected final EventPublishMapper eventPublishMapper;
-    protected final EventSerializer    eventSerializer;
+
+    protected AbstractEventPublisher(EventPublishMapper eventPublishMapper) {
+        this.eventPublishMapper = eventPublishMapper;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -82,6 +82,15 @@ public abstract class AbstractEventPublisher<T extends DomainEvent> implements E
     protected abstract void doPublish(DomainEvent event, EventPublishDO eventDO) throws Exception;
 
     /**
+     * 序列化领域事件为JSON字符串
+     *
+     * <p>由子类实现具体的序列化逻辑。
+     * @param event 领域事件
+     * @return JSON字符串
+     */
+    protected abstract String serializeEvent(DomainEvent event);
+
+    /**
      * 更新事件状态
      * @param eventId 事件ID
      * @param status  新状态
@@ -91,11 +100,7 @@ public abstract class AbstractEventPublisher<T extends DomainEvent> implements E
             EventPublishDO eventDO = new EventPublishDO();
             eventDO.setStatus(status.name());
 
-            eventPublishMapper.updateByQuery(
-                    eventDO,
-                    QueryWrapper.create()
-                            .where("event_id = ?", eventId)
-            );
+            eventPublishMapper.updateByQuery(eventDO, QueryWrapper.create().where("event_id = ?", eventId));
             log.debug("Event status updated: eventId={}, status={}", eventId, status);
         } catch (Exception e) {
             log.error("Failed to update event status: eventId={}, status={}", eventId, status, e);
@@ -115,7 +120,7 @@ public abstract class AbstractEventPublisher<T extends DomainEvent> implements E
         eventDO.setType(event.getEventTypeName());
         eventDO.setPriority(event.getPriority().name());
         eventDO.setOccurredOn(event.getOccurredOn());
-        eventDO.setData(eventSerializer.serialize(event));
+        eventDO.setData(serializeEvent(event));
         eventDO.setStatus(EventStatus.CREATED.name());
         eventDO.setMaxRetryTimes(event.getMaxRetryTimes());
         eventDO.setStep(0);

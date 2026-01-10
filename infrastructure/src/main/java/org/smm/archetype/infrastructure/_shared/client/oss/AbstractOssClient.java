@@ -4,18 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.client.IdClient;
 import org.smm.archetype.domain._shared.client.OssClient;
-import org.smm.archetype.domain.common.file.File;
-import org.smm.archetype.infrastructure._shared.generated.entity.FileBusinessDO;
-import org.smm.archetype.infrastructure._shared.generated.entity.FileMetadataDO;
-import org.smm.archetype.infrastructure._shared.generated.mapper.FileBusinessMapper;
-import org.smm.archetype.infrastructure._shared.generated.mapper.FileMetadataMapper;
-import org.smm.archetype.infrastructure.common.file.config.OssProperties;
+import org.smm.archetype.domain.common.file.FileMetadata;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileMetadataDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.FileMetadataMapper;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.List;
 
-import static org.smm.archetype.infrastructure._shared.generated.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
+import static org.smm.archetype.infrastructure._shared.generated.repository.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
 
 /**
  * 对象存储服务抽象基类
@@ -35,19 +32,9 @@ import static org.smm.archetype.infrastructure._shared.generated.entity.table.Fi
 public abstract class AbstractOssClient implements OssClient {
 
     /**
-     * 对象存储配置
-     */
-    protected final OssProperties properties;
-
-    /**
      * 文件元数据 Mapper
      */
     protected final FileMetadataMapper metadataMapper;
-
-    /**
-     * 文件业务关联 Mapper
-     */
-    protected final FileBusinessMapper businessMapper;
 
     /**
      * ID 生成服务
@@ -69,23 +56,19 @@ public abstract class AbstractOssClient implements OssClient {
                 throw new IllegalArgumentException("FileName cannot be null or blank");
             }
 
-            // 2. 生成 fileId
-            String fileId = idClient.generateId(IdClient.Type.FILE);
-            log.debug("Generated fileId: {}", fileId);
-
-            // 3. 计算文件大小和 MD5
+            // 2. 计算文件大小和 MD5
             byte[] contentBytes = inputStream.readAllBytes();
             long fileSize = contentBytes.length;
             String md5 = calculateMd5(contentBytes);
 
-            // 4. 调用扩展点（由子类实现）
-            String filePath = doUpload(contentBytes, fileName, contentType, fileId);
+            // 3. 调用扩展点（由子类实现）
+            String filePath = doUpload(contentBytes, fileName, contentType);
             log.debug("File uploaded to: {}", filePath);
 
-            // 5. 持久化元数据到 file_metadata 表
-            saveFileMetadata(fileId, fileName, md5, contentType, fileSize, filePath);
+            // 4. 持久化元数据到 file_metadata 表
+            saveFileMetadata(fileName, md5, contentType, fileSize, filePath);
 
-            log.info("File uploaded successfully: fileName={}, fileId={}, filePath={}", fileName, fileId, filePath);
+            log.info("File uploaded successfully: fileName={}, filePath={}", fileName, filePath);
             return filePath;
 
         } catch (Exception e) {
@@ -117,8 +100,8 @@ public abstract class AbstractOssClient implements OssClient {
             }
 
             // 3. 调用扩展点（由子类实现）
-            InputStream inputStream = doDownload(filePath, metadata.getFileId());
-            log.info("File downloaded successfully: filePath={}, fileId={}", filePath, metadata.getFileId());
+            InputStream inputStream = doDownload(filePath);
+            log.info("File downloaded successfully: filePath={}", filePath);
 
             return inputStream;
 
@@ -147,20 +130,20 @@ public abstract class AbstractOssClient implements OssClient {
             );
 
             if (metadata == null) {
-                log.warn("File not found for deletion: filePath={}", filePath);
+                log.warn("FileMetadata not found for deletion: filePath={}", filePath);
                 return;
             }
 
             // 3. 调用扩展点（由子类实现）
-            doDelete(filePath, metadata.getFileId());
+            doDelete(filePath);
 
             // 4. TODO: 标记删除（如果需要软删除功能，可以在这里实现）
 
-            log.info("File deleted successfully: filePath={}, fileId={}", filePath, metadata.getFileId());
+            log.info("File deleted successfully: filePath={}", filePath);
 
         } catch (Exception e) {
             log.error("Failed to delete file: filePath={}", filePath, e);
-            throw new RuntimeException("File delete failed: " + filePath, e);
+            throw new RuntimeException("FileMetadata delete failed: " + filePath, e);
         }
     }
 
@@ -187,28 +170,20 @@ public abstract class AbstractOssClient implements OssClient {
     }
 
     @Override
-    public final List<File> searchFiles(String fileNamePattern, File.FileBusinessEntityType businessEntityType, String businessId) {
-        log.debug("Searching files: fileNamePattern={}, businessEntityType={}, businessId={}",
-                fileNamePattern, businessEntityType, businessId);
+    public final List<FileMetadata> searchFiles(String fileNamePattern) {
+        log.debug("Searching files: fileNamePattern={}", fileNamePattern);
 
         try {
-            // 1. 参数验证
-            if (businessEntityType == null) {
-                throw new IllegalArgumentException("BusinessEntityType cannot be null");
-            }
-            if (businessId == null || businessId.isBlank()) {
-                throw new IllegalArgumentException("BusinessId cannot be null or blank");
-            }
 
-            // 2. 调用扩展点（由子类实现）
-            List<File> files = doSearchFiles(fileNamePattern, businessEntityType, businessId);
-            log.debug("Found {} files", files.size());
+            // 1. 调用扩展点（由子类实现）
+            List<FileMetadata> fileMetadata = doSearchFiles(fileNamePattern);
+            log.debug("Found {} fileMetadata", fileMetadata.size());
 
-            return files;
+            return fileMetadata;
 
         } catch (Exception e) {
-            log.error("Failed to search files: businessEntityType={}, businessId={}", businessEntityType, businessId, e);
-            throw new RuntimeException("File search failed", e);
+            log.error("Failed to search files: {}", fileNamePattern, e);
+            throw new RuntimeException("FileMetadata search failed", e);
         }
     }
 
@@ -224,7 +199,7 @@ public abstract class AbstractOssClient implements OssClient {
 
             // 2. 调用扩展点（由子类实现）
             boolean exists = doExists(filePath);
-            log.debug("File exists: filePath={}, exists={}", filePath, exists);
+            log.debug("FileMetadata exists: filePath={}, exists={}", filePath, exists);
 
             return exists;
 
@@ -246,7 +221,7 @@ public abstract class AbstractOssClient implements OssClient {
 
             // 2. 调用扩展点（由子类实现）
             long size = doGetFileSize(filePath);
-            log.debug("File size: filePath={}, size={}", filePath, size);
+            log.debug("FileMetadata size: filePath={}, size={}", filePath, size);
 
             return size;
 
@@ -263,28 +238,25 @@ public abstract class AbstractOssClient implements OssClient {
      * @param contentBytes 文件内容字节数组
      * @param fileName     文件名
      * @param contentType  MIME 类型
-     * @param fileId       文件唯一标识
      * @return 文件存储路径
      * @throws Exception 上传失败
      */
-    protected abstract String doUpload(byte[] contentBytes, String fileName, String contentType, String fileId) throws Exception;
+    protected abstract String doUpload(byte[] contentBytes, String fileName, String contentType) throws Exception;
 
     /**
      * 下载文件（扩展点）
      * @param filePath 文件存储路径
-     * @param fileId   文件唯一标识
      * @return 文件输入流
      * @throws Exception 下载失败
      */
-    protected abstract InputStream doDownload(String filePath, String fileId) throws Exception;
+    protected abstract InputStream doDownload(String filePath) throws Exception;
 
     /**
      * 删除文件（扩展点）
      * @param filePath 文件存储路径
-     * @param fileId   文件唯一标识
      * @throws Exception 删除失败
      */
-    protected abstract void doDelete(String filePath, String fileId) throws Exception;
+    protected abstract void doDelete(String filePath) throws Exception;
 
     /**
      * 生成访问 URL（扩展点）
@@ -297,14 +269,11 @@ public abstract class AbstractOssClient implements OssClient {
 
     /**
      * 搜索文件（扩展点）
-     * @param fileNamePattern    文件名模式（支持通配符）
-     * @param businessEntityType 业务实体类型
-     * @param businessId         业务 ID
+     * @param fileNamePattern 文件名模式（支持通配符）
      * @return 文件列表
      * @throws Exception 搜索失败
      */
-    protected abstract List<File> doSearchFiles(String fileNamePattern, File.FileBusinessEntityType businessEntityType, String businessId)
-            throws Exception;
+    protected abstract List<FileMetadata> doSearchFiles(String fileNamePattern) throws Exception;
 
     /**
      * 检查文件是否存在（扩展点）
@@ -326,16 +295,14 @@ public abstract class AbstractOssClient implements OssClient {
 
     /**
      * 持久化文件元数据到 file_metadata 表
-     * @param fileId      文件唯一标识
      * @param fileName    文件名
      * @param md5         文件 MD5
      * @param contentType MIME 类型
      * @param size        文件大小（字节）
      * @param path        文件存储路径
      */
-    protected void saveFileMetadata(String fileId, String fileName, String md5, String contentType, long size, String path) {
+    protected void saveFileMetadata(String fileName, String md5, String contentType, long size, String path) {
         FileMetadataDO metadata = FileMetadataDO.builder()
-                                          .fileId(fileId)
                                           .md5(md5)
                                           .contentType(contentType)
                                           .size(size)
@@ -343,30 +310,7 @@ public abstract class AbstractOssClient implements OssClient {
                                           .build();
 
         metadataMapper.insert(metadata);
-        log.debug("File metadata saved: fileId={}", fileId);
-    }
-
-    /**
-     * 持久化文件业务关联到 file_business 表
-     * @param fileId             文件唯一标识
-     * @param businessName       业务文件名
-     * @param businessEntityType 业务实体类型
-     * @param businessId         业务 ID
-     * @param usageType          使用场景
-     */
-    protected void saveFileBusiness(String fileId, String businessName, File.FileBusinessEntityType businessEntityType,
-                                    String businessId, File.UsageType usageType) {
-        FileBusinessDO business = FileBusinessDO.builder()
-                                          .fileId(fileId)
-                                          .name(businessName)
-                                          .type(businessEntityType.name())
-                                          .businessId(businessId)
-                                          .usage(usageType.name())
-                                          .sort(0)
-                                          .build();
-
-        businessMapper.insert(business);
-        log.debug("File business saved: fileId={}, businessId={}", fileId, businessId);
+        log.debug("File metadata saved: id={}, path={}", metadata.getId(), path);
     }
 
     /**

@@ -1,6 +1,5 @@
 package org.smm.archetype.domain._shared.event;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
  * @since 2026/01/09
  */
 @Getter
-@AllArgsConstructor
 public enum ConsumeStatus {
 
     /**
@@ -45,6 +43,14 @@ public enum ConsumeStatus {
      * 状态描述
      */
     private final String description;
+
+    /**
+     * 构造函数
+     * @param description 状态描述
+     */
+    ConsumeStatus(String description) {
+        this.description = description;
+    }
 
     /**
      * 判断是否可以重试

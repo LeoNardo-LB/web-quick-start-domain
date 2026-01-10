@@ -1,6 +1,6 @@
 package org.smm.archetype.infrastructure._shared.client.cache.impl;
 
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.infrastructure._shared.client.cache.AbstractCacheClient;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -23,10 +23,14 @@ import java.util.stream.Collectors;
  * @author Leonardo
  * @since 2026-01-10
  */
-@RequiredArgsConstructor
+@Slf4j
 public class RedisCacheClientImpl extends AbstractCacheClient {
 
     private final RedisTemplate<String, Object> redisTemplate;
+
+    public RedisCacheClientImpl(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

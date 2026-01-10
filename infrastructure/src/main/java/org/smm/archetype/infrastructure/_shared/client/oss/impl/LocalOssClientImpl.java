@@ -3,13 +3,11 @@ package org.smm.archetype.infrastructure._shared.client.oss.impl;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.client.IdClient;
-import org.smm.archetype.domain.common.file.File;
+import org.smm.archetype.domain.common.file.FileMetadata;
+import org.smm.archetype.domain.common.file.FileMetadata.Status;
 import org.smm.archetype.infrastructure._shared.client.oss.AbstractOssClient;
-import org.smm.archetype.infrastructure._shared.generated.entity.FileBusinessDO;
-import org.smm.archetype.infrastructure._shared.generated.entity.FileMetadataDO;
-import org.smm.archetype.infrastructure._shared.generated.mapper.FileBusinessMapper;
-import org.smm.archetype.infrastructure._shared.generated.mapper.FileMetadataMapper;
-import org.smm.archetype.infrastructure.common.file.config.OssProperties;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileMetadataDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.FileMetadataMapper;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,8 +21,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static org.smm.archetype.infrastructure._shared.generated.entity.table.FileBusinessDOTableDef.FILE_BUSINESS_DO;
-import static org.smm.archetype.infrastructure._shared.generated.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
+import static org.smm.archetype.infrastructure._shared.generated.repository.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
 
 /**
  * 本地文件系统对象存储服务实现
@@ -55,25 +52,26 @@ import static org.smm.archetype.infrastructure._shared.generated.entity.table.Fi
 public class LocalOssClientImpl extends AbstractOssClient {
 
     private final Path baseStoragePath;
+    private final boolean zeroCopy;
 
     /**
      * 构造函数
-     * @param properties     对象存储配置
+     * @param basePath       基础存储路径（可选，默认：用户文件夹/.project/${spring.application.name}/oss）
+     * @param zeroCopy       是否使用零拷贝（NIO transferTo/transferFrom）
      * @param metadataMapper 文件元数据 Mapper
-     * @param businessMapper 文件业务 Mapper
      * @param idClient       ID 生成服务
      * @throws IOException 如果创建存储目录失败
      */
-    public LocalOssClientImpl(OssProperties properties,
+    public LocalOssClientImpl(String basePath,
+                              boolean zeroCopy,
                               FileMetadataMapper metadataMapper,
-                              FileBusinessMapper businessMapper,
                               IdClient idClient) throws IOException {
-        super(properties, metadataMapper, businessMapper, idClient);
+        super(metadataMapper, idClient);
+        this.zeroCopy = zeroCopy;
 
         // 解析基础路径: 用户文件夹/.project/${spring.application.name}/oss
         String userHome = System.getProperty("user.home");
         String appName = System.getProperty("spring.application.name", "quickstart");
-        String basePath = properties.getLocal().getBasePath();
 
         if (basePath != null && !basePath.isBlank()) {
             this.baseStoragePath = Paths.get(basePath);
@@ -83,23 +81,25 @@ public class LocalOssClientImpl extends AbstractOssClient {
 
         // 创建目录（如果不存在）
         Files.createDirectories(baseStoragePath);
-        log.info("Local object storage initialized: basePath={}", baseStoragePath.toAbsolutePath());
+        log.info("Local object storage initialized: basePath={}, zeroCopy={}",
+                baseStoragePath.toAbsolutePath(), zeroCopy);
     }
 
     @Override
-    protected String doUpload(byte[] contentBytes, String fileName, String contentType, String fileId) throws Exception {
-        // 生成文件路径: {year}/{month}/{fileId}-{fileName}
+    protected String doUpload(byte[] contentBytes, String fileName, String contentType) throws Exception {
+        // 生成文件路径: {year}/{month}/{timestamp}-{fileName}
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM"));
         Path targetPath = baseStoragePath.resolve(datePath);
 
         // 创建日期目录
         Files.createDirectories(targetPath);
 
-        // 完整文件路径
-        Path filePath = targetPath.resolve(fileId + "-" + fileName);
+        // 使用纳秒时间戳作为文件标识（保证唯一性）
+        String timestamp = String.valueOf(System.nanoTime());
+        Path filePath = targetPath.resolve(timestamp + "-" + fileName);
 
         // 零拷贝上传
-        if (properties.getLocal().isZeroCopy()) {
+        if (zeroCopy) {
             // 先写入临时文件
             Path tempFile = Files.createTempFile("upload-", ".tmp");
             try {
@@ -123,11 +123,11 @@ public class LocalOssClientImpl extends AbstractOssClient {
         }
 
         // 返回相对路径
-        return datePath + "/" + fileId + "-" + fileName;
+        return datePath + "/" + timestamp + "-" + fileName;
     }
 
     @Override
-    protected java.io.InputStream doDownload(String filePath, String fileId) throws Exception {
+    protected java.io.InputStream doDownload(String filePath) throws Exception {
         Path fullPath = baseStoragePath.resolve(filePath);
 
         if (!Files.exists(fullPath)) {
@@ -139,7 +139,7 @@ public class LocalOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected void doDelete(String filePath, String fileId) throws Exception {
+    protected void doDelete(String filePath) throws Exception {
         Path fullPath = baseStoragePath.resolve(filePath);
 
         // 删除文件
@@ -160,38 +160,25 @@ public class LocalOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected List<File> doSearchFiles(String fileNamePattern, File.FileBusinessEntityType businessEntityType, String businessId)
+    protected List<FileMetadata> doSearchFiles(String fileNamePattern)
             throws Exception {
         // 从数据库查询（使用 MyBatis-Flex）
         QueryWrapper query = QueryWrapper.create()
                                      .select()
-                                     .from(FILE_BUSINESS_DO)
-                                     .where(FILE_BUSINESS_DO.TYPE.eq(businessEntityType.name()))
-                                     .and(FILE_BUSINESS_DO.BUSINESS_ID.eq(businessId))
-                                     .leftJoin(FILE_METADATA_DO)
-                                     .on(FILE_BUSINESS_DO.FILE_ID.eq(FILE_METADATA_DO.FILE_ID));
+                                     .from(FILE_METADATA_DO);
 
         // 如果有文件名模式，添加模糊查询
         if (fileNamePattern != null && !fileNamePattern.isBlank()) {
             // 将通配符 * 和 ? 转换为 SQL 的 % 和 _
             String sqlPattern = fileNamePattern.replace("*", "%").replace("?", "_");
-            query.and(FILE_METADATA_DO.PATH.like(sqlPattern));
+            query.where(FILE_METADATA_DO.PATH.like(sqlPattern));
         }
 
-        List<FileBusinessDO> businessDOs = businessMapper.selectListByQuery(query);
+        List<FileMetadataDO> metadataDOs = metadataMapper.selectListByQuery(query);
 
-        // 转换为 File 领域对象
-        return businessDOs.stream()
-                       .map(businessDO -> {
-                           // 查询对应的元数据
-                           FileMetadataDO metadataDO = metadataMapper.selectOneByQuery(
-                                   QueryWrapper.create()
-                                           .select()
-                                           .from(FILE_METADATA_DO)
-                                           .where(FILE_METADATA_DO.FILE_ID.eq(businessDO.getFileId()))
-                           );
-                           return toFile(metadataDO, businessDO);
-                       })
+        // 转换为 FileMetadata 领域对象
+        return metadataDOs.stream()
+                       .map(this::toFile)
                        .toList();
     }
 
@@ -206,7 +193,7 @@ public class LocalOssClientImpl extends AbstractOssClient {
         Path fullPath = baseStoragePath.resolve(filePath);
 
         if (!Files.exists(fullPath)) {
-            throw new FileNotFoundException("File not found: " + filePath);
+            throw new FileNotFoundException("FileMetadata not found: " + filePath);
         }
 
         return Files.size(fullPath);
@@ -215,74 +202,36 @@ public class LocalOssClientImpl extends AbstractOssClient {
     // ==================== 辅助方法 ====================
 
     /**
-     * 将 FileMetadataDO + FileBusinessDO 转换为 File 领域对象
+     * 将 FileMetadataDO 转换为 FileMetadata 领域对象
      * @param metadataDO 文件元数据DO
-     * @param businessDO 文件业务DO
-     * @return File 领域对象
+     * @return FileMetadata 领域对象
      */
-    private File toFile(FileMetadataDO metadataDO, FileBusinessDO businessDO) {
+    private FileMetadata toFile(FileMetadataDO metadataDO) {
         if (metadataDO == null) {
             return null;
         }
 
-        File.FileBuilder fileBuilder = File.builder()
-                                               .setFileId(metadataDO.getFileId())
-                                               .setFilePath(metadataDO.getPath())
-                                               .setFileUrl(metadataDO.getUrl())
-                                               .setMd5(metadataDO.getMd5())
-                                               .setContentType(metadataDO.getContentType())
-                                               .setFileSize(metadataDO.getSize())
-                                               .setStatus(File.FileStatus.ACTIVE)
-                                               .setCreateTime(metadataDO.getCreateTime())
-                                               .setUpdateTime(metadataDO.getUpdateTime());
-
-        // 如果有业务关联信息，则设置
-        if (businessDO != null) {
-            fileBuilder.setFileName(businessDO.getName())
-                    .setFileBusiness(File.FileBusiness.builder()
-                                             .setBusinessEntityType(toBusinessEntityType(businessDO.getType()))
-                                             .setBusinessId(businessDO.getBusinessId())
-                                             .setUsageType(toUsageType(businessDO.getUsage()))
-                                             .setRemark(businessDO.getRemark())
-                                             .setOrder(businessDO.getSort())
-                                             .build());
+        // 从path中提取文件名
+        String fileName = metadataDO.getPath();
+        if (fileName != null && fileName.contains("/")) {
+            fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+            // 移除时间戳前缀（如果存在）
+            if (fileName.contains("-")) {
+                fileName = fileName.substring(fileName.indexOf("-") + 1);
+            }
         }
 
-        return fileBuilder.build();
-    }
-
-    /**
-     * 将字符串转换为 FileBusinessEntityType 枚举
-     * @param type 业务类型字符串
-     * @return FileBusinessEntityType 枚举
-     */
-    private File.FileBusinessEntityType toBusinessEntityType(String type) {
-        if (type == null || type.isBlank()) {
-            return File.FileBusinessEntityType.OTHER;
-        }
-
-        try {
-            return File.FileBusinessEntityType.valueOf(type);
-        } catch (IllegalArgumentException e) {
-            return File.FileBusinessEntityType.OTHER;
-        }
-    }
-
-    /**
-     * 将字符串转换为 UsageType 枚举
-     * @param usage 使用场景字符串
-     * @return UsageType 枚举
-     */
-    private File.UsageType toUsageType(String usage) {
-        if (usage == null || usage.isBlank()) {
-            return File.UsageType.OTHER;
-        }
-
-        try {
-            return File.UsageType.valueOf(usage);
-        } catch (IllegalArgumentException e) {
-            return File.UsageType.OTHER;
-        }
+        return FileMetadata.builder()
+                       .setFileName(fileName)
+                       .setFilePath(metadataDO.getPath())
+                       .setFileUrl(metadataDO.getUrl())
+                       .setMd5(metadataDO.getMd5())
+                       .setContentType(metadataDO.getContentType())
+                       .setFileSize(metadataDO.getSize())
+                       .setStatus(Status.ACTIVE)
+                       .setCreateTime(metadataDO.getCreateTime())
+                       .setUpdateTime(metadataDO.getUpdateTime())
+                       .build();
     }
 
 }

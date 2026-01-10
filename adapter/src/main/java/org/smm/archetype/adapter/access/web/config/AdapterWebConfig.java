@@ -1,6 +1,5 @@
 package org.smm.archetype.adapter.access.web.config;
 
-import org.smm.archetype.adapter.access.web.converter.OrderConverter;
 import org.smm.archetype.adapter.access.web.filter.ContextFillFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -9,23 +8,14 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Adapter层Web相关配置
  *
- * <p>负责创建Web层相关的Bean，如Controller、Filter、Converter等。
+ * <p>负责创建Web层相关的Bean，如Filter等。
+ * <p>注意：MapStruct Converter会自动生成为Spring Bean，无需手动注册。
+ *
  * @author Leonardo
  * @since 2026-01-10
  */
 @Configuration
 public class AdapterWebConfig {
-
-    /**
-     * 订单转换器
-     *
-     * <p>负责订单相关的DTO转换。
-     * @return 订单转换器
-     */
-    @Bean
-    public OrderConverter orderConverter() {
-        return new OrderConverter();
-    }
 
     /**
      * 上下文填充过滤器

@@ -21,7 +21,6 @@ package org.smm.archetype.app._shared.base;
  *
  * <p>使用示例：
  * <pre>{@code
- * @Service
  * public class OrderApplicationService extends ApplicationService {
  *
  *     private final OrderRepository orderRepository;

@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smm.archetype.domain._example.order.event.OrderCreatedEvent;
 import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.EventType;
 
 /**
  * 订单创建事件处理器
@@ -47,11 +46,6 @@ public class OrderCreatedEventHandler implements EventHandler<OrderCreatedEvent>
     @Override
     public boolean canHandle(DomainEvent event) {
         return event instanceof OrderCreatedEvent;
-    }
-
-    @Override
-    public EventType getEventType() {
-        return EventType.ORDER_CREATED;
     }
 
 }

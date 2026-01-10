@@ -1,0 +1,126 @@
+package org.smm.archetype.infrastructure.common.notification;
+
+import com.aliyun.dm20151123.Client;
+import com.aliyun.dm20151123.models.SingleSendMailRequest;
+import com.aliyun.dm20151123.models.SingleSendMailResponse;
+import com.aliyun.teaopenapi.models.Config;
+import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.common.notification.EmailRequest;
+import org.smm.archetype.domain.common.notification.EmailResult;
+import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
+import org.smm.archetype.infrastructure.config.properties.AliyunProperties;
+
+/**
+ * 阿里云邮件服务实现
+ *
+ * <p>基于阿里云邮件推送（DirectMail）发送邮件。
+ *
+ * <p>官方文档：https://help.aliyun.com/zh/direct-mail/
+ * @author Leonardo
+ * @since 2026/01/10
+ */
+@Slf4j
+public class AliyunEmailServiceImpl extends AbstractEmailService {
+
+    private final AliyunProperties aliyunProperties;
+    private final Client           emailClient;
+
+    public AliyunEmailServiceImpl(AliyunProperties aliyunProperties) {
+        this.aliyunProperties = aliyunProperties;
+        this.emailClient = createEmailClient();
+    }
+
+    @Override
+    protected EmailResult doSendEmail(EmailRequest request, ServiceProvider provider) {
+        try {
+            SingleSendMailRequest sendMailRequest = new SingleSendMailRequest();
+
+            // 设置发信地址（必填）
+            String accountName = aliyunProperties.getEmail().getAccountName();
+            if (accountName == null || accountName.isBlank()) {
+                accountName = aliyunProperties.getEmail().getFromAddress();
+            }
+            if (accountName == null || accountName.isBlank()) {
+                throw new IllegalArgumentException("Account name or from address must be configured");
+            }
+            sendMailRequest.setAccountName(accountName);
+
+            // 设置发信人别名（可选）
+            String fromAlias = aliyunProperties.getEmail().getFromAlias();
+            if (fromAlias != null && !fromAlias.isBlank()) {
+                sendMailRequest.setFromAlias(fromAlias);
+            }
+
+            // 设置地址类型（1: 发信地址）
+            sendMailRequest.setAddressType(1);
+
+            // 设置收件人地址
+            sendMailRequest.setToAddress(request.getTo());
+
+            // 设置邮件主题
+            sendMailRequest.setSubject(request.getSubject());
+
+            // 设置邮件正文
+            if (request.getHtmlBody() != null && !request.getHtmlBody().isBlank()) {
+                sendMailRequest.setHtmlBody(request.getHtmlBody());
+            } else if (request.getTextBody() != null && !request.getTextBody().isBlank()) {
+                sendMailRequest.setTextBody(request.getTextBody());
+            } else {
+                throw new IllegalArgumentException("Either HTML body or text body must be provided");
+            }
+
+            // 发送邮件
+            SingleSendMailResponse response = emailClient.singleSendMail(sendMailRequest);
+
+            // 判断是否成功（基于HTTP状态码）
+            boolean success = response.getStatusCode() == 200;
+
+            if (success) {
+                log.info("Aliyun email sent successfully: requestId={}, to={}",
+                        response.getBody().getRequestId(), request.getTo());
+                return EmailResult.builder()
+                               .setSuccess(true)
+                               .setMessageId(response.getBody().getRequestId())
+                               .build();
+            } else {
+                log.error("Aliyun email send failed: statusCode={}, to={}",
+                        response.getStatusCode(), request.getTo());
+                return EmailResult.builder()
+                               .setSuccess(false)
+                               .setErrorCode(String.valueOf(response.getStatusCode()))
+                               .setErrorMessage("Aliyun email send failed with status: " + response.getStatusCode())
+                               .build();
+            }
+
+        } catch (Exception e) {
+            log.error("Failed to send Aliyun email: to={}", request.getTo(), e);
+            return EmailResult.builder()
+                           .setSuccess(false)
+                           .setErrorCode("EXCEPTION")
+                           .setErrorMessage("Exception: " + e.getMessage())
+                           .build();
+        }
+    }
+
+    @Override
+    protected ServiceProvider getDefaultProvider() {
+        return ServiceProvider.ALIYUN;
+    }
+
+    /**
+     * 创建阿里云邮件客户端
+     */
+    private Client createEmailClient() {
+        Config config = new Config()
+                                .setAccessKeyId(aliyunProperties.getAccessKeyId())
+                                .setAccessKeySecret(aliyunProperties.getAccessKeySecret())
+                                .setRegionId(aliyunProperties.getRegionId());
+
+        try {
+            return new Client(config);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to create Aliyun email client", e);
+        }
+    }
+
+}

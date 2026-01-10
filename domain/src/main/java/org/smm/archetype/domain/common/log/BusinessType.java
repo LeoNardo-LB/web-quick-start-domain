@@ -1,6 +1,5 @@
 package org.smm.archetype.domain.common.log;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -11,7 +10,6 @@ import lombok.Getter;
  * @since 2026/01/09
  */
 @Getter
-@AllArgsConstructor
 public enum BusinessType {
 
     /**
@@ -83,6 +81,14 @@ public enum BusinessType {
      * 类型描述
      */
     private final String description;
+
+    /**
+     * 构造函数
+     */
+    BusinessType(String code, String description) {
+        this.code = code;
+        this.description = description;
+    }
 
     /**
      * 根据代码获取业务类型

@@ -1,18 +1,15 @@
 package org.smm.archetype.adapter.access.listener;
 
 import com.mybatisflex.core.query.QueryWrapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.ConsumeStatus;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
-import org.smm.archetype.infrastructure._shared.event.EventSerializer;
-import org.smm.archetype.infrastructure._shared.generated.entity.EventConsumeDO;
-import org.smm.archetype.infrastructure._shared.generated.entity.EventPublishDO;
-import org.smm.archetype.infrastructure._shared.generated.mapper.EventConsumeMapper;
-import org.smm.archetype.infrastructure._shared.generated.mapper.EventPublishMapper;
-import org.springframework.transaction.annotation.Transactional;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventPublishDO;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
 
 import java.time.Instant;
 import java.util.List;
@@ -42,14 +39,23 @@ import java.util.List;
  * @since 2026/01/09
  */
 @Slf4j
-@RequiredArgsConstructor
-public abstract class AbstractEventConsumer<T extends DomainEvent> {
+public abstract class AbstractEventConsumer<T extends DomainEvent> implements EventConsumer<T> {
 
     protected final EventConsumeMapper              eventConsumeMapper;
     protected final EventConsumeRepository          eventConsumeRepository;
     protected final EventPublishMapper              eventPublishMapper;
-    protected final EventSerializer                 eventSerializer;
     protected final List<EventHandler<DomainEvent>> eventHandlers;
+
+    protected AbstractEventConsumer(
+            EventConsumeMapper eventConsumeMapper,
+            EventConsumeRepository eventConsumeRepository,
+            EventPublishMapper eventPublishMapper,
+            List<EventHandler<DomainEvent>> eventHandlers) {
+        this.eventConsumeMapper = eventConsumeMapper;
+        this.eventConsumeRepository = eventConsumeRepository;
+        this.eventPublishMapper = eventPublishMapper;
+        this.eventHandlers = eventHandlers;
+    }
 
     /**
      * 获取消费者组名称
@@ -67,7 +73,6 @@ public abstract class AbstractEventConsumer<T extends DomainEvent> {
      * 消费领域事件（模板方法）
      * @param event 领域事件
      */
-    @Transactional(rollbackFor = Exception.class)
     public void consume(T event) {
         String eventId = event.getEventId();
         String idempotentKey = generateIdempotentKey(event);
@@ -109,7 +114,19 @@ public abstract class AbstractEventConsumer<T extends DomainEvent> {
      * @param consumeDO 消费记录
      * @throws Exception 消费异常
      */
-    protected abstract void doConsume(T event, EventConsumeDO consumeDO) throws Exception;
+    protected void doConsume(T event, EventConsumeDO consumeDO) throws Exception {
+        // 调用对应的 EventHandler 处理事件
+        for (EventHandler<DomainEvent> handler : eventHandlers) {
+            if (handler.canHandle(event)) {
+                log.debug("Delegating to handler: eventId={}, handler={}",
+                        event.getEventId(), handler.getClass().getSimpleName());
+                handler.handle(event);
+                return;
+            }
+        }
+
+        log.warn("No handler found for event: eventId={}, type={}", event.getEventId(), event.getEventTypeName());
+    }
 
     /**
      * 检查幂等性

@@ -32,38 +32,236 @@ spring:
           max-wait: -1ms
       timeout: 3000ms
 
-# 事件重试配置
-event:
-  retry:
-    cron: "0 * * * * ?"
-    batchSize: 100
-    highPriorityRatio: 0.8
-
 # ID 生成器配置
 id:
   snowflake:
     datacenter-id: 0
     worker-id: 0
 
-# 对象存储配置
+# 中间件配置
 middleware:
+  # Kafka消费者配置
+  kafka:
+    consumer:
+      # Bootstrap服务器列表（默认：localhost:9092）
+      bootstrap-servers: localhost:9092
+      # 消费者组ID（默认：kafka-consumer-group）
+      group-id: kafka-consumer-group
+      # 信任的包名列表（用于JsonDeserializer反序列化，默认："*"）
+      trusted-packages: "*"
+      # 订阅的主题列表（默认：["domain-events"]）
+      topics:
+        - domain-events
+      # 自动提交偏移量（默认：false，手动提交）
+      enable-auto-commit: false
+      # 自动偏移量重置策略（默认：earliest）
+      auto-offset-reset: earliest
+      # 最大轮询记录数（默认：500）
+      max-poll-records: 500
+      # 最大轮询间隔（毫秒，默认：300000）
+      max-poll-interval-ms: 300000
+
+  # 线程池配置
+  thread-pool:
+    # IO密集型线程池配置
+    io:
+      # 核心线程数（可选，默认使用CPU核心数动态计算）
+      core-size: ${CPU_COUNT:8}
+      # 最大线程数（可选，默认使用CPU核心数 * 2动态计算）
+      max-size: ${CPU_COUNT_TIMES_2:16}
+      # 队列容量（默认：1000）
+      queue-capacity: 1000
+      # 线程名称前缀（默认：io-task-）
+      thread-name-prefix: io-task-
+      # 拒绝策略（默认：CallerRunsPolicy）
+      # 可选值：CallerRunsPolicy, AbortPolicy, DiscardPolicy, DiscardOldestPolicy
+      rejection-policy: CallerRunsPolicy
+    # CPU密集型线程池配置
+    cpu:
+      # 核心线程数（可选，默认使用CPU核心数动态计算）
+      core-size: ${CPU_COUNT:8}
+      # 最大线程数（可选，默认使用CPU核心数 + 1动态计算）
+      max-size: ${CPU_COUNT_PLUS_1:9}
+      # 队列容量（默认：100）
+      queue-capacity: 100
+      # 线程名称前缀（默认：cpu-task-）
+      thread-name-prefix: cpu-task-
+      # 拒绝策略（默认：AbortPolicy）
+      rejection-policy: AbortPolicy
+    # 守护线程池配置
+    daemon:
+      # 核心线程数（可选，默认使用CPU核心数 / 2动态计算）
+      core-size: ${CPU_COUNT_HALF:4}
+      # 最大线程数（可选，默认使用CPU核心数动态计算）
+      max-size: ${CPU_COUNT:8}
+      # 队列容量（默认：1000）
+      queue-capacity: 1000
+      # 线程名称前缀（默认：daemon-task-）
+      thread-name-prefix: daemon-task-
+      # 线程优先级（默认：1，即MIN_PRIORITY）
+      thread-priority: 1
+    # 任务调度线程池配置
+    scheduler:
+      # 线程池大小（可选，默认使用CPU核心数动态计算）
+      pool-size: ${CPU_COUNT:8}
+      # 线程名称前缀（默认：scheduled-task-）
+      thread-name-prefix: scheduled-task-
+      # 是否在取消任务时从队列中移除（默认：true）
+      remove-on-cancel-policy: true
+      # 等待任务完成的超时时间（秒，默认：60）
+      await-termination-seconds: 60
+
+  # 数据库配置
+  database:
+    # MyBatis日志实现类（默认：StdOutImpl）
+    # 可选值：StdOutImpl, Slf4jImpl, NoLoggingImpl, Jdk14LoggingImpl, Log4j2Impl
+    log-impl: StdOutImpl
+
+  # 对象存储配置
   object-storage:
-    # 存储类型：local | rustfs
+    # 存储类型：local（本地文件系统） | rustfs（对象存储）
+    # - local: 使用本地文件系统，默认实现，无需外部依赖
+    # - rustfs: 使用 RustFS 对象存储（需先启动 RustFS 服务）
+    # 注意：通过 @ConditionalOnProperty 注解自动切换实现
     type: local
-    # RustFS 配置
+
+    # RustFS 配置（type=rustfs 时生效）
+    # 基于 AWS S3 SDK v2 实现，RustFS 100% 兼容 S3 协议
     rustfs:
+      # RustFS 服务器地址
       endpoint: http://localhost:9000
+      # Access Key（默认值：leonardo123）
       access-key: leonardo123
+      # Secret Key（默认值：leonardo123）
       secret-key: leonardo123
+      # Bucket 名称（默认值：default）
       bucket: default
+      # 连接超时（默认：5s）
       connect-timeout: 5s
+      # 读取超时（默认：30s）
       read-timeout: 30s
-    # 本地存储配置
+
+    # 本地存储配置（type=local 时生效）
+    # 作为默认实现，配置缺失时自动启用（matchIfMissing=true）
     local:
-      # 基础路径（可选，默认：用户文件夹/.project/${spring.application.name}/oss）
+      # 基础路径（可选）
+      # 不指定则使用默认路径：用户文件夹/.project/${spring.application.name}/oss
+      # 示例 Windows: C:\Users\${user.home}\.project\quickstart\oss
+      # 示例 Linux/Mac: /home/${user.home}/.project/quickstart/oss
       base-path: ${user.home}/.project/${spring.application.name}/oss
-      # 是否使用零拷贝（NIO transferTo/transferFrom）
+      # 是否使用零拷贝技术（NIO transferTo/transferFrom）
+      # - true: 使用零拷贝，性能更好（推荐）
+      # - false: 使用传统拷贝方式
       zero-copy: true
+
+  # 缓存配置
+  cache:
+    # 缓存类型：local（本地缓存） | redis（分布式缓存）
+    # - local: 使用 Caffeine 本地缓存，默认实现，无需外部依赖
+    # - redis: 使用 Redis 分布式缓存（需先启动 Redis 服务）
+    # 注意：通过 @ConditionalOnProperty 注解自动切换实现
+    # Spring Data Redis 自动配置会根据 spring.data.redis 配置创建 RedisTemplate
+    type: local
+
+    # Redis 配置（type=redis 时生效）
+    # 详细的 Redis 连接配置见上方 spring.data.redis 部分
+    redis:
+      # 缓存键前缀（可选）
+      key-prefix: "app:"
+      # 默认过期时间（可选）
+      default-ttl: 30m
+      # 是否使用 null 值缓存（防止缓存穿透）
+      cache-null-values: true
+
+    # 本地缓存配置（type=local 时生效）
+    # 作为默认实现，配置缺失时自动启用（matchIfMissing=true）
+    local:
+      # 初始容量（默认：100）
+      initial-capacity: 100
+      # 最大容量（默认：1000）
+      maximum-size: 1000
+      # 写入后过期时间（默认：10m）
+      expire-after-write: 10m
+      # 访问后过期时间（默认：5m）
+      expire-after-access: 5m
+
+  # 事件发布配置
+  event:
+    publisher:
+      # 发布器类型：spring（本地事件） | kafka（消息队列）
+      # - spring: 使用 Spring Events 本地事件总线，默认实现，无需外部依赖
+      # - kafka: 使用 Kafka 消息队列（需先启动 Kafka 服务）
+      # 注意：通过 @ConditionalOnProperty 注解自动切换实现
+      type: spring
+
+      # Kafka 配置（type=kafka 时生效）
+      # 详细的 Kafka 配置见上方 spring.kafka 部分
+      kafka:
+        # 主题前缀（可选）
+        topic-prefix: "domain-events-"
+        # 是否启用发布确认
+        enable-acks: true
+        # 超时时间（默认：5s）
+        timeout: 5s
+        # 重试次数（默认：3）
+        retries: 3
+
+      # Spring Events 配置（type=spring 时生效）
+      # 作为默认实现，配置缺失时自动启用（matchIfMissing=true）
+      spring:
+        # 是否异步处理（默认：true）
+        async: true
+        # 线程池核心大小（默认：5）
+        thread-pool-core-size: 5
+        # 线程池最大大小（默认：10）
+        thread-pool-max-size: 10
+        # 队列容量（默认：100）
+        thread-pool-queue-capacity: 100
+
+    # 事件消费配置（事件重试任务）
+    retry:
+      # Cron 表达式（默认：每分钟执行一次）
+      cron: "0 * * * * ?"
+      # 每批次处理数量（默认：100）
+      batch-size: 100
+      # 高优先级事件占比（默认：0.8，即80%）
+      high-priority-ratio: 0.8
+      # 重试延迟时间列表（分钟）
+      delays:
+        - 1   # 第1次重试：1分钟后
+        - 5   # 第2次重试：5分钟后
+        - 15  # 第3次重试：15分钟后
+        - 30  # 第4次重试：30分钟后
+        - 60  # 第5次重试：60分钟后
+      # 最大重试次数（默认：5）
+      max-retry-times: 5
+
+# 阿里云服务配置（可选）
+# 注意：配置 access-key-id 后，会自动启用阿里云短信和邮件服务
+# 未配置时，使用 Mock 实现（SmsServiceImpl、EmailServiceImpl）
+aliyun:
+  # AccessKey ID（必填，启用阿里云服务时需要）
+  access-key-id: ${ALIYUN_ACCESS_KEY_ID:your-access-key-id}
+  # AccessKey Secret（必填，启用阿里云服务时需要）
+  access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:your-access-key-secret}
+  # 区域ID（默认：cn-hangzhou）
+  region-id: cn-hangzhou
+
+  # 短信服务配置
+  sms:
+    # 短信签名名称（在阿里云短信服务控制台申请）
+    sign-name: ${ALIYUN_SMS_SIGN:你的签名}
+
+  # 邮件服务配置
+  email:
+    # 发信地址（在阿里云邮件推送控制台配置的发信地址）
+    from-address: ${ALIYUN_EMAIL_FROM:noreply@example.com}
+    # 发信人别名（可选）
+    from-alias: ${ALIYUN_EMAIL_ALIAS:系统通知}
+    # 账户名称（通常与发信地址相同）
+    account-name: ${ALIYUN_EMAIL_ACCOUNT:noreply@example.com}
+    # 回信地址（可选）
+    reply-to-address: ${ALIYUN_EMAIL_REPLYTO:}
 
 server:
   port: 9101

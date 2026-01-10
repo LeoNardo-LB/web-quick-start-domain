@@ -1,6 +1,5 @@
 package org.smm.archetype.domain.common.notification.provider;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -12,7 +11,6 @@ import lombok.Getter;
  * @since 2026/01/09
  */
 @Getter
-@AllArgsConstructor
 public enum ServiceProvider {
 
     /**
@@ -34,6 +32,13 @@ public enum ServiceProvider {
      * 服务商描述
      */
     private final String description;
+
+    /**
+     * 构造函数
+     */
+    ServiceProvider(String description) {
+        this.description = description;
+    }
 
     /**
      * 获取默认服务商（阿里云）
