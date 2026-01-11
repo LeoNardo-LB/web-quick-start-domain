@@ -23,6 +23,7 @@ public class OssProperties {
      */
     private String type = "local";
 
+    // Getter 方法（Lombok可能未正常工作）
     /**
      * RustFS 配置
      */

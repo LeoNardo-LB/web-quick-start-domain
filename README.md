@@ -34,7 +34,7 @@
 | [README.md](README.md)                                                                              | 项目概览和架构说明 | 所有人    |
 | [CLAUDE.md](CLAUDE.md)                                                                              | AI开发元指南   | AI、开发者 |
 | [业务代码编写规范.md](业务代码编写规范.md)                                                                          | 编码标准详细参考  | 开发者    |
-| [代码AI生成工作流.md](代码AI生成工作流.md)                                                                        | 强制性代码生成流程 | AI、开发者 |
+| [代码AI生成工作流.md](AI生成代码工作流.md)                                                                        | 强制性代码生成流程 | AI、开发者 |
 | [domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md)                         | 领域层详细指南   | 开发者    |
 | [app/README.md](app/src/main/java/org/smm/archetype/app/README.md)                                  | 应用层详细指南   | 开发者    |
 | [adapter/README.md](adapter/src/main/java/org/smm/archetype/adapter/README.md)                      | 接口层详细指南   | 开发者    |
@@ -315,7 +315,7 @@ public class Order extends AggregateRoot {
 
 **快速参考**：
 
-- **代码生成流程**：[代码AI生成工作流.md](代码AI生成工作流.md) - 4步强制验证流程
+- **代码生成流程**：[代码AI生成工作流.md](AI生成代码工作流.md) - 4步强制验证流程
 - **编码规范**：[业务代码编写规范.md](业务代码编写规范.md) - 权威编码标准
 - **测试规范**：[测试代码编写规范.md](测试代码编写规范.md) - 测试代码生成标准
 - **各层开发**
@@ -375,7 +375,7 @@ public class Order extends AggregateRoot {
 
 1. **文档重组**
     - ✅ 创建[业务代码编写规范.md](业务代码编写规范.md)（1,143行，18KB）
-    - ✅ 创建[代码AI生成工作流.md](代码AI生成工作流.md)（666行，11KB）
+   - ✅ 创建[代码AI生成工作流.md](AI生成代码工作流.md)（666行，11KB）
     - ✅ 创建[domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md)（590行，15KB）
     - ✅ 创建[adapter/README.md](adapter/src/main/java/org/smm/archetype/adapter/README.md)（639行）
     - ✅ 创建[app/README.md](app/src/main/java/org/smm/archetype/app/README.md)（589行）

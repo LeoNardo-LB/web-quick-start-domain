@@ -1,7 +1,9 @@
 package org.smm.archetype.config;
 
-import org.smm.archetype.config.condition.AliyunEnabledCondition;
-import org.smm.archetype.config.properties.AliyunProperties;
+import org.smm.archetype.config.condition.AliyunEmailEnabledCondition;
+import org.smm.archetype.config.condition.AliyunSmsEnabledCondition;
+import org.smm.archetype.config.properties.EmailProperties;
+import org.smm.archetype.config.properties.SmsProperties;
 import org.smm.archetype.infrastructure.common.notification.AliyunEmailServiceImpl;
 import org.smm.archetype.infrastructure.common.notification.AliyunSmsServiceImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -14,55 +16,70 @@ import org.springframework.context.annotation.Configuration;
  *
  * <p>通过@Bean方法显式注册阿里云通知服务Bean。
  *
- * <p>条件装配：当且仅当配置了有效的阿里云访问密钥时才创建Bean
+ * <p>条件装配：
  * <ul>
- *   <li>access-key-id 必须配置且非占位符</li>
- *   <li>access-key-secret 必须配置且非占位符</li>
+ *   <li>短信服务：middleware.sms.type=aliyun 且配置了有效的访问密钥</li>
+ *   <li>邮件服务：middleware.email.type=aliyun 且配置了有效的访问密钥</li>
  * </ul>
  *
  * @author Leonardo
- * @since 2026/01/10
+ * @since 2026-01-10
  */
 @Configuration
-@EnableConfigurationProperties(AliyunProperties.class)
+@EnableConfigurationProperties({
+        SmsProperties.class,
+        EmailProperties.class
+})
 public class AliyunNotificationConfigure {
 
     /**
      * 阿里云短信服务Bean
      *
-     * <p>条件：配置了有效的aliyun.access-key-id和access-key-secret时启用
-     * @param aliyunProperties 阿里云配置属性
+     * <p>条件：
+     * <ul>
+     *   <li>middleware.sms.type=aliyun</li>
+     *   <li>配置了有效的 access-key-id 和 access-key-secret</li>
+     * </ul>
+     *
+     * @param smsProperties 短信配置属性
      * @return 阿里云短信服务实例
      */
     @Bean
-    @Conditional(AliyunEnabledCondition.class)
-    public AliyunSmsServiceImpl aliyunSmsService(AliyunProperties aliyunProperties) {
+    @Conditional(AliyunSmsEnabledCondition.class)
+    public AliyunSmsServiceImpl aliyunSmsService(SmsProperties smsProperties) {
+        SmsProperties.Aliyun aliyun = smsProperties.getAliyun();
         return new AliyunSmsServiceImpl(
-                aliyunProperties.getAccessKeyId(),
-                aliyunProperties.getAccessKeySecret(),
-                aliyunProperties.getRegionId(),
-                aliyunProperties.getSms().getSignName()
+                aliyun.getAccessKeyId(),
+                aliyun.getAccessKeySecret(),
+                aliyun.getRegionId(),
+                aliyun.getSignName()
         );
     }
 
     /**
      * 阿里云邮件服务Bean
      *
-     * <p>条件：配置了有效的aliyun.access-key-id和access-key-secret时启用
-     * @param aliyunProperties 阿里云配置属性
+     * <p>条件：
+     * <ul>
+     *   <li>middleware.email.type=aliyun</li>
+     *   <li>配置了有效的 access-key-id 和 access-key-secret</li>
+     * </ul>
+     *
+     * @param emailProperties 邮件配置属性
      * @return 阿里云邮件服务实例
      */
     @Bean
-    @Conditional(AliyunEnabledCondition.class)
-    public AliyunEmailServiceImpl aliyunEmailService(AliyunProperties aliyunProperties) {
+    @Conditional(AliyunEmailEnabledCondition.class)
+    public AliyunEmailServiceImpl aliyunEmailService(EmailProperties emailProperties) {
+        EmailProperties.Aliyun aliyun = emailProperties.getAliyun();
         return new AliyunEmailServiceImpl(
-                aliyunProperties.getAccessKeyId(),
-                aliyunProperties.getAccessKeySecret(),
-                aliyunProperties.getRegionId(),
-                aliyunProperties.getEmail().getFromAddress(),
-                aliyunProperties.getEmail().getFromAlias(),
-                aliyunProperties.getEmail().getAccountName(),
-                aliyunProperties.getEmail().getReplyToAddress()
+                aliyun.getAccessKeyId(),
+                aliyun.getAccessKeySecret(),
+                aliyun.getRegionId(),
+                aliyun.getFromAddress(),
+                aliyun.getFromAlias(),
+                aliyun.getAccountName(),
+                aliyun.getReplyToAddress()
         );
     }
 

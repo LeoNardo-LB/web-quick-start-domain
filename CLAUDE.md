@@ -16,6 +16,148 @@
 
 ---
 
+## 🤖 AI必读：违反规范的高风险场景
+
+> **每次执行任务前，必须先检查以下风险等级！**
+
+### 🔴 风险等级1（CRITICAL）：配置类违规
+
+**触发条件**：
+
+- 用户要求"创建配置类"、"配置Bean"、"注册Bean"
+- 生成应用服务、领域服务、Repository实现类
+- 创建事件处理器、监听器
+
+**强制检查清单**：
+
+```
+□ 配置类位置是否在 start/src/main/java/org/smm/archetype/config/ ？
+□ 配置类名是否按聚合根命名（OrderAggr → OrderConfigure）？
+□ 是否使用 @Configuration + @Bean（而非@Service/@Component）？
+□ 是否使用构造器注入（而非@Autowired字段注入）？
+```
+
+**错误示例**（绝对禁止）：
+
+```java
+// ❌ 错误：配置类在adapter模块
+package org.smm.archetype.adapter._example.order.config;
+
+@Configuration
+public class OrderAdapterConfigure {}
+
+// ❌ 错误：按层命名
+@Configuration
+public class OrderInfraConfigure {}
+
+// ❌ 错误：使用@Service
+@Service
+public class OrderApplicationService {}
+```
+
+**正确示例**（必须遵循）：
+
+```java
+// ✅ 正确：start模块，按聚合根命名
+package org.smm.archetype.config;
+
+@Configuration
+public class OrderConfigure {
+
+    @Bean
+    public OrderApplicationService orderApplicationService(...) {}
+
+}
+```
+
+---
+
+### 🟠 风险等级2（HIGH）：Lombok注解违规
+
+**触发条件**：
+
+- 生成实体类、DTO、值对象
+
+**强制检查**：
+
+- ❌ 绝不使用 @Data（必须手动实现 equals/hashCode/toString）
+- ✅ 使用 @Getter/@Setter + @AllArgsConstructor 或手动构造器
+- ✅ 值对象使用 @AllArgsConstructor + @FieldDefaults(makeFinal=true, level=PRIVATE)
+
+---
+
+### 🟡 风险等级3（MEDIUM）：_notes 文件夹使用
+
+**触发条件**（满足任意一项即应创建笔记）：
+
+- ✅ 任务涉及 **3个及以上文件** 的修改
+- ✅ 任务预计耗时 **超过1小时**
+- ✅ 用户提示词包含"设计"、"规划"、"重构"、"分析"关键词
+- ✅ 任务需要 **跨越多个会话** 完成
+
+**操作流程**：
+
+```
+1. 识别触发条件 → 2. 创建 _notes/current-task.md → 3. 记录进度 → 4. 完成后归档到 _notes/archive/
+```
+
+**笔记模板**：
+
+```markdown
+# Task: [任务标题]
+
+**Created**: YYYY-MM-DD
+**Status**: In Progress/Completed
+**Estimated Complexity**: Low/Medium/High
+
+## Overview
+
+[1-2句话描述任务目标]
+
+## Progress
+
+- [ ] Step 1
+- [x] Step 2 (completed YYYY-MM-DD)
+
+## Findings
+
+[重要发现、决策、阻塞点]
+
+## Next Steps
+
+[下一步行动]
+```
+
+---
+
+### 🟢 风险等级4（NORMAL）：常规编码规范
+
+**参考文档**：《业务代码编写规范.md》相关章节
+
+---
+
+## ⚡ 快速决策树
+
+```
+开始编码任务
+    │
+    ├─ 需要配置Bean？
+    │    ├─ 是 → 检查配置类规范（位置、命名、注解）
+    │    └─ 否 → 继续
+    │
+    ├─ 涉及3+文件或>1小时？
+    │    ├─ 是 → 创建 _notes/current-task.md
+    │    └─ 否 → 继续
+    │
+    ├─ 需要生成实体/DTO？
+    │    ├─ 是 → 检查Lombok规范（禁止@Data）
+    │    └─ 否 → 继续
+    │
+    └─ 遵循《业务代码编写规范.md》对应章节
+```
+
+---
+
 # 🚨 快速参考
 
 ## 测试运行命令速查
@@ -43,7 +185,7 @@ mvn spring-boot:run -pl start
 | 3️⃣ | `mvn test`                                          | 单元测试验证   | Tests run > 0, Failures: 0           |
 | 4️⃣ | `mvn test -Dtest=ApplicationStartupTests -pl start` | **启动验证** | Tests run: 1, Failures: 0, Errors: 0 |
 
-> **⚠️ 提醒**: 详细验证流程和故障排查见[代码AI生成工作流.md](代码AI生成工作流.md)
+> **⚠️ 提醒**: 详细验证流程和故障排查见[代码AI生成工作流.md](AI生成代码工作流.md)
 
 ---
 
@@ -66,7 +208,7 @@ mvn spring-boot:run -pl start
 |-----------------------------------------------------------------------------------------------------|--------------|------------|---------------------|-------|
 | **[业务代码编写规范.md](业务代码编写规范.md)**                                                                      | **编码标准详细参考** | **开发者、AI** | **⭐ 写代码前必读，必须严格遵守** | ⭐⭐⭐⭐⭐ |
 | [README.md](README.md)                                                                              | 项目概览和架构说明    | 所有人        | 了解项目整体架构            | ⭐⭐⭐⭐  |
-| [代码AI生成工作流.md](代码AI生成工作流.md)                                                                        | 强制性代码生成流程    | AI、开发者     | **每次代码生成必须遵循**      | ⭐⭐⭐⭐⭐ |
+| [代码AI生成工作流.md](AI生成代码工作流.md)                                                                        | 强制性代码生成流程    | AI、开发者     | **每次代码生成必须遵循**      | ⭐⭐⭐⭐⭐ |
 | [domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md)                         | 领域层详细指南      | 开发者        | 开发领域模型时             | ⭐⭐⭐   |
 | [app/README.md](app/src/main/java/org/smm/archetype/app/README.md)                                  | 应用层详细指南      | 开发者        | 开发应用服务时             | ⭐⭐⭐   |
 | [adapter/README.md](adapter/src/main/java/org/smm/archetype/adapter/README.md)                      | 接口层详细指南      | 开发者        | 开发Controller时       | ⭐⭐⭐   |
@@ -78,7 +220,7 @@ mvn spring-boot:run -pl start
 
 1. **阅读**: [README.md](README.md#项目架构) - 了解四层架构
 2. **阅读**: [业务代码编写规范.md](业务代码编写规范.md) - 了解编码规范
-3. **阅读**: [代码AI生成工作流.md](代码AI生成工作流.md) - **遵循4步验证流程**
+3. **阅读**: [代码AI生成工作流.md](AI生成代码工作流.md) - **遵循4步验证流程**
 4. **参考**: [domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md) - 创建领域模型
 5. **参考**: [app/README.md](app/src/main/java/org/smm/archetype/app/README.md) - 创建应用服务
 6. **参考**: [infrastructure/README.md](infrastructure/src/main/java/org/smm/archetype/infrastructure/README.md) - 实现Repository
@@ -87,14 +229,14 @@ mvn spring-boot:run -pl start
 
 1. **定位**: 使用Grep/Glob工具查找相关代码
 2. **阅读**: [业务代码编写规范.md](业务代码编写规范.md) - 确认修复方案符合规范
-3. **遵循**: [代码AI生成工作流.md](代码AI生成工作流.md) - 完成4步验证
+3. **遵循**: [代码AI生成工作流.md](AI生成代码工作流.md) - 完成4步验证
 4. **验证**: 运行启动测试确保无副作用
 
 #### 代码重构
 
 1. **阅读**: [业务代码编写规范.md#8-代码设计原则](业务代码编写规范.md#8-代码设计原则) - 确保符合设计原则
 2. **阅读**: [业务代码编写规范.md#84-接口实现分离模式](业务代码编写规范.md#84-接口实现分离模式三层架构) - 三层架构模式
-3. **验证**: [代码AI生成工作流.md](代码AI生成工作流.md) - 确保启动测试通过
+3. **验证**: [代码AI生成工作流.md](AI生成代码工作流.md) - 确保启动测试通过
 
 ### 📖 各文档核心内容速查
 
@@ -164,7 +306,7 @@ mvn spring-boot:run -pl start
 
 ## 开发工作流
 
-**详细工作流程**：[代码AI生成工作流.md](代码AI生成工作流.md)
+**详细工作流程**：[代码AI生成工作流.md](AI生成代码工作流.md)
 
 本章节只保留快速参考，详细流程请参考工作流文档。
 
@@ -197,7 +339,7 @@ mvn spring-boot:run -pl start
 **不包含**：
 
 - ❌ 详细编码规范 → [业务代码编写规范.md](业务代码编写规范.md)
-- ❌ 验证流程细节 → [代码AI生成工作流.md](代码AI生成工作流.md)
+- ❌ 验证流程细节 → [代码AI生成工作流.md](AI生成代码工作流.md)
 - ❌ 测试生成规范 → [测试代码编写规范.md](测试代码编写规范.md)
 - ❌ 架构详细说明 → [README.md](README.md) + 各模块README
 
@@ -218,8 +360,8 @@ mvn spring-boot:run -pl start
 
 **不包含**：
 
-- ❌ 详细开发指南 → [代码AI生成工作流.md](代码AI生成工作流.md)
-- ❌ 完整工作流程 → [代码AI生成工作流.md](代码AI生成工作流.md)
+- ❌ 详细开发指南 → [代码AI生成工作流.md](AI生成代码工作流.md)
+- ❌ 完整工作流程 → [代码AI生成工作流.md](AI生成代码工作流.md)
 - ❌ 故障排查信息 → [CLAUDE.md](CLAUDE.md)
 
 **定位**：对外项目介绍，快速了解项目价值
@@ -258,7 +400,7 @@ mvn spring-boot:run -pl start
 
 **不包含**：
 
-- ❌ 验证流程命令 → [代码AI生成工作流.md](代码AI生成工作流.md)
+- ❌ 验证流程命令 → [代码AI生成工作流.md](AI生成代码工作流.md)
 - ❌ 文档导航信息 → [CLAUDE.md](CLAUDE.md)
 - ❌ 测试规范详细内容 → [测试代码编写规范.md](测试代码编写规范.md)
 
@@ -282,7 +424,7 @@ mvn spring-boot:run -pl start
 **不包含**：
 
 - ❌ 业务代码编码规范 → [业务代码编写规范.md](业务代码编写规范.md)
-- ❌ 验证流程细节 → [代码AI生成工作流.md](代码AI生成工作流.md)
+- ❌ 验证流程细节 → [代码AI生成工作流.md](AI生成代码工作流.md)
 
 **定位**：测试代码生成的唯一标准
 
@@ -322,11 +464,11 @@ mvn spring-boot:run -pl start
 
 1. 先读 [业务代码编写规范.md](业务代码编写规范.md) - 了解编码规范
 2. 再读 [测试代码编写规范.md](测试代码编写规范.md) - 了解测试生成要求
-3. 最后执行 [代码AI生成工作流.md](代码AI生成工作流.md) - 完成4步验证
+3. 最后执行 [代码AI生成工作流.md](AI生成代码工作流.md) - 完成4步验证
 
 ### 场景4：验证失败
 
-1. 先读 [代码AI生成工作流.md](代码AI生成工作流.md) - 查看故障排查决策树
+1. 先读 [代码AI生成工作流.md](AI生成代码工作流.md) - 查看故障排查决策树
 2. 再读 [CLAUDE.md](CLAUDE.md) - 查看常见问题FAQ
 
 ### 场景5：开发特定层功能
@@ -336,11 +478,41 @@ mvn spring-boot:run -pl start
 
 ---
 
-## _task文件夹系统
+## 笔记 [_notes](_notes)文件夹
+
+### 位置
+
+```
+项目根目录/_notes
+```
 
 ### 📁 用途
 
-用于AI管理复杂、长期的任务笔记，开发者可以查看进度，但不应手动编辑。
+用于AI管理复杂、长期的任务笔记，开发者可以查看进度，但不应手动编辑。推荐每次遇到需求时，使用笔记进行任务管理。
+
+### 📝 作用机制
+
+1. **AI自主创建**: 当AI遇到复杂任务（如多文件修改、长期跟踪的问题、需要调研的方案等），自动创建对应的笔记文件
+2. **持续更新**: AI在执行过程中不断更新进度、记录发现、标记阻塞点
+3. **智能归档**: 任务完成后，AI自动将笔记移动到archive/目录并按日期命名
+4. **开发者透明**: 开发者可以通过查看_notes/下的文件了解AI当前的工作状态和历史记录
+
+### 🎯 适用场景
+
+- **复杂功能开发**: 涉及多个模块、多个文件的大型功能开发
+- **技术调研**: 需要对比多种方案、记录优缺点的场景
+- **问题排查**: 追踪复杂bug、记录排查过程和最终解决方案
+- **架构设计**: 记录设计决策、权衡考虑、未来扩展点
+- **学习记录**: AI在处理新领域知识时的临时记录
+
+### 🔧 AI使用建议
+
+1. **自动判断**: 当任务预计超过1小时或涉及3个以上文件时，建议创建笔记
+2. **定期更新**: 每完成一个重要步骤都要更新进度状态
+3. **详细记录**: 记录关键决策点、遇到的问题、解决方案
+4. **及时归档**: 任务完成后立即整理并归档相关笔记
+
+> 这个系统旨在提高AI工作的透明度和连续性，开发者无需干预，但可以随时查看了解项目进展。
 
 ### 📂 结构
 
@@ -471,7 +643,7 @@ _notes/
 2. 确保添加了`lombok-mapstruct-binding`
 3. 运行`mvn clean compile`重新生成
 
-**参考**: [代码AI生成工作流.md - 编译验证](代码AI生成工作流.md#步骤2编译验证)
+**参考**: [代码AI生成工作流.md - 编译验证](AI生成代码工作流.md#步骤2编译验证)
 
 #### 类型转换错误
 
@@ -488,7 +660,7 @@ _notes/
 1. 使用`@Mapping(expression="java(...)")`
 2. 或使用`@Mapping(target="...", ignore=true)`
 
-**参考**: [代码AI生成工作流.md - 常见编译问题](代码AI生成工作流.md#常见编译问题)
+**参考**: [代码AI生成工作流.md - 常见编译问题](AI生成代码工作流.md#常见编译问题)
 
 ### 🧪 单元测试失败
 
@@ -502,7 +674,7 @@ _notes/
 2. 确保使用正确的mock实例
 3. 验证Mock设置在调用之前完成
 
-**参考**: [代码AI生成工作流.md - 测试失败处理](代码AI生成工作流.md#测试失败处理流程)
+**参考**: [代码AI生成工作流.md - 测试失败处理](AI生成代码工作流.md#测试失败处理流程)
 
 #### 断言失败
 
@@ -514,7 +686,7 @@ _notes/
 2. 验证测试用例是否合理
 3. 查看失败的详细堆栈信息
 
-**参考**: [代码AI生成工作流.md - 测试失败示例](代码AI生成工作流.md#附录c-常见错误示例)
+**参考**: [代码AI生成工作流.md - 测试失败示例](AI生成代码工作流.md#附录c-常见错误示例)
 
 ### 🚀 启动测试失败
 
@@ -534,7 +706,7 @@ org.springframework.beans.factory.BeanCreationException
 2. 确保依赖完整
 3. 查看详细堆栈定位失败Bean
 
-**参考**: [代码AI生成工作流.md - 启动失败处理](代码AI生成工作流.md#步骤4主启动类启动验证-最关键)
+**参考**: [代码AI生成工作流.md - 启动失败处理](AI生成代码工作流.md#步骤4主启动类启动验证-最关键)
 
 #### 循环依赖
 
@@ -559,7 +731,7 @@ The dependencies of some of the beans in the application context form a cycle
 
 **参考**:
 
-- [代码AI生成工作流.md - 循环依赖解决](代码AI生成工作流.md#⚠️-循环依赖解决原则)
+- [代码AI生成工作流.md - 循环依赖解决](AI生成代码工作流.md#⚠️-循环依赖解决原则)
 - [业务代码编写规范.md - Bean管理](业务代码编写规范.md#26-springboot-bean管理规范)
 
 #### NoSuchBeanDefinitionException
@@ -578,13 +750,13 @@ No qualifying bean of type 'com.xxx.XxxService' available
 2. 确保条件装配（@ConditionalOnBean）满足
 3. 验证依赖Bean已创建
 
-**参考**: [代码AI生成工作流.md - 常见启动失败问题](代码AI生成工作流.md#常见启动失败问题)
+**参考**: [代码AI生成工作流.md - 常见启动失败问题](AI生成代码工作流.md#常见启动失败问题)
 
 ---
 
 ## 代码质量标准
 
-**详细质量检查清单**：[代码AI生成工作流.md - 代码质量检查清单](代码AI生成工作流.md#代码质量检查清单)
+**详细质量检查清单**：[代码AI生成工作流.md - 代码质量检查清单](AI生成代码工作流.md#代码质量检查清单)
 
 ### 快速参考
 
@@ -619,7 +791,7 @@ No qualifying bean of type 'com.xxx.XxxService' available
 3. 单元测试验证确保测试覆盖
 4. 启动验证确保应用可以正常运行
 
-**详细流程**: [代码AI生成工作流.md](代码AI生成工作流.md)
+**详细流程**: [代码AI生成工作流.md](AI生成代码工作流.md)
 
 ### Q3: 如何解决循环依赖？
 
@@ -637,7 +809,7 @@ No qualifying bean of type 'com.xxx.XxxService' available
 - 使用ApplicationContext.getBean()依赖查找
 - 使用@PostConstruct延迟初始化
 
-**详细说明**: [代码AI生成工作流.md - 循环依赖解决](代码AI生成工作流.md#⚠️-循环依赖解决原则)
+**详细说明**: [代码AI生成工作流.md - 循环依赖解决](AI生成代码工作流.md#⚠️-循环依赖解决原则)
 
 ### Q4: 何时使用三层架构（接口-抽象基类-实现）？
 
@@ -681,7 +853,7 @@ No qualifying bean of type 'com.xxx.XxxService' available
 
 - [README.md](README.md) - 项目概览
 - [业务代码编写规范.md](业务代码编写规范.md) - 编码标准
-- [代码AI生成工作流.md](代码AI生成工作流.md) - 代码生成流程
+- [代码AI生成工作流.md](AI生成代码工作流.md) - 代码生成流程
 - [domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md) - 领域层
 - [app/README.md](app/src/main/java/org/smm/archetype/app/README.md) - 应用层
 - [adapter/README.md](adapter/src/main/java/org/smm/archetype/adapter/README.md) - 接口层

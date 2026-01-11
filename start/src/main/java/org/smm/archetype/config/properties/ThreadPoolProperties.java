@@ -40,6 +40,23 @@ public class ThreadPoolProperties {
      */
     private Scheduler scheduler = new Scheduler();
 
+    // Getter 方法（Lombok可能未正常工作）
+    public Io getIo() {
+        return io;
+    }
+
+    public Cpu getCpu() {
+        return cpu;
+    }
+
+    public Daemon getDaemon() {
+        return daemon;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
     /**
      * IO密集型线程池配置
      */
