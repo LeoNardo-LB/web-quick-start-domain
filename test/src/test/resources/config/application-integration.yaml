@@ -54,10 +54,6 @@ middleware:
   object-storage:
     type: local
 
-  # 禁用阿里云服务（测试环境）
-  aliyun:
-    enabled: false
-
   # 短信服务配置（测试环境禁用）
   sms:
     type: aliyun

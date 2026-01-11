@@ -15,6 +15,8 @@ import org.smm.archetype.app._example.order.command.ShipOrderCommand;
 import org.smm.archetype.app._example.order.dto.OrderDTO;
 import org.smm.archetype.app._example.order.query.GetOrderByIdQuery;
 import org.smm.archetype.app._example.order.query.GetOrdersByCustomerQuery;
+import org.smm.archetype.app._example.order.query.OrderListQuery;
+import org.smm.archetype.app._shared.result.PageResult;
 import org.smm.archetype.domain._example.order.model.valueobject.Address;
 import org.smm.archetype.domain._example.order.model.valueobject.ContactInfo;
 import org.smm.archetype.domain._example.order.model.valueobject.OrderItemInfo;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -247,6 +250,52 @@ public class OrderController {
         } catch (Exception e) {
             log.error("查询客户订单列表失败: {}", e.getMessage(), e);
             return BaseResult.error(500, "查询客户订单列表失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 分页查询订单列表
+     * @param customerId 客户ID（可选）
+     * @param pageNumber 页码（从1开始，默认1）
+     * @param pageSize   每页大小（默认10）
+     * @return 分页结果
+     */
+    @GetMapping
+    public BaseResult<PageResult<OrderResponse>> getOrderList(
+            @RequestParam(required = false) String customerId,
+            @RequestParam(defaultValue = "1") int pageNumber,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        log.info("分页查询订单列表: customerId={}, pageNumber={}, pageSize={}", customerId, pageNumber, pageSize);
+
+        try {
+            // 构建查询对象
+            OrderListQuery query = new OrderListQuery();
+            query.setCustomerId(customerId);
+            query.setPageNumber(pageNumber);
+            query.setPageSize(pageSize);
+
+            // 调用应用服务
+            PageResult<OrderDTO> page = orderApplicationService.getOrderList(query);
+
+            // 转换为响应
+            List<OrderResponse> responses = page.getRecords().stream()
+                                                    .map(OrderResponse::fromDTO)
+                                                    .toList();
+
+            // 构建分页结果
+            PageResult<OrderResponse> result =
+                    PageResult.<OrderResponse>builder()
+                            .pageNumber(page.getPageNumber())
+                            .pageSize(page.getPageSize())
+                            .records(responses)
+                            .totalRaw(page.getTotalRaw())
+                            .build();
+
+            return BaseResult.success(result);
+
+        } catch (Exception e) {
+            log.error("分页查询订单列表失败: {}", e.getMessage(), e);
+            return BaseResult.error(500, "分页查询订单列表失败: " + e.getMessage());
         }
     }
 

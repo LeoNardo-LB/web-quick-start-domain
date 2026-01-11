@@ -13,6 +13,7 @@ import org.smm.archetype.app._example.order.dto.OrderItemDTO;
 import org.smm.archetype.app._example.order.query.GetOrderByIdQuery;
 import org.smm.archetype.app._example.order.query.GetOrdersByCustomerQuery;
 import org.smm.archetype.app._example.order.query.OrderListQuery;
+import org.smm.archetype.app._shared.result.PageResult;
 import org.smm.archetype.domain._example.order.model.OrderAggr;
 import org.smm.archetype.domain._example.order.model.OrderItem;
 import org.smm.archetype.domain._example.order.model.valueobject.Address;
@@ -249,17 +250,31 @@ public class OrderAppService {
     }
 
     /**
-     * 查询订单列表
+     * 查询订单列表（分页）
      * @param query 查询对象
-     * @return 订单DTO列表
+     * @return 分页结果
      */
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrderList(OrderListQuery query) {
-        // TODO: 实现分页查询
-        if (query.getCustomerId() != null) {
-            return getOrdersByCustomer(new GetOrdersByCustomerQuery(query.getCustomerId()));
-        }
-        return List.of();
+    public PageResult<OrderDTO> getOrderList(OrderListQuery query) {
+        // 调用Repository分页查询
+        org.smm.archetype.domain._shared.base.PageModel<OrderAggr> page = orderRepository.findOrders(
+                query.getCustomerId(),
+                query.getPageNumber(),
+                query.getPageSize()
+        );
+
+        // 转换为DTO
+        List<OrderDTO> dtos = page.getRecords().stream()
+                                      .map(this::toDTO)
+                                      .collect(Collectors.toList());
+
+        // 构建返回结果
+        return PageResult.<OrderDTO>builder()
+                       .pageNumber(page.getPageNumber())
+                       .pageSize(page.getPageSize())
+                       .records(dtos)
+                       .totalRaw(page.getTotalRaw())
+                       .build();
     }
 
     /**
@@ -289,7 +304,7 @@ public class OrderAppService {
         if (order.hasUncommittedEvents()) {
             eventPublisher.publish(order.getUncommittedEvents());
             order.markEventsAsCommitted();
-            log.debug("发布领域事件: orderId, eventsCount={}",
+            log.debug("发布领域事件: orderId={}, eventsCount={}",
                     order.getId(), order.getUncommittedEvents().size());
         }
     }
