@@ -127,6 +127,136 @@ class XxxServiceTest {
 }
 ```
 
+### 🔴 强制规则：测试用例生成
+
+**⚠️ 每次生成业务代码后，AI必须执行以下步骤：**
+
+#### 1. 生成单元测试用例
+
+为每个业务类生成对应的单元测试：
+
+- ✅ 使用 `UnitTestBase` 基类（纯Mock，不启动Spring）
+- ✅ 覆盖所有public方法
+- ✅ 覆盖所有异常分支
+- ✅ 使用Mock隔离所有依赖（Repository、外部服务等）
+- ✅ 执行时间应 < 100ms
+
+**单元测试示例**：
+
+```java
+package org.smm.archetype.domain.service;
+
+import support.UnitTestBase;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.InjectMocks;
+
+class OrderServiceTest extends UnitTestBase {
+
+    @Mock
+    private OrderRepository orderRepository;
+
+    @InjectMocks
+    private OrderService orderService;
+
+    @Test
+    void createOrder_ValidOrder_ReturnsOrder() {
+        // 测试逻辑
+    }
+
+    @Test
+    void createOrder_DuplicateEmail_ThrowsException() {
+        // 测试逻辑
+    }
+
+}
+```
+
+#### 2. 生成集成测试用例
+
+为应用服务和控制器生成集成测试：
+
+- ✅ 使用 `IntegrationTestBase` 基类（启动Spring上下文）
+- ✅ 使用DBUnit管理测试数据
+- ✅ Mock外部服务（@MockBean）
+- ✅ 不Mock数据库
+- ✅ 测试完整的HTTP请求/响应流程
+
+**集成测试示例**：
+
+```java
+package org.smm.archetype.adapter.controller;
+
+import support.IntegrationTestBase;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+class OrderControllerIntegrationTest extends IntegrationTestBase {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Override
+    protected String getDataSetFile() {
+        return "controller/order-data.xml";
+    }
+
+    @Test
+    void getOrderById_ExistingOrder_Returns200() throws Exception {
+        mockMvc.perform(get("/api/orders/1"))
+                .andExpect(status().isOk());
+    }
+
+}
+```
+
+#### 3. 验证测试通过
+
+执行以下验证步骤：
+
+```bash
+# 验证单元测试通过率
+mvn test
+# 预期：Tests run > 0, Failures: 0
+
+# 验证集成测试通过率
+mvn test -Dtest=*IntegrationTest -pl test
+# 预期：Tests run > 0, Failures: 0
+
+# 检查覆盖率
+mvn jacoco:report
+# 预期：行覆盖率 ≥95%，分支覆盖率 100%
+```
+
+#### 4. 报告测试结果
+
+生成以下格式的测试结果报告：
+
+```markdown
+## 测试生成结果报告
+
+### 单元测试
+
+- 测试类：OrderServiceTest
+- 测试方法：6个
+- 通过率：100% ✅
+- 覆盖率：行96%，分支100% ✅
+
+### 集成测试
+
+- 测试类：OrderControllerIntegrationTest
+- 测试方法：4个
+- 通过率：100% ✅
+
+### DDL安全检查
+
+- DDL文件访问：只读 ✅
+- 动态DDL：未检测到 ✅
+- 文件修改：无 ✅
+```
+
+**参考文档**：[测试代码编写规范.md](测试代码编写规范.md)
+
 ---
 
 ## 步骤2：编译验证
@@ -379,9 +509,22 @@ mvn test -Dtest=ApplicationStartupTests -pl start | grep -i "error"
 ### 编译与测试验证
 
 - [ ] 编译通过: `mvn clean compile`
-- [ ] 单元测试通过: `mvn test`
+- [ ] 单元测试通过: `mvn test` (通过率100%)
+- [ ] 集成测试通过: `mvn test -Dtest=*IntegrationTest -pl test` (通过率100%)
 - [ ] 启动测试通过: `mvn test -Dtest=ApplicationStartupTests -pl start`
-- [ ] 测试覆盖率: Domain层>80%
+- [ ] 测试覆盖率: 行覆盖率≥95%，分支覆盖率100%
+- [ ] DDL安全检查: 无DDL修改操作
+
+### 测试质量要求
+
+| 指标             | 要求   | 验证命令                                        | 强制性   |
+|----------------|------|---------------------------------------------|-------|
+| **单元测试通过率**    | 100% | `mvn test`                                  | ⚠️ 强制 |
+| **集成测试通过率**    | 100% | `mvn test -Dtest=*IntegrationTest -pl test` | ⚠️ 强制 |
+| **行覆盖率**       | ≥95% | `mvn jacoco:report`                         | ⚠️ 强制 |
+| **分支覆盖率**      | 100% | `mvn jacoco:report`                         | ⚠️ 强制 |
+| **DDL修改次数**    | 0    | 代码审查                                        | ⚠️ 强制 |
+| **Domain层覆盖率** | >80% | `mvn jacoco:report`                         | 建议    |
 
 ### 架构规范检查
 
@@ -675,5 +818,5 @@ The dependencies of some of the beans in the application context form a cycle
 **相关文档**:
 
 - [CLAUDE.md](CLAUDE.md) - AI开发元指南
-- [代码编写规范.md](代码编写规范.md) - 编码规范
+- [业务代码编写规范.md](业务代码编写规范.md) - 编码规范
 - [README.md](README.md) - 项目概览

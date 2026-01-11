@@ -51,6 +51,14 @@ import java.util.UUID;
 public abstract class AggregateRoot extends Entity {
 
     /**
+     * 受保护的默认构造函数
+     * <p>供子类工厂方法使用
+     */
+    protected AggregateRoot() {
+        super();
+    }
+
+    /**
      * 领域事件列表
      */
     private final List<DomainEvent> domainEvents = new ArrayList<>();

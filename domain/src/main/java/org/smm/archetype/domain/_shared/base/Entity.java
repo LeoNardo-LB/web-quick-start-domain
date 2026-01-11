@@ -51,6 +51,13 @@ import java.time.Instant;
 public abstract class Entity implements Identifier {
 
     /**
+     * 受保护的默认构造函数
+     * <p>供子类工厂方法使用
+     */
+    protected Entity() {
+    }
+
+    /**
      * 唯一标识
      */
     protected Long id;

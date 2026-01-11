@@ -33,7 +33,7 @@
 |-----------------------------------------------------------------------------------------------------|-----------|--------|
 | [README.md](README.md)                                                                              | 项目概览和架构说明 | 所有人    |
 | [CLAUDE.md](CLAUDE.md)                                                                              | AI开发元指南   | AI、开发者 |
-| [代码编写规范.md](代码编写规范.md)                                                                              | 编码标准详细参考  | 开发者    |
+| [业务代码编写规范.md](业务代码编写规范.md)                                                                          | 编码标准详细参考  | 开发者    |
 | [代码AI生成工作流.md](代码AI生成工作流.md)                                                                        | 强制性代码生成流程 | AI、开发者 |
 | [domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md)                         | 领域层详细指南   | 开发者    |
 | [app/README.md](app/src/main/java/org/smm/archetype/app/README.md)                                  | 应用层详细指南   | 开发者    |
@@ -246,7 +246,7 @@ public class Order extends AggregateRoot {
 
 **详细信息**:
 
-- [代码编写规范.md - 事件驱动机制](代码编写规范.md#5-事件驱动机制)
+- [业务代码编写规范.md - 事件驱动机制](业务代码编写规范.md#5-事件驱动机制)
 - [infrastructure/README.md - EventPublisher实现](infrastructure/src/main/java/org/smm/archetype/infrastructure/README.md#2-eventpublisher实现事件发布器)
 
 ---
@@ -313,99 +313,42 @@ public class Order extends AggregateRoot {
 
 ## 开发指南
 
-### 创建新的聚合
+**快速参考**：
 
-**步骤**:
+- **代码生成流程**：[代码AI生成工作流.md](代码AI生成工作流.md) - 4步强制验证流程
+- **编码规范**：[业务代码编写规范.md](业务代码编写规范.md) - 权威编码标准
+- **测试规范**：[测试代码编写规范.md](测试代码编写规范.md) - 测试代码生成标准
+- **各层开发**
+  ：参考各模块README（[domain](domain/src/main/java/org/smm/archetype/domain/README.md)、[app](app/src/main/java/org/smm/archetype/app/README.md)、[adapter](adapter/src/main/java/org/smm/archetype/adapter/README.md)、[infrastructure](infrastructure/src/main/java/org/smm/archetype/infrastructure/README.md)）
 
-1. **定义值对象**（如果有）
-2. **创建聚合根** - 继承AggregateRoot
-3. **定义领域事件** - 继承DomainEvent
-4. **创建Repository接口** - 在domain层
-5. **实现Repository** - 在infrastructure层
-6. **创建应用服务** - 在app层
-7. **创建REST Controller** - 在adapter层
+### 核心原则
 
-**详细步骤**: 参考本文档"创建新的聚合"章节
-
-### 代码生成流程
-
-⚠️ **强制执行**: 生成代码后，**必须**按顺序完成以下**4个强制验证步骤**
-
-| 步骤  | 命令                                                  | 验证目标       |
-|-----|-----------------------------------------------------|------------|
-| 1️⃣ | 编写单元测试                                              | 覆盖核心逻辑     |
-| 2️⃣ | `mvn clean compile`                                 | 编译验证       |
-| 3️⃣ | `mvn test`                                          | 单元测试验证     |
-| 4️⃣ | `mvn test -Dtest=ApplicationStartupTests -pl start` | **启动验证** ⭐ |
-
-**详细流程**: [代码AI生成工作流.md](代码AI生成工作流.md)
-
-### 编码规范
-
-**核心规范**:
-
-1. **Lombok规范**: 禁止使用@Data，精确使用注解
-2. **枚举规范**: 禁止魔法值，全部使用枚举
-3. **分层规范**: 严格遵循依赖方向
-4. **Bean管理**: 显式配置，使用@Configuration + @Bean
-5. **依赖注入**: 使用构造器注入
-
-**详细规范**: [代码编写规范.md](代码编写规范.md)
+1. **4步验证流程**：单元测试 → 编译 → 测试 → 启动验证
+2. **测试要求**：每次生成业务代码后必须生成单测与集测用例，并保证通过
+3. **编码规范**：禁止@Data、使用枚举、构造器注入、三层架构
+4. **分层依赖**：Adapter → App → Domain ← Infrastructure
 
 ---
 
 ## 最佳实践
 
-### ✅ DO（推荐）
+**详细最佳实践**：参考各模块README和[业务代码编写规范.md](业务代码编写规范.md)
 
-1. **通过业务方法修改状态**
-   ```java
-   order.pay("ALIPAY");  // ✅ 好
-   ```
+### 核心最佳实践
 
-2. **在聚合根内发布领域事件**
-   ```java
-   this.addDomainEvent(new OrderPaidEvent(...));  // ✅ 好
-   ```
+**✅ DO（推荐）**：
 
-3. **使用规格模式封装业务规则**
-   ```java
-   if (spec.isSatisfiedBy(customer)) { ... }  // ✅ 好
-   ```
+- 通过业务方法修改状态（如 `order.pay()`）
+- 在聚合根内发布领域事件
+- 使用规格模式封装业务规则
+- 在应用服务中管理事务
 
-4. **在应用服务中管理事务**
-   ```java
-   @Transactional
-   public void process() { ... }  // ✅ 好
-   ```
+**❌ DON'T（避免）**：
 
-### ❌ DON'T（避免）
-
-1. **不要使用setter修改状态**
-   ```java
-   order.setStatus(OrderStatus.PAID);  // ❌ 破坏封装性
-   ```
-
-2. **不要在外部直接操作聚合内部集合**
-   ```java
-   order.getItems().add(item);  // ❌ 破坏一致性边界
-   ```
-
-3. **不要在应用服务中编写业务逻辑**
-   ```java
-   // ❌ 业务逻辑应该在领域层
-   if (order.getStatus() == CREATED) {
-       order.setStatus(PAID);
-   }
-   ```
-
-4. **不要为聚合内部的实体创建Repository**
-   ```java
-   // ❌ 错误：OrderItem应该通过Order访问
-   public interface OrderItemRepository { ... }
-   ```
-
-**更多最佳实践**: 参考本文档"最佳实践"章节
+- 不要使用setter修改状态
+- 不要在外部直接操作聚合内部集合
+- 不要在应用服务中编写业务逻辑
+- 不要为聚合内部的实体创建Repository
 
 ---
 
@@ -431,7 +374,7 @@ public class Order extends AggregateRoot {
 **重大更新**:
 
 1. **文档重组**
-    - ✅ 创建[代码编写规范.md](代码编写规范.md)（1,143行，18KB）
+    - ✅ 创建[业务代码编写规范.md](业务代码编写规范.md)（1,143行，18KB）
     - ✅ 创建[代码AI生成工作流.md](代码AI生成工作流.md)（666行，11KB）
     - ✅ 创建[domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md)（590行，15KB）
     - ✅ 创建[adapter/README.md](adapter/src/main/java/org/smm/archetype/adapter/README.md)（639行）

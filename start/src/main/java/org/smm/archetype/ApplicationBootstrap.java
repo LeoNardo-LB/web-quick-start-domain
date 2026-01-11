@@ -2,11 +2,13 @@ package org.smm.archetype;
 
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
+import org.smm.archetype.infrastructure._example.order.config.OrderInfraConfigure;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @EnableAspectJAutoProxy
 @MapperScan("org.smm.archetype.infrastructure.**.mapper")
+@Import(OrderInfraConfigure.class)
 public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
@@ -59,7 +62,7 @@ public class ApplicationBootstrap implements CommandLineRunner {
      * 启动Spring Boot应用程序，初始化应用上下文并启动Web服务器。
      * @param args 命令行参数
      */
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(ApplicationBootstrap.class, args);
     }
 

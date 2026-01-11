@@ -1,5 +1,6 @@
 package org.smm.archetype.config.condition;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.env.Environment;
@@ -26,7 +27,7 @@ public class AliyunEnabledCondition implements Condition {
     private static final String PLACEHOLDER_PREFIX = "your-";
 
     @Override
-    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+    public boolean matches(ConditionContext context, @NonNull AnnotatedTypeMetadata metadata) {
         Environment env = context.getEnvironment();
 
         String accessKeyId = env.getProperty("aliyun.access-key-id");
