@@ -41,15 +41,15 @@ import java.util.stream.Collectors;
  * @since 2026/1/11
  */
 @Slf4j
-public class OrderApplicationService {
+public class OrderAppService {
 
     private final OrderAggrRepository orderRepository;
     private final OrderDomainService  orderDomainService;
     private final EventPublisher      eventPublisher;
 
-    public OrderApplicationService(OrderAggrRepository orderRepository,
-                                   OrderDomainService orderDomainService,
-                                   EventPublisher eventPublisher) {
+    public OrderAppService(OrderAggrRepository orderRepository,
+                           OrderDomainService orderDomainService,
+                           EventPublisher eventPublisher) {
         this.orderRepository = orderRepository;
         this.orderDomainService = orderDomainService;
         this.eventPublisher = eventPublisher;

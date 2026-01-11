@@ -1,13 +1,12 @@
 package org.smm.archetype.infrastructure._example.order.persistence.converter;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
 import org.smm.archetype.domain._example.order.model.OrderAggr;
 import org.smm.archetype.domain._example.order.model.OrderStatus;
 import org.smm.archetype.domain._example.order.model.PaymentMethod;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.OrderAggrDO;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 /**
  * 订单聚合根DO转换器
@@ -15,43 +14,41 @@ import org.smm.archetype.infrastructure._shared.generated.repository.entity.Orde
  * <p>职责：
  * <ul>
  *   <li>OrderAggr（领域对象） → OrderAggrDO（数据对象）</li>
- *   <li>OrderAggrDO（数据对象） → OrderAggr（领域对象）</li>
  *   <li>处理值对象转换（Money）</li>
  *   <li>处理枚举转换（OrderStatus、PaymentMethod）</li>
  * </ul>
  *
  * <p>注意：
  * <ul>
- *   <li>toDomain 方法需要手动处理，因为OrderAggr是聚合根，字段没有setter</li>
+ *   <li>DO → OrderAggr 转换由 OrderAggrRepositoryImpl 使用反射处理</li>
  *   <li>关联数据（items、address、contactInfo）需要额外查询</li>
  * </ul>
  * @author Leonardo
  * @since 2026/1/11
  */
-@Mapper(componentModel = "spring")
-public interface OrderAggrConverter {
+@Component
+public class OrderAggrConverter {
 
     /**
      * 领域对象转DO（用于新增）
      * @param order 订单聚合根
      * @return 订单DO
      */
-    @Mapping(target = "totalAmount", source = "totalAmount.amount")
-    @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
-    @Mapping(target = "paymentMethod", source = "paymentMethod", qualifiedByName = "paymentMethodToString")
-    OrderAggrDO toDO(OrderAggr order);
+    public OrderAggrDO toDO(OrderAggr order) {
+        if (order == null) {
+            return null;
+        }
 
-    /**
-     * DO转领域对象（用于查询）
-     * <p>注意：此方法返回一个空的OrderAggr对象，需要手动设置字段
-     * <p>由于OrderAggr是聚合根，字段没有setter，所以不能使用MapStruct自动转换
-     * @param orderDO 订单DO
-     * @return 订单聚合根（需要手动初始化）
-     */
-    default OrderAggr toDomain(OrderAggrDO orderDO) {
-        // 由于OrderAggr的聚合根特性，字段没有setter
-        // 这里返回null，由RepositoryImpl手动处理
-        return null;
+        return OrderAggrDO.builder()
+                       .totalAmount(orderTotalAmountAmount(order))
+                       .status(statusToString(order.getStatus()))
+                       .paymentMethod(paymentMethodToString(order.getPaymentMethod()))
+                       .orderNo(order.getOrderNo())
+                       .customerId(order.getCustomerId())
+                       .customerName(order.getCustomerName())
+                       .currency(order.getCurrency())
+                       .remark(order.getRemark())
+                       .build();
     }
 
     /**
@@ -59,18 +56,46 @@ public interface OrderAggrConverter {
      * @param order   订单聚合根
      * @param orderDO 订单DO
      */
-    @Mapping(target = "totalAmount", source = "totalAmount.amount")
-    @Mapping(target = "status", source = "status", qualifiedByName = "statusToString")
-    @Mapping(target = "paymentMethod", source = "paymentMethod", qualifiedByName = "paymentMethodToString")
-    void updateDO(OrderAggr order, @MappingTarget OrderAggrDO orderDO);
+    public void updateDO(OrderAggr order, OrderAggrDO orderDO) {
+        if (order == null || orderDO == null) {
+            return;
+        }
 
-    // ==================== 自定义转换方法 ====================
+        orderDO.setTotalAmount(orderTotalAmountAmount(order));
+        orderDO.setStatus(statusToString(order.getStatus()));
+        orderDO.setPaymentMethod(paymentMethodToString(order.getPaymentMethod()));
+        orderDO.setId(order.getId());
+        orderDO.setCreateTime(order.getCreateTime());
+        orderDO.setUpdateTime(order.getUpdateTime());
+        orderDO.setCreateUser(order.getCreateUser());
+        orderDO.setUpdateUser(order.getUpdateUser());
+        orderDO.setOrderNo(order.getOrderNo());
+        orderDO.setCustomerId(order.getCustomerId());
+        orderDO.setCustomerName(order.getCustomerName());
+        orderDO.setCurrency(order.getCurrency());
+        orderDO.setRemark(order.getRemark());
+    }
+
+    // ==================== 私有转换方法 ====================
+
+    /**
+     * 获取订单总金额数值
+     * @param orderAggr 订单聚合根
+     * @return 金额数值
+     */
+    private BigDecimal orderTotalAmountAmount(OrderAggr orderAggr) {
+        if (orderAggr == null || orderAggr.getTotalAmount() == null) {
+            return null;
+        }
+        return orderAggr.getTotalAmount().getAmount();
+    }
 
     /**
      * OrderStatus → String
+     * @param status 订单状态
+     * @return 字符串
      */
-    @Named("statusToString")
-    default String statusToString(OrderStatus status) {
+    private String statusToString(OrderStatus status) {
         if (status == null) {
             return null;
         }
@@ -79,9 +104,10 @@ public interface OrderAggrConverter {
 
     /**
      * PaymentMethod → String
+     * @param method 支付方式
+     * @return 字符串
      */
-    @Named("paymentMethodToString")
-    default String paymentMethodToString(PaymentMethod method) {
+    private String paymentMethodToString(PaymentMethod method) {
         if (method == null) {
             return null;
         }

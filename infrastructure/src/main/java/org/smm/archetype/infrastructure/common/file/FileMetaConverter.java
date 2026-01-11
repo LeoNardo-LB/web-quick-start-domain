@@ -1,11 +1,8 @@
 package org.smm.archetype.infrastructure.common.file;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
 import org.smm.archetype.domain.common.file.FileMetadata;
-import org.smm.archetype.infrastructure._shared.converter.BaseDomainConverter;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileMetadataDO;
+import org.springframework.stereotype.Component;
 
 /**
  * 文件元数据领域对象转换器
@@ -14,20 +11,60 @@ import org.smm.archetype.infrastructure._shared.generated.repository.entity.File
  * @author Leonardo
  * @since 2026/01/10
  */
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface FileMetaConverter extends BaseDomainConverter<FileMetadata, FileMetadataDO> {
+@Component
+public class FileMetaConverter {
 
-    @Override
-    @Mapping(target = "fileName", ignore = true)
-    @Mapping(target = "filePath", source = "path")
-    @Mapping(target = "fileUrl", source = "url")
-    @Mapping(target = "fileSize", source = "size")
-    FileMetadata toEntity(FileMetadataDO dataObject);
+    /**
+     * 将数据对象转换为领域对象
+     * @param dataObject 数据对象
+     * @return 领域对象
+     */
+    public FileMetadata toEntity(FileMetadataDO dataObject) {
+        if (dataObject == null) {
+            return null;
+        }
 
-    @Override
-    @Mapping(target = "size", source = "fileSize")
-    @Mapping(target = "url", source = "fileUrl")
-    @Mapping(target = "path", source = "filePath")
-    FileMetadataDO toDataObject(FileMetadata entity);
+        return FileMetadata.builder()
+                       .setId(dataObject.getId())
+                       .setCreateTime(dataObject.getCreateTime())
+                       .setUpdateTime(dataObject.getUpdateTime())
+                       .setCreateUser(dataObject.getCreateUser())
+                       .setUpdateUser(dataObject.getUpdateUser())
+                       // fileName is ignored (not mapped from DO)
+                       .setFilePath(dataObject.getPath())
+                       .setFileUrl(dataObject.getUrl())
+                       .setFileSize(dataObject.getSize())
+                       .setMd5(dataObject.getMd5())
+                       .setContentType(dataObject.getContentType())
+                       // status is not in DO, will use default
+                       .build();
+    }
+
+    /**
+     * 将领域对象转换为数据对象
+     * @param entity 领域对象
+     * @return 数据对象
+     */
+    public FileMetadataDO toDataObject(FileMetadata entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        FileMetadataDO fileMetadataDO = FileMetadataDO.builder()
+                                                .setSize(entity.getFileSize())
+                                                .setUrl(entity.getFileUrl())
+                                                .setPath(entity.getFilePath())
+                                                // fileName is ignored (not mapped to DO)
+                                                .build();
+
+        // BaseDO fields need to be set via setters (not in builder)
+        fileMetadataDO.setId(entity.getId());
+        fileMetadataDO.setCreateTime(entity.getCreateTime());
+        fileMetadataDO.setUpdateTime(entity.getUpdateTime());
+        fileMetadataDO.setCreateUser(entity.getCreateUser());
+        fileMetadataDO.setUpdateUser(entity.getUpdateUser());
+
+        return fileMetadataDO;
+    }
 
 }

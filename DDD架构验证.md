@@ -63,7 +63,7 @@
     - 职责：封装跨聚合根的业务规则
     - 方法：`validateOrderItems()` 验证商品库存和价格
     - 特点：无状态，纯业务逻辑，可测试性强
-- **应用服务**（`OrderApplicationService`）：
+- **应用服务**（`OrderAppService`）：
     - 职责：协调领域对象，处理事务，编排工作流
     - 方法：`createOrder()`、`processPayment()`
     - 特点：处理基础设施依赖，管理事务边界
@@ -344,7 +344,7 @@ service/
 #### 应用层 (14个类)
 
 ```
-OrderApplicationService.java            【应用服务】订单应用服务
+OrderAppService.java            【应用服务】订单应用服务
 
 command/
 ├── CreateOrderCommand.java             【命令】创建订单
@@ -469,51 +469,51 @@ start/src/test/java/integration/order/
 | CQRS架构  | ✅ 90%  | 命令查询分离，查询侧可进一步优化                           |
 | 六边形架构   | ✅ 100% | 端口接口在领域层，适配器在基础设施层                         |
 | 领域服务    | ✅ 100% | OrderDomainService封装跨聚合根业务规则               |
-| 应用服务    | ✅ 100% | OrderApplicationService编排用例                |
+| 应用服务    | ✅ 100% | OrderAppService编排用例                        |
 | 仓储模式    | ✅ 100% | Repository接口+实现，使用MapStruct转换              |
 
 ### 功能实现详情
 
-| 展示的功能            | 关联的类                                                       | 实现方式                                             |
-|------------------|------------------------------------------------------------|--------------------------------------------------|
-| **分层架构设计**       |                                                            |                                                  |
-| 领域层              | OrderAggr、OrderItem、Money、Address等28个类                     | 纯净的领域模型，无外部依赖                                    |
-| 应用层              | OrderApplicationService、Command/Query等14个类                 | 用例编排、事务管理、DTO转换                                  |
-| 基础设施层            | RepositoryImpl、Converter、Adapter等18个类                      | 数据持久化、外部服务集成                                     |
-| 接口层              | OrderController、Request/Response等15个类                      | HTTP接口、参数验证、响应封装                                 |
-| **CQRS架构实现**     |                                                            |                                                  |
-| 命令侧              | CreateOrderCommand、PayOrderCommand等                        | 命令对象封装写操作                                        |
-| 查询侧              | GetOrderByIdQuery、GetOrdersByCustomerQuery                 | 查询对象直接访问读模型                                      |
-| 分离原则             | OrderApplicationService.execute() vs query()               | 命令修改状态，查询只读数据                                    |
-| **聚合根与对象设计**     |                                                            |                                                  |
-| 聚合根              | OrderAggr                                                  | 工厂方法create()，状态机pay()/ship()/complete()/cancel() |
-| 实体               | OrderItem                                                  | 有唯一ID，业务方法calculateSubtotal()                    |
-| 值对象              | Money、Address、ContactInfo                                  | 不可变对象，值相等性，业务规则内聚                                |
-| 仓储接口             | OrderAggrRepository                                        | findById()、save()、findByOrderNo()                |
-| **六边形架构实现**      |                                                            |                                                  |
-| 端口接口             | InventoryService、PaymentGateway                            | 领域层定义接口                                          |
-| 适配器实现            | MockInventoryServiceAdapter                                | 基础设施层实现适配器                                       |
-| 防腐层              | OrderDomainService调用InventoryService                       | 隔离外部服务变化                                         |
-| **领域服务 vs 应用服务** |                                                            |                                                  |
-| 领域服务             | OrderDomainService                                         | validateOrderItems()、validateInventory()         |
-| 应用服务             | OrderApplicationService                                    | createOrder()编排：验证→创建→保存→发布事件                    |
-| 职责区分             | OrderDomainService无状态                                      | OrderApplicationService管理事务                      |
-| **领域事件发布与消费**    |                                                            |                                                  |
-| 事件定义             | OrderCreatedEvent、OrderPaidEvent、OrderCancelledEvent       | 聚合根内部addDomainEvent()                            |
-| 事件发布             | OrderApplicationService                                    | 事务提交后eventPublisher.publish()                    |
-| 事件消费             | OrderCreatedEventListener                                  | 监听OrderCreatedEvent锁定库存                          |
-| **完整订单链路流程**     |                                                            |                                                  |
-| 创建订单             | OrderController→OrderApplicationService→OrderAggr.create() | 验证库存→创建订单→保存→发布事件                                |
-| 支付订单             | PayOrderCommand→OrderAggr.pay()                            | 验证金额→更新状态→保存→发布事件                                |
-| 取消订单             | CancelOrderCommand→OrderAggr.cancel()                      | 验证状态→更新状态→保存→释放库存                                |
-| **关键设计原则体现**     |                                                            |                                                  |
-| 聚合根边界            | OrderAggr唯一修改入口                                            | 一个事务只修改一个聚合根                                     |
-| 依赖倒置             | InventoryService接口在domain                                  | 实现在infrastructure                                |
-| 单一职责             | 每层职责清晰                                                     | 领域层业务逻辑，应用服务编排                                   |
-| **测试策略**         |                                                            |                                                  |
-| 单元测试             | OrderAggrUTest、MoneyUTest等                                 | 27个单元测试，纯Mock                                    |
-| 集成测试             | OrderControllerITest、OrderControllerCompleteITest          | 18个集成测试，完整流程                                     |
-| 测试覆盖率            | 45个测试全部通过                                                  | 覆盖核心业务逻辑                                         |
+| 展示的功能            | 关联的类                                                 | 实现方式                                             |
+|------------------|------------------------------------------------------|--------------------------------------------------|
+| **分层架构设计**       |                                                      |                                                  |
+| 领域层              | OrderAggr、OrderItem、Money、Address等28个类               | 纯净的领域模型，无外部依赖                                    |
+| 应用层              | OrderAppService、Command/Query等14个类                   | 用例编排、事务管理、DTO转换                                  |
+| 基础设施层            | RepositoryImpl、Converter、Adapter等18个类                | 数据持久化、外部服务集成                                     |
+| 接口层              | OrderController、Request/Response等15个类                | HTTP接口、参数验证、响应封装                                 |
+| **CQRS架构实现**     |                                                      |                                                  |
+| 命令侧              | CreateOrderCommand、PayOrderCommand等                  | 命令对象封装写操作                                        |
+| 查询侧              | GetOrderByIdQuery、GetOrdersByCustomerQuery           | 查询对象直接访问读模型                                      |
+| 分离原则             | OrderAppService.execute() vs query()                 | 命令修改状态，查询只读数据                                    |
+| **聚合根与对象设计**     |                                                      |                                                  |
+| 聚合根              | OrderAggr                                            | 工厂方法create()，状态机pay()/ship()/complete()/cancel() |
+| 实体               | OrderItem                                            | 有唯一ID，业务方法calculateSubtotal()                    |
+| 值对象              | Money、Address、ContactInfo                            | 不可变对象，值相等性，业务规则内聚                                |
+| 仓储接口             | OrderAggrRepository                                  | findById()、save()、findByOrderNo()                |
+| **六边形架构实现**      |                                                      |                                                  |
+| 端口接口             | InventoryService、PaymentGateway                      | 领域层定义接口                                          |
+| 适配器实现            | MockInventoryServiceAdapter                          | 基础设施层实现适配器                                       |
+| 防腐层              | OrderDomainService调用InventoryService                 | 隔离外部服务变化                                         |
+| **领域服务 vs 应用服务** |                                                      |                                                  |
+| 领域服务             | OrderDomainService                                   | validateOrderItems()、validateInventory()         |
+| 应用服务             | OrderAppService                                      | createOrder()编排：验证→创建→保存→发布事件                    |
+| 职责区分             | OrderDomainService无状态                                | OrderAppService管理事务                              |
+| **领域事件发布与消费**    |                                                      |                                                  |
+| 事件定义             | OrderCreatedEvent、OrderPaidEvent、OrderCancelledEvent | 聚合根内部addDomainEvent()                            |
+| 事件发布             | OrderAppService                                      | 事务提交后eventPublisher.publish()                    |
+| 事件消费             | OrderCreatedEventListener                            | 监听OrderCreatedEvent锁定库存                          |
+| **完整订单链路流程**     |                                                      |                                                  |
+| 创建订单             | OrderController→OrderAppService→OrderAggr.create()   | 验证库存→创建订单→保存→发布事件                                |
+| 支付订单             | PayOrderCommand→OrderAggr.pay()                      | 验证金额→更新状态→保存→发布事件                                |
+| 取消订单             | CancelOrderCommand→OrderAggr.cancel()                | 验证状态→更新状态→保存→释放库存                                |
+| **关键设计原则体现**     |                                                      |                                                  |
+| 聚合根边界            | OrderAggr唯一修改入口                                      | 一个事务只修改一个聚合根                                     |
+| 依赖倒置             | InventoryService接口在domain                            | 实现在infrastructure                                |
+| 单一职责             | 每层职责清晰                                               | 领域层业务逻辑，应用服务编排                                   |
+| **测试策略**         |                                                      |                                                  |
+| 单元测试             | OrderAggrUTest、MoneyUTest等                           | 27个单元测试，纯Mock                                    |
+| 集成测试             | OrderControllerITest、OrderControllerCompleteITest    | 18个集成测试，完整流程                                     |
+| 测试覆盖率            | 45个测试全部通过                                            | 覆盖核心业务逻辑                                         |
 
 ### 核心亮点
 

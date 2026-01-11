@@ -1,11 +1,8 @@
 package org.smm.archetype.infrastructure.common.file;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
 import org.smm.archetype.domain.common.file.FileBusiness;
-import org.smm.archetype.infrastructure._shared.converter.BaseDomainConverter;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileBusinessDO;
+import org.springframework.stereotype.Component;
 
 /**
  * 业务文件领域对象转换器
@@ -14,17 +11,50 @@ import org.smm.archetype.infrastructure._shared.generated.repository.entity.File
  * @author Leonardo
  * @since 2026/01/10
  */
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface FileBusinessConverter extends BaseDomainConverter<FileBusiness, FileBusinessDO> {
+@Component
+public class FileBusinessConverter {
 
-    @Override
-    @Mapping(target = "fileMetadata", ignore = true)
-    @Mapping(target = "order", source = "sort")
-    FileBusiness toEntity(FileBusinessDO dataObject);
+    /**
+     * 将数据对象转换为领域对象
+     * @param dataObject 数据对象
+     * @return 领域对象
+     */
+    public FileBusiness toEntity(FileBusinessDO dataObject) {
+        if (dataObject == null) {
+            return null;
+        }
 
-    @Override
-    @Mapping(target = "name", ignore = true)
-    @Mapping(target = "sort", source = "order")
-    FileBusinessDO toDataObject(FileBusiness entity);
+        return FileBusiness.builder()
+                       .setOrder(dataObject.getSort())
+                       .setId(dataObject.getId())
+                       .setCreateTime(dataObject.getCreateTime())
+                       .setUpdateTime(dataObject.getUpdateTime())
+                       .setCreateUser(dataObject.getCreateUser())
+                       .setUpdateUser(dataObject.getUpdateUser())
+                       .setBusinessId(dataObject.getBusinessId())
+                       .setType(dataObject.getType() != null ? FileBusiness.Type.valueOf(dataObject.getType()) : null)
+                       .setUsage(dataObject.getUsage() != null ? FileBusiness.Usage.valueOf(dataObject.getUsage()) : null)
+                       .setRemark(dataObject.getRemark())
+                       .build();
+    }
+
+    /**
+     * 将领域对象转换为数据对象
+     * @param entity 领域对象
+     * @return 数据对象
+     */
+    public FileBusinessDO toDataObject(FileBusiness entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        return FileBusinessDO.builder()
+                       .setSort(entity.getOrder())
+                       .setBusinessId(entity.getBusinessId())
+                       .setType(entity.getType() != null ? entity.getType().name() : null)
+                       .setUsage(entity.getUsage() != null ? entity.getUsage().name() : null)
+                       .setRemark(entity.getRemark())
+                       .build();
+    }
 
 }

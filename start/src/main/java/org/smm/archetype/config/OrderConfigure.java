@@ -3,7 +3,7 @@ package org.smm.archetype.config;
 import org.smm.archetype.adapter._example.order.listener.OrderCancelledEventHandler;
 import org.smm.archetype.adapter._example.order.listener.OrderCreatedEventHandler;
 import org.smm.archetype.adapter._example.order.listener.OrderPaidEventHandler;
-import org.smm.archetype.app._example.order.OrderApplicationService;
+import org.smm.archetype.app._example.order.OrderAppService;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._example.order.repository.OrderAggrRepository;
 import org.smm.archetype.domain._example.order.service.InventoryService;
@@ -49,14 +49,14 @@ public class OrderConfigure {
      * @param orderRepository    订单仓储
      * @param orderDomainService 订单领域服务
      * @param eventPublisher     事件发布器
-     * @return OrderApplicationService
+     * @return OrderAppService
      */
     @Bean
-    public OrderApplicationService orderApplicationService(
+    public OrderAppService orderAppService(
             OrderAggrRepository orderRepository,
             OrderDomainService orderDomainService,
             @Qualifier("springEventPublisher") EventPublisher eventPublisher) {
-        return new OrderApplicationService(orderRepository, orderDomainService, eventPublisher);
+        return new OrderAppService(orderRepository, orderDomainService, eventPublisher);
     }
 
     // ==================== 仓储实现 ====================

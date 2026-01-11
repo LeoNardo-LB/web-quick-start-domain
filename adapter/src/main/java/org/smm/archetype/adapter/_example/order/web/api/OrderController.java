@@ -7,7 +7,7 @@ import org.smm.archetype.adapter._example.order.web.dto.request.CreateOrderReque
 import org.smm.archetype.adapter._example.order.web.dto.request.PayOrderRequest;
 import org.smm.archetype.adapter._example.order.web.dto.response.OrderResponse;
 import org.smm.archetype.adapter._shared.result.BaseResult;
-import org.smm.archetype.app._example.order.OrderApplicationService;
+import org.smm.archetype.app._example.order.OrderAppService;
 import org.smm.archetype.app._example.order.command.CancelOrderCommand;
 import org.smm.archetype.app._example.order.command.CreateOrderCommand;
 import org.smm.archetype.app._example.order.command.PayOrderCommand;
@@ -39,9 +39,9 @@ import java.util.List;
 @RequestMapping("/api/orders")
 public class OrderController {
 
-    private final OrderApplicationService orderApplicationService;
+    private final OrderAppService orderApplicationService;
 
-    public OrderController(OrderApplicationService orderApplicationService) {
+    public OrderController(OrderAppService orderApplicationService) {
         this.orderApplicationService = orderApplicationService;
     }
 

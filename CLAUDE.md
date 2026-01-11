@@ -52,7 +52,7 @@ public class OrderInfraConfigure {}
 
 // ❌ 错误：使用@Service
 @Service
-public class OrderApplicationService {}
+public class OrderAppService {}
 ```
 
 **正确示例**（必须遵循）：
@@ -65,7 +65,7 @@ package org.smm.archetype.config;
 public class OrderConfigure {
 
     @Bean
-    public OrderApplicationService orderApplicationService(...) {}
+    public OrderAppService orderAppService(...) {}
 
 }
 ```

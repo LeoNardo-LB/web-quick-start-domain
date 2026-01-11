@@ -1,6 +1,7 @@
 package org.smm.archetype.domain._example.order.repository;
 
 import org.smm.archetype.domain._example.order.model.OrderAggr;
+import org.smm.archetype.domain._shared.base.PageModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +47,15 @@ public interface OrderAggrRepository {
      * @return 订单列表
      */
     List<OrderAggr> findByCustomerId(String customerId);
+
+    /**
+     * 分页查询订单列表
+     * @param customerId 客户ID（可选）
+     * @param pageNumber 页码（从1开始）
+     * @param pageSize   每页大小
+     * @return 分页结果
+     */
+    PageModel<OrderAggr> findOrders(String customerId, int pageNumber, int pageSize);
 
     /**
      * 检查订单号是否存在

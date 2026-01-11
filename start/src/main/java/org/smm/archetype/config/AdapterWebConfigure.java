@@ -1,7 +1,6 @@
 package org.smm.archetype.config;
 
-import org.smm.archetype.adapter.access.web.aspect.LoggingAspect;
-import org.smm.archetype.adapter.access.web.filter.ContextFillFilter;
+import org.smm.archetype.adapter.access.web.config.ContextFillFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,17 +29,6 @@ public class AdapterWebConfigure {
         registrationBean.addUrlPatterns("/*");
         registrationBean.setOrder(1);
         return registrationBean;
-    }
-
-    /**
-     * 日志切面
-     *
-     * <p>记录所有Controller方法的调用日志，包括请求信息、响应信息和耗时。
-     * @return 日志切面Bean
-     */
-    @Bean
-    public LoggingAspect loggingAspect() {
-        return new LoggingAspect();
     }
 
 }

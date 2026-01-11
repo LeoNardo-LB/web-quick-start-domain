@@ -11,6 +11,7 @@ import org.smm.archetype.domain._example.order.model.valueobject.Address;
 import org.smm.archetype.domain._example.order.model.valueobject.ContactInfo;
 import org.smm.archetype.domain._example.order.model.valueobject.Money;
 import org.smm.archetype.domain._example.order.repository.OrderAggrRepository;
+import org.smm.archetype.domain._shared.base.PageModel;
 import org.smm.archetype.infrastructure._example.order.persistence.converter.OrderAggrConverter;
 import org.smm.archetype.infrastructure._example.order.persistence.converter.OrderItemConverter;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.OrderAddressDO;
@@ -218,6 +219,36 @@ public class OrderAggrRepositoryImpl implements OrderAggrRepository {
         return orderDOs.stream()
                        .map(this::toDomain)
                        .toList();
+    }
+
+    @Override
+    public PageModel<OrderAggr> findOrders(String customerId, int pageNumber, int pageSize) {
+        // 构建查询条件
+        QueryWrapper queryWrapper = QueryWrapper.create();
+        if (customerId != null && !customerId.isEmpty()) {
+            queryWrapper.where("customer_id = ?", customerId);
+        }
+
+        // 查询总数
+        Long totalRaw = orderAggrMapper.selectCountByQuery(queryWrapper);
+
+        // 查询分页数据
+        int offset = (pageNumber - 1) * pageSize;
+        List<OrderAggrDO> orderDOs = orderAggrMapper.selectListByQuery(
+                queryWrapper.limit(pageSize).offset(offset)
+        );
+
+        // 转换为领域对象
+        List<OrderAggr> orders = orderDOs.stream()
+                                         .map(this::toDomain)
+                                         .toList();
+
+        return PageModel.<OrderAggr>builder()
+                       .pageNumber((long) pageNumber)
+                       .pageSize((long) pageSize)
+                       .records(orders)
+                       .totalRaw(totalRaw)
+                       .build();
     }
 
     @Override
