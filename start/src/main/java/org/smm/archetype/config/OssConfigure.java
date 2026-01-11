@@ -160,15 +160,13 @@ public class OssConfigure {
      * <p>整合OssClient、CommonFileRepository，提供完整的文件管理功能
      * @param ossClient            对象存储服务
      * @param commonFileRepository 通用文件仓储
-     * @param idClient             ID生成服务
      * @return 通用文件服务实现
      */
     @Bean
     public org.smm.archetype.domain.common.file.CommonFileService commonFileService(
             final OssClient ossClient,
-            final CommonFileRepository commonFileRepository,
-            final IdClient idClient) {
-        return new CommonFileServiceImpl(ossClient, commonFileRepository, idClient);
+            final CommonFileRepository commonFileRepository) {
+        return new CommonFileServiceImpl(ossClient, commonFileRepository);
     }
 
 }

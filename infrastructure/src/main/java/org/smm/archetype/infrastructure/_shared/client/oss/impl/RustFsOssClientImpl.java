@@ -38,7 +38,7 @@ import static org.smm.archetype.infrastructure._shared.generated.repository.enti
  * <p>关键配置：
  * <ul>
  *   <li>forcePathStyle: true - RustFS 必须启用 Path-Style 访问</li>
- *   <li>endpointOverride: http://localhost:9000 - RustFS 服务地址</li>
+ *   <li>endpointOverride: <a href="http://localhost:9000">RustFS 服务地址</a></li>
  *   <li>region: US_EAST_1 - 任意值，RustFS 不校验</li>
  * </ul>
  * @author Leonardo
@@ -98,7 +98,7 @@ public class RustFsOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected String doUpload(byte[] contentBytes, String fileName, String contentType) throws Exception {
+    protected String doUpload(byte[] contentBytes, String fileName, String contentType) {
         // 生成 S3 key：yyyy/MM/timestamp-fileName
         String datePath = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy/MM"));
 
@@ -133,7 +133,7 @@ public class RustFsOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected void doDelete(String filePath) throws Exception {
+    protected void doDelete(String filePath) {
         // filePath 就是 S3 key
         DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
                                                     .bucket(bucket)
@@ -145,14 +145,14 @@ public class RustFsOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected String doGenerateUrl(String filePath, long expireSeconds) throws Exception {
+    protected String doGenerateUrl(String filePath, long expireSeconds) {
         // TODO: 需要添加 s3-presigner 依赖才能实现预签名 URL 功能
         // 参考文档：https://docs.rustfs.com.cn/developer/sdk/java.html
         throw new UnsupportedOperationException("Presigned URL generation requires s3-presigner dependency");
     }
 
     @Override
-    protected boolean doExists(String filePath) throws Exception {
+    protected boolean doExists(String filePath) {
         try {
             HeadObjectRequest headRequest = HeadObjectRequest.builder()
                                                     .bucket(bucket)
@@ -167,7 +167,7 @@ public class RustFsOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected long doGetFileSize(String filePath) throws Exception {
+    protected long doGetFileSize(String filePath) {
         HeadObjectRequest headRequest = HeadObjectRequest.builder()
                                                 .bucket(bucket)
                                                 .key(filePath)
@@ -225,25 +225,12 @@ public class RustFsOssClientImpl extends AbstractOssClient {
                        .setFilePath(metadataDO.getPath())
                        .setFileUrl(metadataDO.getUrl())
                        .setMd5(metadataDO.getMd5())
-                       .setContentType(metadataDO.getContentType())
+                       .setContentType(FileMetadata.ContentType.fromMimeType(metadataDO.getContentType()))
                        .setFileSize(metadataDO.getSize())
                        .setStatus(Status.ACTIVE)
                        .setCreateTime(metadataDO.getCreateTime())
                        .setUpdateTime(metadataDO.getUpdateTime())
                        .build();
-    }
-
-    /**
-     * 关闭资源
-     */
-    public void close() {
-        try {
-            if (s3Client != null) {
-                s3Client.close();
-            }
-        } catch (Exception e) {
-            log.warn("Failed to close S3 client", e);
-        }
     }
 
 }

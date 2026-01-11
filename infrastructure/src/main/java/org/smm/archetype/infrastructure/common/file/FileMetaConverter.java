@@ -35,7 +35,7 @@ public class FileMetaConverter {
                        .setFileUrl(dataObject.getUrl())
                        .setFileSize(dataObject.getSize())
                        .setMd5(dataObject.getMd5())
-                       .setContentType(dataObject.getContentType())
+                       .setContentType(FileMetadata.ContentType.fromMimeType(dataObject.getContentType()))
                        // status is not in DO, will use default
                        .build();
     }
@@ -54,6 +54,9 @@ public class FileMetaConverter {
                                                 .setSize(entity.getFileSize())
                                                 .setUrl(entity.getFileUrl())
                                                 .setPath(entity.getFilePath())
+                                                .setContentType(entity.getContentType() != null
+                                                                        ? entity.getContentType().toMimeType()
+                                                                        : null)
                                                 // fileName is ignored (not mapped to DO)
                                                 .build();
 

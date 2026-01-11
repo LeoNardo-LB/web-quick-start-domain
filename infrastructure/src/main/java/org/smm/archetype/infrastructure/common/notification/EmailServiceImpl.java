@@ -3,7 +3,7 @@ package org.smm.archetype.infrastructure.common.notification;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.common.notification.EmailRequest;
 import org.smm.archetype.domain.common.notification.EmailResult;
-import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
+import org.smm.archetype.domain.common.notification.ServiceProvider;
 
 import java.util.UUID;
 
@@ -59,10 +59,10 @@ public class EmailServiceImpl extends AbstractEmailService {
      *
      * <p>推荐服务商：
      * <ul>
-     *   <li>阿里云邮件推送：https://www.aliyun.com/product/directmail</li>
-     *   <li>腾讯云邮件服务：https://cloud.tencent.com/product/ses</li>
-     *   <li>SendGrid：https://sendgrid.com/</li>
-     *   <li>Spring Mail（SMTP）：https://spring.io/guides/gs/sending-mail/</li>
+     *   <li><a href="https://www.aliyun.com/product/directmail">阿里云邮件推送</a></li>
+     *   <li><a href="https://cloud.tencent.com/product/ses">腾讯云邮件服务</a></li>
+     *   <li><a href="https://sendgrid.com/">SendGrid</a></li>
+     *   <li><a href="https://spring.io/guides/gs/sending-mail/">Spring Mail（SMTP）</a></li>
      * </ul>
      * @param request  邮件请求
      * @param provider 服务商

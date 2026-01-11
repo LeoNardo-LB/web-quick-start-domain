@@ -6,16 +6,16 @@ import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.aliyun.teaopenapi.models.Config;
 import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.common.notification.ServiceProvider;
 import org.smm.archetype.domain.common.notification.SmsRequest;
 import org.smm.archetype.domain.common.notification.SmsResult;
-import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
 
 /**
  * 阿里云短信服务实现
  *
  * <p>基于阿里云短信服务（SMS）发送短信。
  *
- * <p>官方文档：https://help.aliyun.com/zh/sms/
+ * <p><a href="https://help.aliyun.com/zh/sms/">官方文档</a>
  * @author Leonardo
  * @since 2026/01/10
  */

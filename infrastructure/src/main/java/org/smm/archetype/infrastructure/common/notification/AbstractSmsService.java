@@ -1,10 +1,10 @@
 package org.smm.archetype.infrastructure.common.notification;
 
 import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.common.notification.ServiceProvider;
 import org.smm.archetype.domain.common.notification.SmsRequest;
 import org.smm.archetype.domain.common.notification.SmsResult;
 import org.smm.archetype.domain.common.notification.SmsService;
-import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
 
 import java.util.List;
 
@@ -131,7 +131,6 @@ public abstract class AbstractSmsService implements SmsService {
      * @param request  短信请求
      * @param provider 服务商
      * @return 发送结果
-     * @throws Exception 发送异常
      */
     protected abstract SmsResult doSendSms(SmsRequest request, ServiceProvider provider);
 

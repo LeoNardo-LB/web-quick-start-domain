@@ -2,7 +2,6 @@ package org.smm.archetype.infrastructure.common.file;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain._shared.client.IdClient;
 import org.smm.archetype.domain._shared.client.OssClient;
 import org.smm.archetype.domain.common.file.CommonFileRepository;
 import org.smm.archetype.domain.common.file.CommonFileService;
@@ -26,7 +25,6 @@ public class CommonFileServiceImpl implements CommonFileService {
 
     private final OssClient            ossClient;
     private final CommonFileRepository commonFileRepository;
-    private final IdClient             idClient;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -38,7 +36,10 @@ public class CommonFileServiceImpl implements CommonFileService {
                 fileBusiness.getUsage());
 
         // 1. 上传文件到对象存储
-        String filePath = ossClient.upload(inputStream, fileMetadata.getFileName(), fileMetadata.getContentType());
+        String filePath = ossClient.upload(inputStream, fileMetadata.getFileName(),
+                fileMetadata.getContentType() != null
+                        ? fileMetadata.getContentType().toMimeType()
+                        : null);
         log.debug("File uploaded to OSS: filePath={}", filePath);
 
         // 2. 设置文件元数据

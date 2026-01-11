@@ -78,8 +78,7 @@ public class AliyunNotificationConfigure {
                 aliyun.getRegionId(),
                 aliyun.getFromAddress(),
                 aliyun.getFromAlias(),
-                aliyun.getAccountName(),
-                aliyun.getReplyToAddress()
+                aliyun.getAccountName()
         );
     }
 

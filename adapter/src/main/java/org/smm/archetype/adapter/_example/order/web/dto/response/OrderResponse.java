@@ -3,6 +3,8 @@ package org.smm.archetype.adapter._example.order.web.dto.response;
 import lombok.Getter;
 import lombok.Setter;
 import org.smm.archetype.app._example.order.dto.OrderDTO;
+import org.smm.archetype.domain._example.order.model.OrderStatus;
+import org.smm.archetype.domain._example.order.model.PaymentMethod;
 
 import java.time.Instant;
 import java.util.List;
@@ -39,12 +41,12 @@ public class OrderResponse {
     /**
      * 订单状态
      */
-    private String status;
+    private OrderStatus status;
 
     /**
      * 支付方式
      */
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
     /**
      * 总金额
@@ -110,8 +112,8 @@ public class OrderResponse {
         response.setOrderNo(dto.getOrderNo());
         response.setCustomerId(dto.getCustomerId());
         response.setCustomerName(dto.getCustomerName());
-        response.setStatus(dto.getStatus() != null ? dto.getStatus().name() : null);
-        response.setPaymentMethod(dto.getPaymentMethod() != null ? dto.getPaymentMethod().name() : null);
+        response.setStatus(dto.getStatus());
+        response.setPaymentMethod(dto.getPaymentMethod());
         response.setTotalAmount(MoneyResponse.fromDTO(dto.getTotalAmount()));
         response.setItems(dto.getItems().stream()
                                   .map(OrderItemResponse::fromDTO)

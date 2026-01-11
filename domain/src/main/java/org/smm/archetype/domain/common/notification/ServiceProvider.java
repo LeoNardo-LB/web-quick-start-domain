@@ -1,4 +1,4 @@
-package org.smm.archetype.domain.common.notification.provider;
+package org.smm.archetype.domain.common.notification;
 
 import lombok.Getter;
 

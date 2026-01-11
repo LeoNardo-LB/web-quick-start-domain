@@ -1,9 +1,9 @@
 package org.smm.archetype.infrastructure.common.notification;
 
 import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.common.notification.ServiceProvider;
 import org.smm.archetype.domain.common.notification.SmsRequest;
 import org.smm.archetype.domain.common.notification.SmsResult;
-import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
 
 import java.util.UUID;
 
@@ -59,7 +59,7 @@ public class SmsServiceImpl extends AbstractSmsService {
      *
      * <p>推荐服务商：
      * <ul>
-     *   <li>阿里云短信：https://www.aliyun.com/product/sms</li>
+     *   <li><a href="https://www.aliyun.com/product/sms">阿里云短信</a></li>
      *   <li>腾讯云短信：https://cloud.tencent.com/product/sms</li>
      *   <li>华为云短信：https://www.huaweicloud.com/product/msgsms.html</li>
      *   <li>Twilio：https://www.twilio.com/sms</li>

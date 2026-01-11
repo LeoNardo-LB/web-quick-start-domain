@@ -7,14 +7,14 @@ import com.aliyun.teaopenapi.models.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.common.notification.EmailRequest;
 import org.smm.archetype.domain.common.notification.EmailResult;
-import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
+import org.smm.archetype.domain.common.notification.ServiceProvider;
 
 /**
  * 阿里云邮件服务实现
  *
  * <p>基于阿里云邮件推送（DirectMail）发送邮件。
  *
- * <p>官方文档：https://help.aliyun.com/zh/direct-mail/
+ * <p><a href="https://help.aliyun.com/zh/direct-mail/">官方文档</a>
  * @author Leonardo
  * @since 2026/01/10
  */
@@ -35,8 +35,7 @@ public class AliyunEmailServiceImpl extends AbstractEmailService {
             String regionId,
             String fromAddress,
             String fromAlias,
-            String accountName,
-            String replyToAddress) {
+            String accountName) {
         this.accessKeyId = accessKeyId;
         this.accessKeySecret = accessKeySecret;
         this.regionId = regionId;

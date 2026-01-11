@@ -1,7 +1,5 @@
 package org.smm.archetype.domain.common.notification;
 
-import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
-
 /**
  * 邮件服务接口
  *

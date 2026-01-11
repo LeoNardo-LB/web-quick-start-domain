@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.common.notification.EmailRequest;
 import org.smm.archetype.domain.common.notification.EmailResult;
 import org.smm.archetype.domain.common.notification.EmailService;
-import org.smm.archetype.domain.common.notification.provider.ServiceProvider;
+import org.smm.archetype.domain.common.notification.ServiceProvider;
 
 import java.util.List;
 
@@ -131,7 +131,6 @@ public abstract class AbstractEmailService implements EmailService {
      * @param request  邮件请求
      * @param provider 服务商
      * @return 发送结果
-     * @throws Exception 发送异常
      */
     protected abstract EmailResult doSendEmail(EmailRequest request, ServiceProvider provider);
 

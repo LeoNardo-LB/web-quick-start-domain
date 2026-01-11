@@ -153,15 +153,14 @@ public class LocalOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected String doGenerateUrl(String filePath, long expireSeconds) throws Exception {
+    protected String doGenerateUrl(String filePath, long expireSeconds) {
         // 本地文件使用 file:// 协议
         Path fullPath = baseStoragePath.resolve(filePath);
         return fullPath.toUri().toString();
     }
 
     @Override
-    protected List<FileMetadata> doSearchFiles(String fileNamePattern)
-            throws Exception {
+    protected List<FileMetadata> doSearchFiles(String fileNamePattern) {
         // 从数据库查询（使用 MyBatis-Flex）
         QueryWrapper query = QueryWrapper.create()
                                      .select()
@@ -183,7 +182,7 @@ public class LocalOssClientImpl extends AbstractOssClient {
     }
 
     @Override
-    protected boolean doExists(String filePath) throws Exception {
+    protected boolean doExists(String filePath) {
         Path fullPath = baseStoragePath.resolve(filePath);
         return Files.exists(fullPath);
     }
@@ -226,7 +225,7 @@ public class LocalOssClientImpl extends AbstractOssClient {
                        .setFilePath(metadataDO.getPath())
                        .setFileUrl(metadataDO.getUrl())
                        .setMd5(metadataDO.getMd5())
-                       .setContentType(metadataDO.getContentType())
+                       .setContentType(FileMetadata.ContentType.fromMimeType(metadataDO.getContentType()))
                        .setFileSize(metadataDO.getSize())
                        .setStatus(Status.ACTIVE)
                        .setCreateTime(metadataDO.getCreateTime())
