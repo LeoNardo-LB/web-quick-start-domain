@@ -31,8 +31,8 @@
 **强制检查清单**：
 
 ```
-□ 配置类位置是否在 start/src/main/java/org/smm/archetype/config/ ？
-□ 配置类名是否按聚合根命名（OrderAggr → OrderConfigure）？
+□ 配置类位置是否在 {start}:src/main/java/{groupId}/config/ ？
+□ 配置类名是否按聚合根命名（{业务}Aggr → {业务}Configure）？
 □ 是否使用 @Configuration + @Bean（而非@Service/@Component）？
 □ 是否使用构造器注入（而非@Autowired字段注入）？
 ```
@@ -41,31 +41,39 @@
 
 ```java
 // ❌ 错误：配置类在adapter模块
-package org.smm.archetype.adapter._example.order.config;
+package {adapter}#{groupId}.adapter.{业务模块}.config;
 
 @Configuration
-public class OrderAdapterConfigure {}
+public class {业务}
+
+AdapterConfigure {}
 
 // ❌ 错误：按层命名
 @Configuration
-public class OrderInfraConfigure {}
+public class {业务}
+
+InfraConfigure {}
 
 // ❌ 错误：使用@Service
 @Service
-public class OrderAppService {}
+public class {业务}
+
+AppService {}
 ```
 
 **正确示例**（必须遵循）：
 
 ```java
 // ✅ 正确：start模块，按聚合根命名
-package org.smm.archetype.config;
+package {groupId}.config;
 
 @Configuration
-public class OrderConfigure {
+public class {业务}
+
+Configure {
 
     @Bean
-    public OrderAppService orderAppService(...) {}
+    public {业务} AppService orderAppService (...){}
 
 }
 ```
@@ -209,10 +217,6 @@ mvn spring-boot:run -pl start
 | **[业务代码编写规范.md](业务代码编写规范.md)**                                                                      | **编码标准详细参考** | **开发者、AI** | **⭐ 写代码前必读，必须严格遵守** | ⭐⭐⭐⭐⭐ |
 | [README.md](README.md)                                                                              | 项目概览和架构说明    | 所有人        | 了解项目整体架构            | ⭐⭐⭐⭐  |
 | [代码AI生成工作流.md](AI生成代码工作流.md)                                                                        | 强制性代码生成流程    | AI、开发者     | **每次代码生成必须遵循**      | ⭐⭐⭐⭐⭐ |
-| [domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md)                         | 领域层详细指南      | 开发者        | 开发领域模型时             | ⭐⭐⭐   |
-| [app/README.md](app/src/main/java/org/smm/archetype/app/README.md)                                  | 应用层详细指南      | 开发者        | 开发应用服务时             | ⭐⭐⭐   |
-| [adapter/README.md](adapter/src/main/java/org/smm/archetype/adapter/README.md)                      | 接口层详细指南      | 开发者        | 开发Controller时       | ⭐⭐⭐   |
-| [infrastructure/README.md](infrastructure/src/main/java/org/smm/archetype/infrastructure/README.md) | 基础设施层详细指南    | 开发者        | 实现Repository时       | ⭐⭐⭐   |
 
 ### 🎯 按任务类型查找文档
 
@@ -221,9 +225,6 @@ mvn spring-boot:run -pl start
 1. **阅读**: [README.md](README.md#项目架构) - 了解四层架构
 2. **阅读**: [业务代码编写规范.md](业务代码编写规范.md) - 了解编码规范
 3. **阅读**: [代码AI生成工作流.md](AI生成代码工作流.md) - **遵循4步验证流程**
-4. **参考**: [domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md) - 创建领域模型
-5. **参考**: [app/README.md](app/src/main/java/org/smm/archetype/app/README.md) - 创建应用服务
-6. **参考**: [infrastructure/README.md](infrastructure/src/main/java/org/smm/archetype/infrastructure/README.md) - 实现Repository
 
 #### Bug修复
 
@@ -854,7 +855,3 @@ No qualifying bean of type 'com.xxx.XxxService' available
 - [README.md](README.md) - 项目概览
 - [业务代码编写规范.md](业务代码编写规范.md) - 编码标准
 - [代码AI生成工作流.md](AI生成代码工作流.md) - 代码生成流程
-- [domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md) - 领域层
-- [app/README.md](app/src/main/java/org/smm/archetype/app/README.md) - 应用层
-- [adapter/README.md](adapter/src/main/java/org/smm/archetype/adapter/README.md) - 接口层
-- [infrastructure/README.md](infrastructure/src/main/java/org/smm/archetype/infrastructure/README.md) - 基础设施层

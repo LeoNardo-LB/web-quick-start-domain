@@ -103,43 +103,43 @@ mvn spring-boot:run -pl start
 !define RECTANGLE class
 
 package "接口层 (Adapter)" #LightCyan {
-  [OrderController]
-  [OrderEventListener]
+  [{业务}Controller]
+  [{业务}EventListener]
 }
 
 package "应用层 (Application)" #LightGreen {
-  [OrderAppService]
-  [CreateOrderCommand]
-  [GetOrderByIdQuery]
+  [{业务}AppService]
+  [Create{业务}Command]
+  [Get{业务}ByIdQuery]
 }
 
 package "领域层 (Domain)" #LightYellow {
-  [OrderAggr <<aggregate root>>]
-  [OrderItem <<entity>>]
+  [{业务}Aggr <<aggregate root>>]
+  [{业务}Item <<entity>>]
   [Money <<value object>>]
-  [OrderAggrRepository <<interface>>]
+  [{业务}AggrRepository <<interface>>]
 }
 
 package "基础设施层 (Infrastructure)" #LightPink {
-  [OrderAggrRepositoryImpl]
-  [OrderAggrMapper]
+  [{业务}AggrRepositoryImpl]
+  [{业务}AggrMapper]
   [InventoryServiceAdapter]
 }
 
 'Adapter --> Application
-OrderController --> OrderAppService
-OrderEventListener --> OrderAppService
+{业务}Controller --> {业务}AppService
+{业务}EventListener --> {业务}AppService
 
 'Application --> Domain
-OrderAppService --> OrderAggr
-OrderAppService --> OrderAggrRepository
-OrderAppService --> CreateOrderCommand
-OrderAppService --> GetOrderByIdQuery
+{业务}AppService --> {业务}Aggr
+{业务}AppService --> {业务}AggrRepository
+{业务}AppService --> Create{业务}Command
+{业务}AppService --> Get{业务}ByIdQuery
 
 'Domain <-- Infrastructure
-OrderAggrRepository <|.. OrderAggrRepositoryImpl
+{业务}AggrRepository <|.. {业务}AggrRepositoryImpl
 
-note right of OrderAggr
+note right of {业务}Aggr
   聚合根
   一致性边界
 end note
@@ -175,18 +175,18 @@ end note
 订单Demo是本项目的核心示例，展示了完整的DDD实践：
 
 - **75个类**：分布在四层架构中
-- **4个领域事件**：OrderCreatedEvent、OrderPaidEvent、OrderShippedEvent、OrderCancelledEvent
+- **4个领域事件**：{业务}CreatedEvent、{业务}PaidEvent、{业务}ShippedEvent、{业务}CancelledEvent
 - **完整的业务流程**：创建 → 支付 → 发货 → 完成（或取消）
 
 **核心DDD元素**：
 
-- ✅ 聚合根：OrderAggr
-- ✅ 实体：OrderItem
+- ✅ 聚合根：{业务}Aggr
+- ✅ 实体：{业务}Item
 - ✅ 值对象：Money、Address、ContactInfo
 - ✅ 领域事件：4个订单事件
-- ✅ 仓储模式：OrderAggrRepository（接口）+ OrderAggrRepositoryImpl（实现）
-- ✅ 领域服务：OrderDomainService
-- ✅ 应用服务：OrderAppService
+- ✅ 仓储模式：{业务}AggrRepository（接口）+ {业务}AggrRepositoryImpl（实现）
+- ✅ 领域服务：{业务}DomainService
+- ✅ 应用服务：{业务}AppService
 
 ### 1.4 阅读路径建议
 
@@ -200,10 +200,10 @@ end note
 
 ```
 建议阅读顺序：
-1. OrderAggr.java (领域层聚合根) - 理解业务逻辑封装
-2. OrderAppService.java (应用层) - 理解用例编排
-3. OrderController.java (接口层) - 理解API设计
-4. OrderAggrRepositoryImpl.java (基础设施层) - 理解持久化
+1. {业务}Aggr.java (领域层聚合根) - 理解业务逻辑封装
+2. {业务}AppService.java (应用层) - 理解用例编排
+3. {业务}Controller.java (接口层) - 理解API设计
+4. {业务}AggrRepositoryImpl.java (基础设施层) - 理解持久化
 ```
 
 ---
@@ -217,20 +217,20 @@ end note
 
 ' 领域层
 package "领域层 (Domain)" #LightYellow {
-  class OrderAggr <<aggregate root>> {
-    - orderNo: String
+  class {业务}Aggr <<aggregate root>> {
+    - {业务}No: String
     - customerId: String
-    - status: OrderStatus
+    - status: {业务}Status
     - totalAmount: Money
-    - items: ArrayList<OrderItem>
+    - items: ArrayList<{业务}Item>
     - shippingAddress: Address
-    + create(): OrderAggr
+    + create(): {业务}Aggr
     + pay(): void
     + ship(): void
     + cancel(): void
   }
 
-  class OrderItem <<entity>> {
+  class {业务}Item <<entity>> {
     - productId: String
     - productName: String
     - quantity: int
@@ -254,7 +254,7 @@ package "领域层 (Domain)" #LightYellow {
     - contactPhone: String
   }
 
-  enum OrderStatus {
+  enum {业务}Status {
     CREATED
     PAID
     SHIPPED
@@ -262,47 +262,47 @@ package "领域层 (Domain)" #LightYellow {
     CANCELLED
   }
 
-  interface OrderAggrRepository {
-    + findById(): Optional<OrderAggr>
-    + save(): OrderAggr
-    + findByOrderNo(): Optional<OrderAggr>
+  interface {业务}AggrRepository {
+    + findById(): Optional<{业务}Aggr>
+    + save(): {业务}Aggr
+    + findBy{业务}No(): Optional<{业务}Aggr>
   }
 }
 
 ' 应用层
 package "应用层 (Application)" #LightGreen {
-  class OrderAppService {
-    + createOrder(): OrderDTO
-    + payOrder(): OrderDTO
-    + cancelOrder(): OrderDTO
+  class {业务}AppService {
+    + createOrder(): {业务}DTO
+    + payOrder(): {业务}DTO
+    + cancelOrder(): {业务}DTO
   }
 
-  class CreateOrderCommand {
+  class Create{业务}Command {
     + customerId: String
-    + items: List<OrderItemInfo>
+    + items: List<{业务}ItemInfo>
   }
 
-  class GetOrderByIdQuery {
-    + orderId: Long
+  class Get{业务}ByIdQuery {
+    + {业务}Id: Long
   }
 
-  class OrderDTO {
+  class {业务}DTO {
     + id: Long
-    + orderNo: String
-    + status: OrderStatus
+    + {业务}No: String
+    + status: {业务}Status
   }
 }
 
 ' 基础设施层
 package "基础设施层 (Infrastructure)" #LightPink {
-  class OrderAggrRepositoryImpl {
-    + findById(): Optional<OrderAggr>
-    + save(): OrderAggr
+  class {业务}AggrRepositoryImpl {
+    + findById(): Optional<{业务}Aggr>
+    + save(): {业务}Aggr
   }
 
-  class OrderAggrConverter {
-    + toDO(): OrderAggrDO
-    + toDomain(): OrderAggr
+  class {业务}AggrConverter {
+    + toDO(): {业务}AggrDO
+    + toDomain(): {业务}Aggr
   }
 
   interface InventoryService {
@@ -317,48 +317,48 @@ package "基础设施层 (Infrastructure)" #LightPink {
 
 ' 接口层
 package "接口层 (Adapter)" #LightCyan {
-  class OrderController {
-    + createOrder(): ResponseEntity<OrderResponse>
-    + payOrder(): ResponseEntity<OrderResponse>
+  class {业务}Controller {
+    + createOrder(): ResponseEntity<{业务}Response>
+    + payOrder(): ResponseEntity<{业务}Response>
   }
 
-  class CreateOrderRequest {
+  class Create{业务}Request {
     + customerId: String
-    + items: List<OrderItemRequest>
+    + items: List<{业务}ItemRequest>
   }
 
-  class OrderResponse {
-    + orderId: Long
-    + orderNo: String
+  class {业务}Response {
+    + {业务}Id: Long
+    + {业务}No: String
   }
 
-  class OrderCreatedEventListener {
+  class {业务}CreatedEventListener {
     + onEvent(): void
   }
 }
 
 ' 关系
-OrderAggr *-- "1..*" OrderItem
-OrderAggr *-- Money
-OrderAggr *-- Address
-OrderAggr *-- ContactInfo
-OrderAggr ..> OrderStatus : uses
+{业务}Aggr *-- "1..*" {业务}Item
+{业务}Aggr *-- Money
+{业务}Aggr *-- Address
+{业务}Aggr *-- ContactInfo
+{业务}Aggr ..> {业务}Status : uses
 
-OrderAppService --> OrderAggrRepository : uses
-OrderAppService --> CreateOrderCommand : uses
-OrderAppService --> GetOrderByIdQuery : uses
-OrderAppService --> OrderDTO : creates
+{业务}AppService --> {业务}AggrRepository : uses
+{业务}AppService --> Create{业务}Command : uses
+{业务}AppService --> Get{业务}ByIdQuery : uses
+{业务}AppService --> {业务}DTO : creates
 
-OrderAggrRepository <|.. OrderAggrRepositoryImpl : implements
+{业务}AggrRepository <|.. {业务}AggrRepositoryImpl : implements
 
-OrderController --> OrderAppService : calls
-OrderController --> CreateOrderRequest : receives
-OrderController --> OrderResponse : returns
+{业务}Controller --> {业务}AppService : calls
+{业务}Controller --> Create{业务}Request : receives
+{业务}Controller --> {业务}Response : returns
 
-OrderCreatedEventListener --> OrderAppService : calls
+{业务}CreatedEventListener --> {业务}AppService : calls
 
-OrderDomainService ..> InventoryService : uses
-OrderDomainService ..> PaymentGateway : uses
+{业务}DomainService ..> InventoryService : uses
+{业务}DomainService ..> PaymentGateway : uses
 
 @enduml
 ```
@@ -377,31 +377,31 @@ OrderDomainService ..> PaymentGateway : uses
 
 ```
 web-quick-start-domain/
-├── adapter/_example/order/           # 接口层 (15个类)
-│   ├── web/api/OrderController.java
-│   ├── web/dto/request/              # 请求DTO (3个)
-│   ├── web/dto/response/             # 响应DTO (2个)
-│   └── listener/                     # 事件监听器 (3个)
+├── adapter/{业务模块}/           # 接口层
+│   ├── web/api/{业务}Controller.java
+│   ├── web/dto/request/              # 请求DTO
+│   ├── web/dto/response/             # 响应DTO
+│   └── listener/                     # 事件监听器
 │
-├── app/_example/order/               # 应用层 (14个类)
-│   ├── OrderAppService.java  # 应用服务
-│   ├── command/                      # 命令对象 (4个)
-│   ├── query/                        # 查询对象 (3个)
-│   └── dto/                          # DTO (6个)
+├── app/{业务模块}/               # 应用层
+│   ├── {业务}AppService.java  # 应用服务
+│   ├── command/                      # 命令对象
+│   ├── query/                        # 查询对象
+│   └── dto/                          # DTO
 │
-├── domain/_example/order/            # 领域层 (28个类) ⭐
+├── domain/{业务模块}/            # 领域层 ⭐
 │   ├── model/
-│   │   ├── OrderAggr.java            # 聚合根
-│   │   ├── OrderItem.java            # 实体
-│   │   ├── valueobject/              # 值对象 (4个)
-│   │   └── event/                    # 领域事件 (4个)
-│   ├── repository/OrderAggrRepository.java
-│   └── service/OrderDomainService.java
+│   │   ├── {业务}Aggr.java            # 聚合根
+│   │   ├── {业务}Item.java            # 实体
+│   │   ├── valueobject/              # 值对象
+│   │   └── event/                    # 领域事件
+│   ├── repository/{业务}AggrRepository.java
+│   └── service/{业务}DomainService.java
 │
-└── infrastructure/_example/order/    # 基础设施层 (18个类)
-    ├── repository/impl/OrderAggrRepositoryImpl.java
-    ├── converter/                    # MapStruct转换器 (4个)
-    └── adapter/                      # 外部服务适配器 (2个)
+└── infrastructure/{业务模块}/    # 基础设施层
+    ├── repository/impl/{业务}AggrRepositoryImpl.java
+    ├── converter/                    # MapStruct转换器
+    └── adapter/                      # 外部服务适配器
 ```
 
 ### 2.4 依赖关系图
@@ -410,38 +410,38 @@ web-quick-start-domain/
 @startuml 依赖关系图
 
 package "接口层" {
-  [OrderController]
-  [OrderEventListener]
+  [{业务}Controller]
+  [{业务}EventListener]
 }
 
 package "应用层" {
-  [OrderAppService]
+  [{业务}AppService]
   [Command]
   [Query]
 }
 
 package "领域层" {
-  [OrderAggr]
-  [OrderItem]
+  [{业务}Aggr]
+  [{业务}Item]
   [Money]
-  [OrderAggrRepository]
-  [OrderDomainService]
+  [{业务}AggrRepository]
+  [{业务}DomainService]
 }
 
 package "基础设施层" {
-  [OrderAggrRepositoryImpl]
+  [{业务}AggrRepositoryImpl]
   [InventoryServiceAdapter]
   [PaymentGatewayAdapter]
 }
 
 ' 依赖关系
-[OrderController] --> [OrderAppService]
-[OrderEventListener] --> [OrderAppService]
-[OrderAppService] --> [OrderAggr]
-[OrderAppService] --> [OrderAggrRepository]
-[OrderAppService] --> [OrderDomainService]
-[OrderAggrRepositoryImpl] ..|> [OrderAggrRepository]
-[OrderDomainService] --> [InventoryServiceAdapter]
+[{业务}Controller] --> [{业务}AppService]
+[{业务}EventListener] --> [{业务}AppService]
+[{业务}AppService] --> [{业务}Aggr]
+[{业务}AppService] --> [{业务}AggrRepository]
+[{业务}AppService] --> [{业务}DomainService]
+[{业务}AggrRepositoryImpl] ..|> [{业务}AggrRepository]
+[{业务}DomainService] --> [InventoryServiceAdapter]
 
 note right
   依赖规则：
@@ -468,8 +468,8 @@ end note
 
 **核心组件**：
 
-- `OrderController`：REST API控制器
-- `OrderEventListener`：事件监听器
+- `{业务}Controller`：REST API控制器
+- `{业务}EventListener`：事件监听器
 - Request/Response DTO：请求响应数据传输对象
 
 **示例**：
@@ -478,17 +478,19 @@ end note
 
 @RestController
 @RequestMapping("/api/orders")
-public class OrderController {
+public class {业务}
 
-    private final OrderAppService orderApplicationService;
+Controller {
+
+    private final {业务} AppService orderApplicationService;
 
     @PostMapping
-    public OrderResponse createOrder(@RequestBody CreateOrderRequest request) {
+    public {业务} Response createOrder (@RequestBody Create {业务} Request request){
         // 1. 参数验证
         // 2. 转换为Command
-        CreateOrderCommand command = toCommand(request);
+        Create {业务} Command command = toCommand(request);
         // 3. 调用应用服务
-        OrderDTO orderDTO = orderApplicationService.createOrder(command);
+        {业务} DTO orderDTO = orderApplicationService.createOrder(command);
         // 4. 返回响应
         return toResponse(orderDTO);
     }
@@ -507,7 +509,7 @@ public class OrderController {
 
 **核心组件**：
 
-- `OrderAppService`：应用服务
+- `{业务}AppService`：应用服务
 - `Command`：命令对象（写操作）
 - `Query`：查询对象（读操作）
 - `DTO`：数据传输对象
@@ -517,18 +519,37 @@ public class OrderController {
 ```java
 
 @Transactional
-public OrderDTO createOrder(CreateOrderCommand command) {
+public {业务}
+
+DTO createOrder(Create {业务}
+
+Command command){
     // 1. 验证订单项
-    List<OrderItem> items = orderDomainService.createOrderItems(command.getItems());
+        List
+
+< {业务}
+
+Item>items ={业务}DomainService.
+
+create {业务}
+
+Items(command.getItems());
 
     // 2. 验证库存
-    orderDomainService.validateInventory(command.getItems());
+        {业务}DomainService.
+
+validateInventory(command.getItems());
 
     // 3. 创建订单（调用聚合根工厂方法）
-    OrderAggr order = OrderAggr.create(...)
+        {业务}
+Aggr order = {业务}Aggr.
+
+create(...)
 
     // 4. 保存订单
-    OrderAggr savedOrder = orderRepository.save(order);
+{业务}
+
+Aggr savedOrder = orderRepository.save(order);
 
     // 5. 发布领域事件
     publishDomainEvents(savedOrder);
@@ -548,11 +569,11 @@ public OrderDTO createOrder(CreateOrderCommand command) {
 
 **核心组件**：
 
-- `OrderAggr`：聚合根（最重要）
-- `OrderItem`：实体
+- `{业务}Aggr`：聚合根（最重要）
+- `{业务}Item`：实体
 - `Money`、`Address`：值对象
-- `OrderCreatedEvent`：领域事件
-- `OrderAggrRepository`：仓储接口（只定义，不实现）
+- `{业务}CreatedEvent`：领域事件
+- `{业务}AggrRepository`：仓储接口（只定义，不实现）
 
 **设计原则**：
 
@@ -571,8 +592,8 @@ public OrderDTO createOrder(CreateOrderCommand command) {
 
 **核心组件**：
 
-- `OrderAggrRepositoryImpl`：仓储实现
-- `OrderAggrConverter`：MapStruct转换器
+- `{业务}AggrRepositoryImpl`：仓储实现
+- `{业务}AggrConverter`：MapStruct转换器
 - `InventoryServiceAdapter`：外部服务适配器
 - `EventPublisher`：事件发布器
 
@@ -581,15 +602,17 @@ public OrderDTO createOrder(CreateOrderCommand command) {
 ```java
 
 @Component
-public class OrderAggrRepositoryImpl implements OrderAggrRepository {
+public class {业务}AggrRepositoryImpl implements{业务}
 
-    private final OrderAggrMapper    mapper;
-    private final OrderAggrConverter converter;
+AggrRepository {
+
+    private final {业务} AggrMapper mapper;
+    private final {业务} AggrConverter converter;
 
     @Override
-    public OrderAggr save(OrderAggr order) {
+    public {业务} Aggr save ({业务} Aggr order){
         // 1. 转换为DO
-        OrderAggrDO orderDO = converter.toDO(order);
+        {业务} AggrDO orderDO = converter.toDO(order);
         // 2. 持久化
         mapper.insertOrUpdate(orderDO);
         // 3. 返回领域对象
@@ -605,24 +628,24 @@ public class OrderAggrRepositoryImpl implements OrderAggrRepository {
 @startuml 依赖规则
 
 package "接口层" {
-  [OrderController]
+  [{业务}Controller]
 }
 
 package "应用层" {
-  [OrderAppService]
+  [{业务}AppService]
 }
 
 package "领域层" {
-  [OrderAggr]
+  [{业务}Aggr]
 }
 
 package "基础设施层" {
-  [OrderAggrRepositoryImpl]
+  [{业务}AggrRepositoryImpl]
 }
 
-[OrderController] --> [OrderAppService] : 依赖
-[OrderAppService] --> [OrderAggr] : 依赖
-[OrderAggrRepositoryImpl] ..> [OrderAggr] : 实现
+[{业务}Controller] --> [{业务}AppService] : 依赖
+[{业务}AppService] --> [{业务}Aggr] : 依赖
+[{业务}AggrRepositoryImpl] ..> [{业务}Aggr] : 实现
 
 note right
   依赖规则：
@@ -657,17 +680,19 @@ end note
 - 📢 **事件管理**：发布和管理领域事件
 - 🏭 **工厂方法**：通过静态工厂方法创建聚合根
 
-**OrderAggr示例**：
+**{业务}Aggr示例**：
 
 ```java
 
 @Slf4j
 @Getter
-public class OrderAggr extends AggregateRoot {
+public class {业务}Aggr extends
 
-    private OrderStatus          status;
+AggregateRoot {
+
+    private {业务} Status status;
     private Money                totalAmount;
-    private ArrayList<OrderItem> items;
+    private ArrayList < {业务} Item > items;
     private Address              shippingAddress;
     private ContactInfo          contactInfo;
 
@@ -676,25 +701,25 @@ public class OrderAggr extends AggregateRoot {
     /**
      * 创建订单（工厂方法）
      */
-    public static OrderAggr create(
-            String orderNo,
+    public static {业务} Aggr create (
+            String {业务} No,
             String customerId,
             String customerName,
-            ArrayList<OrderItem> items,
+            ArrayList < {业务} Item > items,
             Money totalAmount,
             Address shippingAddress,
             ContactInfo contactInfo,
             String remark
     ) {
-        OrderAggr order = new OrderAggr();
-        order.orderNo = orderNo;
+        {业务} Aggr order = new {业务} Aggr();
+        order. {业务} No = {业务} No;
         order.customerId = customerId;
         order.customerName = customerName;
         order.items = items != null ? new ArrayList<>(items) : new ArrayList<>();
         order.totalAmount = totalAmount;
         order.shippingAddress = shippingAddress;
         order.contactInfo = contactInfo;
-        order.status = OrderStatus.CREATED;
+        order.status = {业务} Status.CREATED;
 
         // 💡 业务规则：创建订单后立即发布事件
         order.publishCreatedEvent();
@@ -727,7 +752,7 @@ public class OrderAggr extends AggregateRoot {
         }
 
         // ⚠️ 一致性边界：状态修改
-        this.status = OrderStatus.PAID;
+        this.status = {业务} Status.PAID;
         this.paymentMethod = paymentMethod;
         this.paymentTime = Instant.now();
 
@@ -744,7 +769,7 @@ public class OrderAggr extends AggregateRoot {
             throw new IllegalStateException("订单状态不允许发货");
         }
 
-        this.status = OrderStatus.SHIPPED;
+        this.status = {业务} Status.SHIPPED;
         this.shippedTime = Instant.now();
 
         publishShippedEvent();
@@ -759,7 +784,7 @@ public class OrderAggr extends AggregateRoot {
             throw new IllegalStateException("订单状态不允许取消");
         }
 
-        this.status = OrderStatus.CANCELLED;
+        this.status = {业务} Status.CANCELLED;
         this.cancelReason = reason;
         this.cancelledTime = Instant.now();
 
@@ -798,7 +823,7 @@ end note
 
 **关键要点**：
 
-1. ✅ 使用工厂方法创建（`OrderAggr.create()`）
+1. ✅ 使用工厂方法创建（`{业务}Aggr.create()`）
 2. ✅ 通过业务方法修改状态（`pay()`、`ship()`）
 3. ✅ 业务规则封装在聚合根内
 4. ✅ 一致性边界：一个事务只修改一个聚合根
@@ -815,12 +840,14 @@ end note
 - 📦 **生命周期**：由聚合根管理
 - 📍 **位置**：在聚合内部，不独立存在
 
-**OrderItem示例**：
+**{业务}Item示例**：
 
 ```java
 
 @Getter
-public class OrderItem extends Entity {
+public class {业务}Item extends
+
+Entity {
 
     private String productId;
     private String productName;
@@ -993,7 +1020,7 @@ setBillingAddress(sharedAddress);
 **特征**：
 
 - 🔒 **不可变性**：事件创建后不能修改
-- ⏮️ **过去式命名**：OrderCreatedEvent、OrderPaidEvent
+- ⏮️ **过去式命名**：{业务}CreatedEvent、{业务}PaidEvent
 - 📦 **携带状态**：包含事件发生时的状态快照
 - 📢 **发布时机**：在聚合根内添加，应用服务发布
 
@@ -1005,30 +1032,32 @@ setBillingAddress(sharedAddress);
  * 💡 不可变、使用过去式命名
  */
 @Getter
-public class OrderCreatedEvent extends DomainEvent {
+public class {业务}CreatedEvent extends
 
-    private final Long                     orderId;
-    private final String                   orderNo;
+DomainEvent {
+
+    private final Long {业务} Id;
+    private final String {业务} No;
     private final String                   customerId;
     private final String                   customerName;
     private final Money                    totalAmount;
     private final Address                  shippingAddress;
     private final ContactInfo              contactInfo;
-    private final ArrayList<OrderItemInfo> orderItems;
+    private final ArrayList < {业务} ItemInfo > orderItems;
     private final Instant                  occurredOn;
 
-    public OrderCreatedEvent(
-            Long orderId,
-            String orderNo,
+    public {业务} CreatedEvent(
+            Long {业务} Id,
+            String {业务} No,
             String customerId,
             String customerName,
             Money totalAmount,
             Address shippingAddress,
             ContactInfo contactInfo,
-            ArrayList<OrderItemInfo> orderItems
+            ArrayList < {业务} ItemInfo > orderItems
     ) {
-        this.orderId = orderId;
-        this.orderNo = orderNo;
+        this. {业务} Id = {业务} Id;
+        this. {业务} No = {业务} No;
         this.customerId = customerId;
         this.customerName = customerName;
         this.totalAmount = totalAmount;
@@ -1044,26 +1073,26 @@ public class OrderCreatedEvent extends DomainEvent {
 
 ```plantuml
 @startuml 领域事件发布与消费
-participant OrderAggr
-participant OrderAppService
+participant {业务}Aggr
+participant {业务}AppService
 participant EventPublisher
-participant OrderCreatedEventListener
+participant {业务}CreatedEventListener
 participant InventoryService
 
-OrderAggr -> OrderAggr: addDomainEvent(OrderCreatedEvent)
-OrderAggr --> OrderAppService: return OrderAggr
+{业务}Aggr -> {业务}Aggr: addDomainEvent({业务}CreatedEvent)
+{业务}Aggr --> {业务}AppService: return {业务}Aggr
 
-OrderAppService -> OrderAggr: getUncommittedEvents()
-OrderAggr --> OrderAppService: List<DomainEvent>
+{业务}AppService -> {业务}Aggr: getUncommittedEvents()
+{业务}Aggr --> {业务}AppService: List<DomainEvent>
 
-OrderAppService -> EventPublisher: publish(events)
+{业务}AppService -> EventPublisher: publish(events)
 group 同步事件
-  EventPublisher -> OrderCreatedEventListener: onEvent(event)
-  OrderCreatedEventListener -> InventoryService: lockInventory()
-  InventoryService --> OrderCreatedEventListener: OK
+  EventPublisher -> {业务}CreatedEventListener: onEvent(event)
+  {业务}CreatedEventListener -> InventoryService: lockInventory()
+  InventoryService --> {业务}CreatedEventListener: OK
 end
 
-OrderAppService -> OrderAggr: markEventsAsCommitted()
+{业务}AppService -> {业务}Aggr: markEventsAsCommitted()
 
 @enduml
 ```
@@ -1093,29 +1122,29 @@ OrderAppService -> OrderAggr: markEventsAsCommitted()
  * 订单聚合根仓储接口
  * 💡 定义在领域层，只定义方法签名
  */
-public interface OrderAggrRepository {
+public interface {业务}
+
+AggrRepository {
 
     /**
      * 根据ID查询订单
      */
-    Optional<OrderAggr> findById(Long id);
+    Optional < {业务} Aggr > findById(Long id);
 
     /**
      * 保存订单（新增或更新）
      */
-    OrderAggr save(OrderAggr order);
+    {业务} Aggr save ({业务} Aggr order)
 
     /**
      * 根据订单号查询
      */
-    Optional<OrderAggr> findByOrderNo(String orderNo);
+    Optional < {业务} Aggr > findBy {业务} No(String {业务} No)
 
     /**
      * 检查订单号是否存在
      */
-    boolean existsByOrderNo(String orderNo);
-
-}
+    boolean existsBy {业务} No(String {业务} No);
 ```
 
 **仓储实现**（基础设施层）：
@@ -1124,34 +1153,34 @@ public interface OrderAggrRepository {
 @startuml 仓储模式
 
 package "领域层" {
-  interface OrderAggrRepository {
+  interface {业务}AggrRepository {
     + findById()
     + save()
-    + findByOrderNo()
+    + findBy{业务}No()
   }
 }
 
 package "基础设施层" {
-  class OrderAggrRepositoryImpl {
+  class {业务}AggrRepositoryImpl {
     + findById()
     + save()
-    + findByOrderNo()
+    + findBy{业务}No()
   }
 
-  class OrderAggrMapper <<MyBatis>> {
+  class {业务}AggrMapper <<MyBatis>> {
     + selectById()
     + insertOrUpdate()
   }
 
-  class OrderAggrConverter {
+  class {业务}AggrConverter {
     + toDO()
     + toDomain()
   }
 }
 
-OrderAggrRepository <|.. OrderAggrRepositoryImpl : implements
-OrderAggrRepositoryImpl --> OrderAggrMapper : uses
-OrderAggrRepositoryImpl --> OrderAggrConverter : uses
+{业务}AggrRepository <|.. {业务}AggrRepositoryImpl : implements
+{业务}AggrRepositoryImpl --> {业务}AggrMapper : uses
+{业务}AggrRepositoryImpl --> {业务}AggrConverter : uses
 
 note right
   仓储模式特点：
@@ -1166,8 +1195,8 @@ end note
 
 **关键要点**：
 
-1. ✅ 接口定义在领域层（`OrderAggrRepository`）
-2. ✅ 实现在基础设施层（`OrderAggrRepositoryImpl`）
+1. ✅ 接口定义在领域层（`{业务}AggrRepository`）
+2. ✅ 实现在基础设施层（`{业务}AggrRepositoryImpl`）
 3. ✅ 操作聚合根级别，不操作聚合内部实体
 4. ✅ 负责DO ↔ Domain的转换
 
@@ -1182,7 +1211,7 @@ end note
 - ✅ **可测试**：不依赖基础设施
 - 📋 **职责清晰**：回答"业务规则是什么"
 
-**OrderDomainService示例**：
+**{业务}DomainService示例**：
 
 ```java
 /**
@@ -1190,7 +1219,9 @@ end note
  * 💡 封装跨聚合根的业务规则
  */
 @Slf4j
-public class OrderDomainService {
+public class {业务}
+
+DomainService {
 
     private final InventoryService inventoryService;
     private final PaymentGateway   paymentGateway;
@@ -1199,8 +1230,8 @@ public class OrderDomainService {
      * 验证库存
      * 💡 涉及订单聚合和库存服务
      */
-    public void validateInventory(List<OrderItemInfo> items) {
-        for (OrderItemInfo item : items) {
+    public void validateInventory (List < {业务} ItemInfo > items){
+        for ({业务} ItemInfo items){
             boolean available = inventoryService.checkInventory(
                     item.getProductId(),
                     item.getSkuCode(),
@@ -1218,16 +1249,18 @@ public class OrderDomainService {
     /**
      * 锁定库存
      */
-    public void lockInventory(Long orderId, String orderNo, List<OrderItemInfo> items) {
-        inventoryService.lockInventory(orderId, orderNo, items);
+    public void lockInventory (Long {业务} Id, String {业务} No, List < {业务} ItemInfo > items){
+        inventoryService.lockInventory({业务}Id, {业务}No, items);
     }
 
     /**
      * 创建订单项
      */
-    public List<OrderItem> createOrderItems(List<OrderItemInfo> itemInfos) {
+    public List < {业务} Item > create {业务} Items(List < {业务}ItemInfo > itemInfos) {
         return itemInfos.stream()
-                       .map(info -> OrderItem.create(
+                       .map(info -> {
+                           业务
+                       }Item.create(
                                info.getProductId(),
                                info.getProductName(),
                                info.getSkuCode(),
@@ -1242,13 +1275,13 @@ public class OrderDomainService {
 
 **领域服务 vs 应用服务**：
 
-| 维度     | 领域服务               | 应用服务            |
-|--------|--------------------|-----------------|
-| **职责** | 封装业务规则             | 用例编排            |
-| **问题** | "业务规则是什么"          | "如何完成这个用例"      |
-| **状态** | 无状态                | 管理事务状态          |
-| **依赖** | 可依赖端口接口            | 可依赖仓储、领域服务      |
-| **示例** | OrderDomainService | OrderAppService |
+| 维度     | 领域服务              | 应用服务           |
+|--------|-------------------|----------------|
+| **职责** | 封装业务规则            | 用例编排           |
+| **问题** | "业务规则是什么"         | "如何完成这个用例"     |
+| **状态** | 无状态               | 管理事务状态         |
+| **依赖** | 可依赖端口接口           | 可依赖仓储、领域服务     |
+| **示例** | {业务}DomainService | {业务}AppService |
 
 ### 4.7 应用服务（ApplicationService）
 
@@ -1261,7 +1294,7 @@ public class OrderDomainService {
 - 🔄 **DTO转换**：领域对象 ↔ DTO
 - 📢 **事件发布**：收集并发布领域事件
 
-**OrderAppService示例**：
+**{业务}AppService示例**：
 
 ```java
 /**
@@ -1269,10 +1302,12 @@ public class OrderDomainService {
  * 💡 职责：用例编排、事务管理、DTO转换、事件发布
  */
 @Slf4j
-public class OrderAppService {
+public class {业务}
 
-    private final OrderAggrRepository orderRepository;
-    private final OrderDomainService  orderDomainService;
+AppService {
+
+    private final {业务} AggrRepository orderRepository;
+    private final {业务} DomainService {业务} DomainService;
     private final EventPublisher      eventPublisher;
 
     /**
@@ -1280,20 +1315,20 @@ public class OrderAppService {
      * 💡 展示完整的用例编排流程
      */
     @Transactional(rollbackFor = Exception.class)
-    public OrderDTO createOrder(CreateOrderCommand command) {
+    public {业务} DTO createOrder (Create {业务} Command command){
         log.info("创建订单: customerId={}, itemsCount={}",
                 command.getCustomerId(), command.getItems().size());
 
         // 1. 💡 验证订单项（领域服务）
-        List<OrderItem> orderItems = orderDomainService.createOrderItems(command.getItems());
-        orderDomainService.validateOrderItems(orderItems);
+        List < {业务} Item > orderItems = {业务} DomainService.create {业务} Items(command.getItems());
+        {业务} DomainService.validate {业务} Items(orderItems);
 
         // 2. 💡 验证库存（领域服务 + 外部服务）
-        orderDomainService.validateInventory(command.getItems());
+        {业务} DomainService.validateInventory(command.getItems());
 
         // 3. 💡 创建订单（聚合根工厂方法）
-        OrderAggr order = OrderAggr.create(
-                OrderAggr.generateOrderNo(),
+        {业务} Aggr order = {业务} Aggr.create(
+                {业务}Aggr.generate {业务} No(),
                 command.getCustomerId(),
                 command.getCustomerName(),
                 new ArrayList<>(orderItems),
@@ -1301,18 +1336,18 @@ public class OrderAppService {
                 command.getShippingAddress(),
                 command.getContactInfo(),
                 command.getRemark()
-        );
+        )
 
         // 4. 💾 保存订单（仓储）
-        OrderAggr savedOrder = orderRepository.save(order);
+        {业务} Aggr savedOrder = orderRepository.save(order);
 
         // 5. 🔒 锁定库存（领域服务）
-        orderDomainService.lockInventory(savedOrder.getId(), savedOrder.getOrderNo(), command.getItems());
+        {业务} DomainService.lockInventory(savedOrder.getId(), savedOrder.getOrderNo(), command.getItems());
 
         // 6. 📢 发布领域事件
         publishDomainEvents(savedOrder);
 
-        log.info("订单创建成功: orderId={}, orderNo={}", savedOrder.getId(), savedOrder.getOrderNo());
+        log.info("订单创建成功: {业务}Id={}, {业务}No={}", savedOrder.getId(), savedOrder.getOrderNo());
 
         // 7. 🔄 转换为DTO
         return toDTO(savedOrder);
@@ -1322,11 +1357,11 @@ public class OrderAppService {
      * 发布领域事件
      * 💡 事务提交后发布
      */
-    private void publishDomainEvents(OrderAggr order) {
+    private void publishDomainEvents ({业务} Aggr order){
         if (order.hasUncommittedEvents()) {
             eventPublisher.publish(order.getUncommittedEvents());
             order.markEventsAsCommitted();
-            log.debug("发布领域事件: orderId={}, eventsCount={}",
+            log.debug("发布领域事件: {业务}Id={}, eventsCount={}",
                     order.getId(), order.getUncommittedEvents().size());
         }
     }
@@ -1334,8 +1369,8 @@ public class OrderAppService {
     /**
      * 转换为DTO
      */
-    private OrderDTO toDTO(OrderAggr order) {
-        OrderDTO dto = new OrderDTO();
+    private {业务} DTO toDTO ({业务} Aggr order){
+        {业务} DTO dto = new {业务} DTO();
         dto.setId(order.getId());
         dto.setOrderNo(order.getOrderNo());
         dto.setStatus(order.getStatus());
@@ -1367,28 +1402,28 @@ public class OrderAppService {
 ```plantuml
 @startuml CQRS架构
 package "命令侧（Command）" #LightGreen {
-  [CreateOrderCommand]
-  [PayOrderCommand]
-  [CancelOrderCommand]
-  [OrderAppService]
-  database "写模型\n(OrderAggr)"
+  [Create{业务}Command]
+  [Pay{业务}Command]
+  [Cancel{业务}Command]
+  [{业务}AppService]
+  database "写模型\n({业务}Aggr)"
 }
 
 package "查询侧（Query）" #LightBlue {
-  [GetOrderByIdQuery]
-  [GetOrdersByCustomerQuery]
-  database "读模型\n(OrderViewDTO)"
+  [Get{业务}ByIdQuery]
+  [Get{业务}ByCustomerQuery]
+  database "读模型\n({业务}ViewDTO)"
 }
 
-[OrderController] --> [CreateOrderCommand]
-[OrderController] --> [GetOrderByIdQuery]
+[{业务}Controller] --> [Create{业务}Command]
+[{业务}Controller] --> [Get{业务}ByIdQuery]
 
-[CreateOrderCommand] --> [OrderAppService]
-[OrderAppService] --> "写模型\n(OrderAggr)" : 修改状态
+[Create{业务}Command] --> [{业务}AppService]
+[{业务}AppService] --> "写模型\n({业务}Aggr)" : 修改状态
 
-[GetOrderByIdQuery] --> "读模型\n(OrderViewDTO)" : 只读查询
+[Get{业务}ByIdQuery] --> "读模型\n({业务}ViewDTO)" : 只读查询
 
-note right of "读模型\n(OrderViewDTO)"
+note right of "读模型\n({业务}ViewDTO)"
   优化的查询表
   可使用物化视图
   与写模型分离
@@ -1415,11 +1450,16 @@ end note
  * 💡 封装创建订单的意图
  */
 @Getter
-public class CreateOrderCommand {
+public class Create {
+
+    业务
+}
+
+Command {
 
     private final String              customerId;
     private final String              customerName;
-    private final List<OrderItemInfo> items;
+    private final List < {业务} ItemInfo > items;
     private final Money               totalAmount;
     private final Address             shippingAddress;
     private final ContactInfo         contactInfo;
@@ -1430,7 +1470,7 @@ public class CreateOrderCommand {
 
 **特点**：
 
-- ✅ 命令式命名：CreateOrderCommand、PayOrderCommand
+- ✅ 命令式命名：Create{业务}Command、Pay{业务}Command
 - ✅ 不可变：所有字段final
 - ✅ 包含所有必要的参数
 
@@ -1445,9 +1485,14 @@ public class CreateOrderCommand {
  * 根据ID查询订单
  */
 @Getter
-public class GetOrderByIdQuery {
+public class Get {
 
-    private final Long orderId;
+    业务
+}
+
+ByIdQuery {
+
+    private final Long {业务} Id;
 
 }
 
@@ -1455,7 +1500,12 @@ public class GetOrderByIdQuery {
  * 查询客户订单列表
  */
 @Getter
-public class GetOrdersByCustomerQuery {
+public class Get {
+
+    业务
+}
+
+ByCustomerQuery {
 
     private final String customerId;
 
@@ -1469,9 +1519,16 @@ public class GetOrdersByCustomerQuery {
 ```java
 
 @Transactional
-public OrderDTO createOrder(CreateOrderCommand command) {
+public {业务}
+
+DTO createOrder(Create {业务}
+
+Command command){
     // 修改状态
-    OrderAggr order = OrderAggr.create(...)
+        {业务}
+Aggr order = {业务}Aggr.
+
+create(...)
     return orderRepository.save(order);
 }
 ```
@@ -1481,9 +1538,19 @@ public OrderDTO createOrder(CreateOrderCommand command) {
 ```java
 
 @Transactional(readOnly = true)
-public OrderDTO getOrderById(GetOrderByIdQuery query) {
+public {业务}
+
+DTO get{业务}
+
+ById(Get {业务}
+
+ByIdQuery query){
     // 只读查询，直接访问DO或读模型
-    return orderQueryRepository.findById(query.getOrderId());
+        return{业务}QueryRepository.
+
+findById(query.get {业务}
+
+Id());
 }
 ```
 
@@ -1512,12 +1579,28 @@ public interface InventoryService {
     /**
      * 锁定库存
      */
-    void lockInventory(Long orderId, String orderNo, List<OrderItemInfo> items);
+    void lockInventory(Long {业务}
+
+    Id,
+
+    String {业务}
+
+    No,List<
+
+    {业务}
+
+    ItemInfo>items);
 
     /**
      * 释放库存
      */
-    void releaseInventory(Long orderId, String orderNo);
+    void releaseInventory(Long {业务}
+
+    Id,
+
+    String {业务}
+
+    No);
 
 }
 ```
@@ -1543,12 +1626,32 @@ public class MockInventoryServiceAdapter implements InventoryService {
     }
 
     @Override
-    public void lockInventory(Long orderId, String orderNo, List<OrderItemInfo> items) {
+    public void lockInventory(Long {业务}
+
+    Id,
+
+    String {业务}
+
+    No,List<
+
+    {业务}
+
+    ItemInfo>items)
+
+    {
         // 调用外部库存服务锁定库存
     }
 
     @Override
-    public void releaseInventory(Long orderId, String orderNo) {
+    public void releaseInventory(Long {业务}
+
+    Id,
+
+    String {业务}
+
+    No)
+
+    {
         // 调用外部库存服务释放库存
     }
 
@@ -1570,7 +1673,7 @@ public class MockInventoryServiceAdapter implements InventoryService {
 ```plantuml
 @startuml 六边形架构
 rectangle "订单领域（Domain）" #LightBlue {
-  [OrderAggr <<aggregate root>>]
+  [{业务}Aggr <<aggregate root>>]
   interface InventoryService <<port>>
   interface PaymentGateway <<port>>
 }
@@ -1578,7 +1681,7 @@ rectangle "订单领域（Domain）" #LightBlue {
 package "适配器（Adapters）" #LightPink {
   [MockInventoryServiceAdapter] ..|> InventoryService
   [StripePaymentAdapter] ..|> PaymentGateway
-  [OrderController] as WebAdapter
+  [{业务}Controller] as WebAdapter
 }
 
 package "外部服务" #LightCyan {
@@ -1588,7 +1691,7 @@ package "外部服务" #LightCyan {
 
 [MockInventoryServiceAdapter] --> [库存微服务]
 [StripePaymentAdapter] --> [Stripe支付网关]
-[WebAdapter] --> [OrderAggr]
+[WebAdapter] --> [{业务}Aggr]
 
 note bottom of InventoryService
   端口接口在领域层定义
@@ -1608,48 +1711,48 @@ end note
 ```plantuml
 @startuml 创建订单序列图
 actor Client
-participant OrderController
-participant OrderAppService
-participant OrderDomainService
-participant OrderAggr
-participant OrderAggrRepository
+participant {业务}Controller
+participant {业务}AppService
+participant {业务}DomainService
+participant {业务}Aggr
+participant {业务}AggrRepository
 participant InventoryService
 participant EventPublisher
 
-Client -> OrderController: POST /api/orders
-activate OrderController
-OrderController -> OrderAppService: createOrder(command)
-activate OrderAppService
+Client -> {业务}Controller: POST /api/orders
+activate {业务}Controller
+{业务}Controller -> {业务}AppService: createOrder(command)
+activate {业务}AppService
 
-OrderAppService -> OrderDomainService: createOrderItems()
-OrderDomainService --> OrderAppService: List<OrderItem>
+{业务}AppService -> {业务}DomainService: create{业务}Items()
+{业务}DomainService --> {业务}AppService: List<{业务}Item>
 
-OrderAppService -> OrderDomainService: validateInventory()
-activate OrderDomainService
-OrderDomainService -> InventoryService: checkInventory()
-InventoryService --> OrderDomainService: OK
-deactivate OrderDomainService
+{业务}AppService -> {业务}DomainService: validateInventory()
+activate {业务}DomainService
+{业务}DomainService -> InventoryService: checkInventory()
+InventoryService --> {业务}DomainService: OK
+deactivate {业务}DomainService
 
-OrderAppService -> OrderAggr: create(...)\n(工厂方法)
-activate OrderAggr
-OrderAggr -> OrderAggr: addDomainEvent(OrderCreatedEvent)
-OrderAggr --> OrderAppService: OrderAggr
-deactivate OrderAggr
+{业务}AppService -> {业务}Aggr: create(...)\n(工厂方法)
+activate {业务}Aggr
+{业务}Aggr -> {业务}Aggr: addDomainEvent({业务}CreatedEvent)
+{业务}Aggr --> {业务}AppService: {业务}Aggr
+deactivate {业务}Aggr
 
-OrderAppService -> OrderAggrRepository: save(order)
-OrderAggrRepository --> OrderAppService: savedOrder
+{业务}AppService -> {业务}AggrRepository: save(order)
+{业务}AggrRepository --> {业务}AppService: savedOrder
 
-OrderAppService -> OrderDomainService: lockInventory()
-OrderDomainService -> InventoryService: lockInventory()
-InventoryService --> OrderDomainService: OK
+{业务}AppService -> {业务}DomainService: lockInventory()
+{业务}DomainService -> InventoryService: lockInventory()
+InventoryService --> {业务}DomainService: OK
 
-OrderAppService -> EventPublisher: publish(events)
-EventPublisher -> OrderCreatedEventListener: onEvent(event)
+{业务}AppService -> EventPublisher: publish(events)
+EventPublisher -> {业务}CreatedEventListener: onEvent(event)
 
-OrderAppService --> OrderController: OrderDTO
-deactivate OrderAppService
-OrderController --> Client: 200 OK
-deactivate OrderController
+{业务}AppService --> {业务}Controller: {业务}DTO
+deactivate {业务}AppService
+{业务}Controller --> Client: 200 OK
+deactivate {业务}Controller
 
 @enduml
 ```
@@ -1659,31 +1762,31 @@ deactivate OrderController
 ```plantuml
 @startuml 支付订单序列图
 actor Client
-participant OrderController
-participant OrderAppService
-participant OrderAggr
+participant {业务}Controller
+participant {业务}AppService
+participant {业务}Aggr
 participant PaymentGateway
 participant EventPublisher
 
-Client -> OrderController: POST /api/orders/{id}/pay
-OrderController -> OrderAppService: payOrder(command)
+Client -> {业务}Controller: POST /api/orders/{id}/pay
+{业务}Controller -> {业务}AppService: payOrder(command)
 
-OrderAppService -> OrderAggr: findById(id)
-OrderAggr --> OrderAppService: OrderAggr
+{业务}AppService -> {业务}Aggr: findById(id)
+{业务}Aggr --> {业务}AppService: {业务}Aggr
 
-OrderAppService -> PaymentGateway: processPayment()
-PaymentGateway --> OrderAppService: PaymentResult
+{业务}AppService -> PaymentGateway: processPayment()
+PaymentGateway --> {业务}AppService: PaymentResult
 
-OrderAppService -> OrderAggr: pay(method, amount)
-activate OrderAggr
-OrderAggr -> OrderAggr: addDomainEvent(OrderPaidEvent)
-OrderAggr --> OrderAppService: OrderAggr
-deactivate OrderAggr
+{业务}AppService -> {业务}Aggr: pay(method, amount)
+activate {业务}Aggr
+{业务}Aggr -> {业务}Aggr: addDomainEvent({业务}PaidEvent)
+{业务}Aggr --> {业务}AppService: {业务}Aggr
+deactivate {业务}Aggr
 
-OrderAppService -> EventPublisher: publish(events)
+{业务}AppService -> EventPublisher: publish(events)
 
-OrderAppService --> OrderController: OrderDTO
-OrderController --> Client: 200 OK
+{业务}AppService --> {业务}Controller: {业务}DTO
+{业务}Controller --> Client: 200 OK
 
 @enduml
 ```
@@ -1693,20 +1796,20 @@ OrderController --> Client: 200 OK
 ```plantuml
 @startuml 查询订单序列图
 actor Client
-participant OrderController
-participant OrderAppService
-participant OrderAggrRepository
+participant {业务}Controller
+participant {业务}AppService
+participant {业务}AggrRepository
 
-Client -> OrderController: GET /api/orders/{id}
-OrderController -> OrderAppService: getOrderById(query)
+Client -> {业务}Controller: GET /api/orders/{id}
+{业务}Controller -> {业务}AppService: get{业务}ById(query)
 
-OrderAppService -> OrderAggrRepository: findById(id)
-OrderAggrRepository --> OrderAppService: Optional<OrderAggr>
+{业务}AppService -> {业务}AggrRepository: findById(id)
+{业务}AggrRepository --> {业务}AppService: Optional<{业务}Aggr>
 
-OrderAppService -> OrderAppService: toDTO(order)
+{业务}AppService -> {业务}AppService: toDTO(order)
 
-OrderAppService --> OrderController: OrderDTO
-OrderController --> Client: 200 OK
+{业务}AppService --> {业务}Controller: {业务}DTO
+{业务}Controller --> Client: 200 OK
 
 @enduml
 ```
@@ -1715,30 +1818,30 @@ OrderController --> Client: 200 OK
 
 ```plantuml
 @startuml 事件驱动流程
-participant OrderAggr
-participant OrderAppService
+participant {业务}Aggr
+participant {业务}AppService
 participant EventPublisher
 participant InventoryService
 participant NotificationService
 participant AnalysisService
 
-OrderAggr -> OrderAggr: addDomainEvent(OrderPaidEvent)
-OrderAggr --> OrderAppService: return OrderAggr
+{业务}Aggr -> {业务}Aggr: addDomainEvent({业务}PaidEvent)
+{业务}Aggr --> {业务}AppService: return {业务}Aggr
 
-OrderAppService -> OrderAggr: getUncommittedEvents()
-OrderAggr --> OrderAppService: List<DomainEvent>
+{业务}AppService -> {业务}Aggr: getUncommittedEvents()
+{业务}Aggr --> {业务}AppService: List<DomainEvent>
 
-OrderAppService -> EventPublisher: publish(events)
+{业务}AppService -> EventPublisher: publish(events)
 
 par 同步处理（关键业务）
     EventPublisher -> InventoryService: unlockInventory()
     InventoryService --> EventPublisher: OK
 else 异步处理（非关键业务）
     EventPublisher -> NotificationService: sendPaymentSuccessNotification()
-    EventPublisher -> AnalysisService: updateOrderStatistics()
+    EventPublisher -> AnalysisService: update{业务}Statistics()
 end
 
-OrderAppService -> OrderAggr: markEventsAsCommitted()
+{业务}AppService -> {业务}Aggr: markEventsAsCommitted()
 
 @enduml
 ```
@@ -1876,7 +1979,9 @@ public class Money extends ValueObject {
 2. **在聚合根中使用**
 
 ```java
-public class OrderAggr extends AggregateRoot {
+public class {业务}Aggr extends
+
+AggregateRoot {
 
     private Money totalAmount;
 
@@ -1895,11 +2000,13 @@ public class OrderAggr extends AggregateRoot {
 2. **创建领域服务类**
 
 ```java
-public class OrderDomainService {
+public class {业务}
+
+DomainService {
 
     private final InventoryService inventoryService;
 
-    public void validateInventory(List<OrderItemInfo> items) {
+    public void validateInventory (List < {业务} ItemInfo > items){
         // 跨聚合的业务规则
     }
 
@@ -1911,11 +2018,13 @@ public class OrderDomainService {
 ```java
 
 @Configuration
-public class OrderConfigure {
+public class {业务}
+
+Configure {
 
     @Bean
-    public OrderDomainService orderDomainService(InventoryService inventoryService) {
-        return new OrderDomainService(inventoryService);
+    public {业务} DomainService {业务} DomainService(InventoryService inventoryService) {
+        return new {业务} DomainService(inventoryService);
     }
 
 }
@@ -1989,7 +2098,7 @@ public class OrderConfigure {
 1. 🔄 **查询性能优化**：引入读模型（Materialized View）
 2. 🔄 **事件异步化**：当前事件为同步处理
 3. 🔄 **分布式事务**：跨服务调用的分布式事务处理
-4. 🔄 **OrderAggrDO字段**：部分字段未在DO中生成
+4. 🔄 **{业务}AggrDO字段**：部分字段未在DO中生成
 
 ### 9.4 参考资源
 
@@ -2018,10 +2127,6 @@ public class OrderConfigure {
 | [业务代码编写规范.md](业务代码编写规范.md)                                                                          | 编码标准详细参考       | 开发者    |
 | [代码AI生成工作流.md](AI生成代码工作流.md)                                                                        | 强制性代码生成流程      | AI、开发者 |
 | [测试代码编写规范.md](测试代码编写规范.md)                                                                          | 测试代码生成标准       | AI、开发者 |
-| [domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md)                         | 领域层详细指南        | 开发者    |
-| [app/README.md](app/src/main/java/org/smm/archetype/app/README.md)                                  | 应用层详细指南        | 开发者    |
-| [adapter/README.md](adapter/src/main/java/org/smm/archetype/adapter/README.md)                      | 接口层详细指南        | 开发者    |
-| [infrastructure/README.md](infrastructure/src/main/java/org/smm/archetype/infrastructure/README.md) | 基础设施层详细指南      | 开发者    |
 
 ### 最佳实践
 
@@ -2076,10 +2181,6 @@ public class OrderConfigure {
 1. **文档重组**
     - ✅ 创建[业务代码编写规范.md](业务代码编写规范.md)（1,143行，18KB）
    - ✅ 创建[代码AI生成工作流.md](AI生成代码工作流.md)（666行，11KB）
-   - ✅ 创建[domain/README.md](domain/src/main/java/org/smm/archetype/domain/README.md)（590行，15KB）
-   - ✅ 创建[adapter/README.md](adapter/src/main/java/org/smm/archetype/adapter/README.md)（639行）
-   - ✅ 创建[app/README.md](app/src/main/java/org/smm/archetype/app/README.md)（589行）
-   - ✅ 创建[infrastructure/README.md](infrastructure/src/main/java/org/smm/archetype/infrastructure/README.md)（997行）
 
 2. **文档特点**
     - 清晰的职责划分

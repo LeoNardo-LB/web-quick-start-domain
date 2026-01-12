@@ -12,7 +12,6 @@
     <artifactId>web-quick-start-domain</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
-    <description>DDD Web quick start archetype</description>
     <modules>
         <module>adapter</module>
         <module>app</module>
