@@ -3,7 +3,6 @@ package org.smm.archetype.infrastructure._example.order.persistence.converter;
 import org.smm.archetype.domain._example.order.model.OrderItem;
 import org.smm.archetype.domain._example.order.model.valueobject.Money;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.OrderItemDO;
-import org.springframework.stereotype.Component;
 
 /**
  * 订单项转换器
@@ -12,10 +11,10 @@ import org.springframework.stereotype.Component;
  * <ul>
  *   <li>OrderItem与OrderItemDO之间的转换</li>
  * </ul>
+ * <p>通过OrderConfigure配置类注册为Bean
  * @author Leonardo
  * @since 2026/1/11
  */
-@Component
 public class OrderItemConverter {
 
     /**

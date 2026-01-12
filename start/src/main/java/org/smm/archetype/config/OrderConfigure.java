@@ -12,6 +12,8 @@ import org.smm.archetype.domain._example.order.service.PaymentGateway;
 import org.smm.archetype.domain._shared.event.EventPublisher;
 import org.smm.archetype.infrastructure._example.order.adapter.MockInventoryServiceAdapter;
 import org.smm.archetype.infrastructure._example.order.persistence.OrderAggrRepositoryImpl;
+import org.smm.archetype.infrastructure._example.order.persistence.converter.OrderAggrConverter;
+import org.smm.archetype.infrastructure._example.order.persistence.converter.OrderItemConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -146,6 +148,28 @@ public class OrderConfigure {
     @Bean
     public EventHandler<?> orderCancelledEventHandler() {
         return new OrderCancelledEventHandler();
+    }
+
+    // ==================== 转换器 ====================
+
+    /**
+     * 订单聚合根转换器Bean
+     * <p>职责：OrderAggr与OrderAggrDO之间的转换
+     * @return OrderAggrConverter
+     */
+    @Bean
+    public OrderAggrConverter orderAggrConverter() {
+        return new OrderAggrConverter();
+    }
+
+    /**
+     * 订单项转换器Bean
+     * <p>职责：OrderItem与OrderItemDO之间的转换
+     * @return OrderItemConverter
+     */
+    @Bean
+    public OrderItemConverter orderItemConverter() {
+        return new OrderItemConverter();
     }
 
 }

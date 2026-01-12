@@ -1,5 +1,7 @@
 package org.smm.archetype.infrastructure.common.log;
 
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -14,7 +16,6 @@ import org.smm.archetype.domain.common.log.handler.persistence.PersistenceType;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyHandler;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyType;
 import org.smm.archetype.infrastructure._shared.context.executable.ContextRunnable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 
 import java.time.Instant;
@@ -34,21 +35,36 @@ import java.util.stream.Collectors;
 @Slf4j
 @Aspect
 @Order
+@RequiredArgsConstructor
 public class LogAspect {
 
     /**
-     * 持久化处理器映射表
+     * 持久化处理器列表
      * <p>
-     * 存储不同持久化类型的处理器实例，用于根据日志配置的持久化类型执行相应的持久化操作。
+     * 通过构造器注入，在@PostConstruct中转换为映射表。
      */
-    private final Map<PersistenceType, PersistenceHandler> persistenceHandlerMap;
+    private final List<PersistenceHandler> persistenceHandlers;
+
+    /**
+     * 序列化处理器列表
+     * <p>
+     * 通过构造器注入，在@PostConstruct中转换为映射表。
+     */
+    private final List<StringifyHandler> stringifyHandlers;
 
     /**
      * 持久化处理器映射表
      * <p>
      * 存储不同持久化类型的处理器实例，用于根据日志配置的持久化类型执行相应的持久化操作。
      */
-    private final Map<StringifyType, StringifyHandler> stringifyHandlerMap;
+    private Map<PersistenceType, PersistenceHandler> persistenceHandlerMap;
+
+    /**
+     * 序列化处理器映射表
+     * <p>
+     * 存储不同序列化类型的处理器实例，用于根据日志配置的序列化类型执行相应的序列化操作。
+     */
+    private Map<StringifyType, StringifyHandler> stringifyHandlerMap;
 
     /**
      * 异步执行服务
@@ -58,15 +74,16 @@ public class LogAspect {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     /**
-     * 构造函数
+     * 初始化处理器映射表
      * <p>
-     * 初始化持久化处理器映射表，将注入的处理器列表转换为按类型索引的映射表。
-     * @param persistenceHandlers 持久化处理器列表
+     * 将注入的处理器列表转换为按类型索引的映射表。
      */
-    @Autowired
-    public LogAspect(List<PersistenceHandler> persistenceHandlers, List<StringifyHandler> stringifyHandlers) {
-        this.persistenceHandlerMap = persistenceHandlers.stream().collect(Collectors.toMap(PersistenceHandler::getPersistenceType, s -> s));
-        this.stringifyHandlerMap = stringifyHandlers.stream().collect(Collectors.toMap(StringifyHandler::getStringifyType, s -> s));
+    @PostConstruct
+    public void init() {
+        this.persistenceHandlerMap = persistenceHandlers.stream()
+                                             .collect(Collectors.toMap(PersistenceHandler::getPersistenceType, s -> s));
+        this.stringifyHandlerMap = stringifyHandlers.stream()
+                                           .collect(Collectors.toMap(StringifyHandler::getStringifyType, s -> s));
     }
 
     /**

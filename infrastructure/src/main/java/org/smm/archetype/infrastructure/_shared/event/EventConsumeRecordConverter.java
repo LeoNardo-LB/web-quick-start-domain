@@ -4,7 +4,6 @@ import org.smm.archetype.domain._shared.event.ConsumeStatus;
 import org.smm.archetype.domain._shared.event.EventConsumeRecord;
 import org.smm.archetype.domain._shared.event.EventPriority;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
-import org.springframework.stereotype.Component;
 
 /**
  * 事件消费记录转换器
@@ -17,10 +16,10 @@ import org.springframework.stereotype.Component;
  *   <li>App层需要使用Domain层的值对象</li>
  *   <li>转换逻辑集中在一个地方，便于维护</li>
  * </ul>
+ * <p>通过ConverterConfigure配置类注册为Bean
  * @author Leonardo
  * @since 2026/01/10
  */
-@Component
 public class EventConsumeRecordConverter {
 
     /**

@@ -1,7 +1,10 @@
 package org.smm.archetype.config;
 
+import org.smm.archetype.domain.common.notification.EmailService;
+import org.smm.archetype.domain.common.notification.SmsService;
 import org.smm.archetype.infrastructure.common.notification.EmailServiceImpl;
 import org.smm.archetype.infrastructure.common.notification.SmsServiceImpl;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -21,9 +24,16 @@ import org.springframework.context.annotation.Import;
  * <ol>
  *   <li>添加邮件/短信服务SDK依赖</li>
  *   <li>实现AbstractEmailService和AbstractSmsService的子类</li>
- *   <li>在此配置类中通过@Bean注册新实现</li>
+ *   <li>使用@ConditionalOnMissingBean替换默认实现</li>
  *   <li>配置服务商账号信息</li>
  * </ol>
+ *
+ * <p>设计原则：
+ * <ul>
+ *   <li>Bean方法返回接口类型（EmailService/SmsService）而非具体实现</li>
+ *   <li>使用@ConditionalOnMissingBean允许用户替换实现</li>
+ *   <li>配置类位于 start/src/main/java/org/smm/archetype/config/</li>
+ * </ul>
  *
  * @author Leonardo
  * @since 2026/01/10
@@ -34,19 +44,27 @@ public class NotificationConfigure {
 
     /**
      * 短信服务Bean（模拟实现）
-     * @return 短信服务实例
+     * <p>职责：发送短信通知
+     * <p>默认实现：SmsServiceImpl（模拟实现，仅打印日志）
+     * <p>生产环境：用户可以通过@ConditionalOnMissingBean替换为真实实现
+     * @return SmsService接口类型
      */
     @Bean
-    public SmsServiceImpl smsService() {
+    @ConditionalOnMissingBean(SmsService.class)
+    public SmsService smsService() {
         return new SmsServiceImpl();
     }
 
     /**
      * 邮件服务Bean（模拟实现）
-     * @return 邮件服务实例
+     * <p>职责：发送邮件通知
+     * <p>默认实现：EmailServiceImpl（模拟实现，仅打印日志）
+     * <p>生产环境：用户可以通过@ConditionalOnMissingBean替换为真实实现
+     * @return EmailService接口类型
      */
     @Bean
-    public EmailServiceImpl emailService() {
+    @ConditionalOnMissingBean(EmailService.class)
+    public EmailService emailService() {
         return new EmailServiceImpl();
     }
 

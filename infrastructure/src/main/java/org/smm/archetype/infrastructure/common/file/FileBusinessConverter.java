@@ -2,16 +2,15 @@ package org.smm.archetype.infrastructure.common.file;
 
 import org.smm.archetype.domain.common.file.FileBusiness;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileBusinessDO;
-import org.springframework.stereotype.Component;
 
 /**
  * 业务文件领域对象转换器
  *
  * <p>负责FileBusiness与FileBusinessDO之间的转换
+ * <p>通过ConverterConfigure配置类注册为Bean
  * @author Leonardo
  * @since 2026/01/10
  */
-@Component
 public class FileBusinessConverter {
 
     /**

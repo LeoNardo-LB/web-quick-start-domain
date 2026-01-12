@@ -168,6 +168,7 @@ public class EventConfigure implements AsyncConfigurer {
      * <p>包装具体的事件发布器，提供异步发布能力。
      *
      * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式，避免循环依赖）
+     * <p>注意：使用@Autowired(required=false)标记可选依赖，因为KafkaEventPublisher可能不存在
      * @param kafkaEventPublisher  Kafka事件发布器（可选）
      * @param springEventPublisher Spring事件发布器（可选）
      * @return 异步事件发布器
@@ -190,6 +191,7 @@ public class EventConfigure implements AsyncConfigurer {
      * <p>确保事件在事务提交后才发布。
      *
      * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式，避免循环依赖）
+     * <p>注意：使用@Autowired(required=false)标记可选依赖，因为KafkaEventPublisher可能不存在
      * @param kafkaEventPublisher  Kafka事件发布器（可选）
      * @param springEventPublisher Spring事件发布器（可选）
      * @return 事务性事件发布器

@@ -4,7 +4,6 @@ import org.smm.archetype.domain._example.order.model.OrderAggr;
 import org.smm.archetype.domain._example.order.model.OrderStatus;
 import org.smm.archetype.domain._example.order.model.PaymentMethod;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.OrderAggrDO;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
@@ -23,10 +22,10 @@ import java.math.BigDecimal;
  *   <li>DO → OrderAggr 转换由 OrderAggrRepositoryImpl 使用反射处理</li>
  *   <li>关联数据（items、address、contactInfo）需要额外查询</li>
  * </ul>
+ * <p>通过OrderConfigure配置类注册为Bean
  * @author Leonardo
  * @since 2026/1/11
  */
-@Component
 public class OrderAggrConverter {
 
     /**

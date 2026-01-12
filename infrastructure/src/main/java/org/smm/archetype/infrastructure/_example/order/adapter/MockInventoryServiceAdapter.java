@@ -48,24 +48,16 @@ public class MockInventoryServiceAdapter implements InventoryService {
         map.put("PRODUCT_002_SKU_001", 50);
         map.put("PRODUCT_003_SKU_001", 200);
         DEFAULT_INVENTORY = Collections.unmodifiableMap(map);
-        System.out.println("============ MockInventoryServiceAdapter static init: DEFAULT_INVENTORY size = " + DEFAULT_INVENTORY.size()
-                                   + " ============");
+        log.info("MockInventoryServiceAdapter static init: DEFAULT_INVENTORY size = {}", DEFAULT_INVENTORY.size());
     }
 
-    private Map<String, Integer> inventoryData;
+    private final Map<String, Integer> inventoryData;
 
     public MockInventoryServiceAdapter() {
         log.info("MockInventoryServiceAdapter Constructor called");
         // Initialize inventory data from static defaults
         this.inventoryData = new ConcurrentHashMap<>(DEFAULT_INVENTORY);
-        log.info("MockInventoryServiceAdapter initialized with {} inventory items in constructor", inventoryData.size());
-    }
-
-    @jakarta.annotation.PostConstruct
-    public void init() {
-        log.info("MockInventoryServiceAdapter @PostConstruct called");
-        this.inventoryData = new ConcurrentHashMap<>(DEFAULT_INVENTORY);
-        log.info("MockInventoryServiceAdapter initialized with {} inventory items from @PostConstruct", inventoryData.size());
+        log.info("MockInventoryServiceAdapter initialized with {} inventory items", inventoryData.size());
     }
 
     /**
@@ -81,11 +73,6 @@ public class MockInventoryServiceAdapter implements InventoryService {
             String orderNo,
             List<InventoryItem> inventoryItems
     ) throws InsufficientInventoryException {
-        // 直接使用静态DEFAULT_INVENTORY，避免实例字段初始化问题
-        if (this.inventoryData == null || this.inventoryData.isEmpty()) {
-            this.inventoryData = new ConcurrentHashMap<>(DEFAULT_INVENTORY);
-        }
-
         log.info("锁定库存开始: orderId={}, orderNo={}, itemCount={}",
                 orderId, orderNo, inventoryItems.size());
 
@@ -122,17 +109,11 @@ public class MockInventoryServiceAdapter implements InventoryService {
 
     @Override
     public boolean validateInventory(List<InventoryItem> inventoryItems) {
-        // 直接使用静态DEFAULT_INVENTORY，避免实例字段初始化问题
-        Map<String, Integer> inventoryToCheck = (this.inventoryData != null && !this.inventoryData.isEmpty())
-                                                        ? this.inventoryData
-                                                        : DEFAULT_INVENTORY;
-
-        log.info("验证库存开始: itemCount={}, usingInventory={}", inventoryItems.size(),
-                inventoryToCheck == DEFAULT_INVENTORY ? "DEFAULT_INVENTORY" : "instance");
+        log.info("验证库存开始: itemCount={}", inventoryItems.size());
 
         for (InventoryItem item : inventoryItems) {
             String key = item.productId() + "_" + item.skuCode();
-            Integer availableStock = inventoryToCheck.getOrDefault(key, 0);
+            Integer availableStock = inventoryData.getOrDefault(key, 0);
 
             log.info("检查库存: key={}, productId={}, skuCode={}, available={}, required={}",
                     key, item.productId(), item.skuCode(), availableStock, item.quantity());

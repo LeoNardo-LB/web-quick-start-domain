@@ -2,16 +2,15 @@ package org.smm.archetype.infrastructure.common.file;
 
 import org.smm.archetype.domain.common.file.FileMetadata;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileMetadataDO;
-import org.springframework.stereotype.Component;
 
 /**
  * 文件元数据领域对象转换器
  *
  * <p>负责FileMeta与FileMetadataDO之间的转换
+ * <p>通过ConverterConfigure配置类注册为Bean
  * @author Leonardo
  * @since 2026/01/10
  */
-@Component
 public class FileMetaConverter {
 
     /**
