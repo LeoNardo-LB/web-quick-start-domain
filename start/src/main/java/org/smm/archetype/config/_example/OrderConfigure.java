@@ -193,26 +193,9 @@ public class OrderConfigure {
         return new OrderCancelledEventHandler();
     }
 
-    // ==================== 转换器 ====================
-
-    /**
-     * 订单聚合根转换器Bean
-     * <p>职责：OrderAggr与OrderAggrDO之间的转换
-     * @return OrderAggrConverter
-     */
-    @Bean
-    public OrderAggrConverter orderAggrConverter() {
-        return new OrderAggrConverter();
-    }
-
-    /**
-     * 订单项转换器Bean
-     * <p>职责：OrderItem与OrderItemDO之间的转换
-     * @return OrderItemConverter
-     */
-    @Bean
-    public OrderItemConverter orderItemConverter() {
-        return new OrderItemConverter();
-    }
+    // ==================== 转换器说明 ====================
+    // 注意：OrderAggrConverter 和 OrderItemConverter 使用 MapStruct 自动生成
+    // 它们通过 @Mapper(componentModel = "spring") 注解自动注册为 Spring Bean
+    // 无需在此手动配置 @Bean 方法，可以直接使用 @Autowired 注入
 
 }

@@ -1,5 +1,7 @@
 package org.smm.archetype.app._example.order.command;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.smm.archetype.domain._shared.base.Command;
 
 /**
@@ -7,6 +9,8 @@ import org.smm.archetype.domain._shared.base.Command;
  * @author Leonardo
  * @since 2026/1/11
  */
+@Setter
+@Getter
 public class CancelOrderCommand implements Command {
 
     /**
@@ -24,22 +28,6 @@ public class CancelOrderCommand implements Command {
 
     public CancelOrderCommand(Long orderId, String reason) {
         this.orderId = orderId;
-        this.reason = reason;
-    }
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
         this.reason = reason;
     }
 

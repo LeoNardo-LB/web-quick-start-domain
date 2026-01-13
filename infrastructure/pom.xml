@@ -10,11 +10,18 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>infrastructure</artifactId>
+
     <dependencies>
         <!--系统依赖-->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>domain</artifactId>
+        </dependency>
+
+        <!-- MapStruct（版本由根POM的dependencyManagement管理）-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
         </dependency>
 
         <!-- MyBatis-Flex -->

@@ -1,12 +1,14 @@
 package org.smm.archetype.infrastructure._shared.event;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.smm.archetype.domain._shared.event.ConsumeStatus;
 import org.smm.archetype.domain._shared.event.EventConsumeRecord;
 import org.smm.archetype.domain._shared.event.EventPriority;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
 
 /**
- * 事件消费记录转换器
+ * 事件消费记录转换器（MapStruct实现）
  *
  * <p>负责在EventConsumeDO（Infrastructure层）和EventConsumeRecord（Domain层）之间转换。
  *
@@ -16,11 +18,13 @@ import org.smm.archetype.infrastructure._shared.generated.repository.entity.Even
  *   <li>App层需要使用Domain层的值对象</li>
  *   <li>转换逻辑集中在一个地方，便于维护</li>
  * </ul>
- * <p>通过ConverterConfigure配置类注册为Bean
+ *
+ * <p>通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
  * @author Leonardo
  * @since 2026/01/10
  */
-public class EventConsumeRecordConverter {
+@Mapper(componentModel = "spring")
+public interface EventConsumeRecordConverter {
 
     /**
      * 从EventConsumeDO转换为EventConsumeRecord
@@ -34,33 +38,16 @@ public class EventConsumeRecordConverter {
      * @param consumeDO 消费记录DO对象
      * @return 消费记录值对象
      */
-    public EventConsumeRecord from(EventConsumeDO consumeDO) {
-        if (consumeDO == null) {
-            return null;
-        }
-
-        return EventConsumeRecord.builder()
-                       .setEventId(consumeDO.getEventId())
-                       .setPriority(stringToEventPriority(consumeDO.getPriority()))
-                       .setIdempotentKey(consumeDO.getIdempotentKey())
-                       .setConsumerGroup(consumeDO.getConsumerGroup())
-                       .setConsumerName(consumeDO.getConsumerName())
-                       .setConsumeStatus(stringToConsumeStatus(consumeDO.getConsumeStatus()))
-                       .setConsumeTime(consumeDO.getConsumeTime())
-                       .setCompleteTime(consumeDO.getCompleteTime())
-                       .setNextRetryTime(consumeDO.getNextRetryTime())
-                       .setRetryTimes(consumeDO.getRetryTimes())
-                       .setMaxRetryTimes(consumeDO.getMaxRetryTimes())
-                       .setErrorMessage(consumeDO.getErrorMessage())
-                       .setCreateTime(consumeDO.getCreateTime())
-                       .setVersion(consumeDO.getVersion())
-                       .build();
-    }
+    @Mapping(target = "priority", expression = "java(stringToEventPriority(consumeDO.getPriority()))")
+    @Mapping(target = "consumeStatus", expression = "java(stringToConsumeStatus(consumeDO.getConsumeStatus()))")
+    EventConsumeRecord from(EventConsumeDO consumeDO);
 
     /**
      * 字符串转EventPriority枚举
+     * @param priority 优先级字符串
+     * @return EventPriority枚举
      */
-    private EventPriority stringToEventPriority(String priority) {
+    default EventPriority stringToEventPriority(String priority) {
         if (priority == null) {
             return null;
         }
@@ -69,8 +56,10 @@ public class EventConsumeRecordConverter {
 
     /**
      * 字符串转ConsumeStatus枚举
+     * @param consumeStatus 消费状态字符串
+     * @return ConsumeStatus枚举
      */
-    private ConsumeStatus stringToConsumeStatus(String consumeStatus) {
+    default ConsumeStatus stringToConsumeStatus(String consumeStatus) {
         if (consumeStatus == null) {
             return null;
         }

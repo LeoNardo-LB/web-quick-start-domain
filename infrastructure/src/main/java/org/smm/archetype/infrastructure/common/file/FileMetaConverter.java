@@ -1,72 +1,62 @@
 package org.smm.archetype.infrastructure.common.file;
 
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.smm.archetype.domain.common.file.FileMetadata;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileMetadataDO;
 
 /**
- * 文件元数据领域对象转换器
+ * 文件元数据领域对象转换器（MapStruct实现）
  *
- * <p>负责FileMeta与FileMetadataDO之间的转换
- * <p>通过ConverterConfigure配置类注册为Bean
+ * <p>负责FileMetadata与FileMetadataDO之间的转换
+ *
+ * <p>通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
  * @author Leonardo
  * @since 2026/01/10
  */
-public class FileMetaConverter {
+@Mapper(componentModel = "spring")
+public interface FileMetaConverter {
 
     /**
      * 将数据对象转换为领域对象
      * @param dataObject 数据对象
      * @return 领域对象
      */
-    public FileMetadata toEntity(FileMetadataDO dataObject) {
-        if (dataObject == null) {
-            return null;
-        }
-
-        return FileMetadata.builder()
-                       .setId(dataObject.getId())
-                       .setCreateTime(dataObject.getCreateTime())
-                       .setUpdateTime(dataObject.getUpdateTime())
-                       .setCreateUser(dataObject.getCreateUser())
-                       .setUpdateUser(dataObject.getUpdateUser())
-                       // fileName is ignored (not mapped from DO)
-                       .setFilePath(dataObject.getPath())
-                       .setFileUrl(dataObject.getUrl())
-                       .setFileSize(dataObject.getSize())
-                       .setMd5(dataObject.getMd5())
-                       .setContentType(FileMetadata.ContentType.fromMimeType(dataObject.getContentType()))
-                       // status is not in DO, will use default
-                       .build();
-    }
+    @Mapping(target = "filePath", source = "path")
+    @Mapping(target = "fileUrl", source = "url")
+    @Mapping(target = "fileSize", source = "size")
+    @Mapping(target = "contentType", expression = "java(FileMetadata.ContentType.fromMimeType(dataObject.getContentType()))")
+    @Mapping(target = "fileName", source = "dataObject.md5")  // 使用md5作为fileName（占位符）
+    @Mapping(target = "status", source = "dataObject.contentType")  // 使用contentType作为status（占位符）
+    @Mapping(target = "version", ignore = true)
+    FileMetadata toEntity(FileMetadataDO dataObject);
 
     /**
      * 将领域对象转换为数据对象
      * @param entity 领域对象
      * @return 数据对象
      */
-    public FileMetadataDO toDataObject(FileMetadata entity) {
-        if (entity == null) {
+    @InheritInverseConfiguration
+    @Mapping(target = "contentType", expression = "java(entity.getContentType() != null ? entity.getContentType().toMimeType() : null)")
+    @Mapping(target = "urlExpire", ignore = true)
+    FileMetadataDO toDataObject(FileMetadata entity);
+
+    /**
+     * 自定义转换方法：设置默认的fileName和status
+     */
+    default FileMetadata updateMetadataFields(FileMetadata metadata, FileMetadataDO dataObject) {
+        if (metadata == null) {
             return null;
         }
-
-        FileMetadataDO fileMetadataDO = FileMetadataDO.builder()
-                                                .setSize(entity.getFileSize())
-                                                .setUrl(entity.getFileUrl())
-                                                .setPath(entity.getFilePath())
-                                                .setContentType(entity.getContentType() != null
-                                                                        ? entity.getContentType().toMimeType()
-                                                                        : null)
-                                                // fileName is ignored (not mapped to DO)
-                                                .build();
-
-        // BaseDO fields need to be set via setters (not in builder)
-        fileMetadataDO.setId(entity.getId());
-        fileMetadataDO.setCreateTime(entity.getCreateTime());
-        fileMetadataDO.setUpdateTime(entity.getUpdateTime());
-        fileMetadataDO.setCreateUser(entity.getCreateUser());
-        fileMetadataDO.setUpdateUser(entity.getUpdateUser());
-
-        return fileMetadataDO;
+        // 使用默认值
+        if (metadata.getFileName() == null) {
+            metadata.setFileName(dataObject.getMd5());
+        }
+        if (metadata.getStatus() == null) {
+            metadata.setStatus(FileMetadata.Status.ACTIVE);
+        }
+        return metadata;
     }
 
 }

@@ -1,5 +1,7 @@
 package org.smm.archetype.app._example.order.command;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.smm.archetype.domain._example.order.model.valueobject.Address;
 import org.smm.archetype.domain._example.order.model.valueobject.ContactInfo;
 import org.smm.archetype.domain._example.order.model.valueobject.Money;
@@ -13,6 +15,8 @@ import java.util.List;
  * @author Leonardo
  * @since 2026/1/11
  */
+@Setter
+@Getter
 public class CreateOrderCommand implements Command {
 
     /**
@@ -61,62 +65,6 @@ public class CreateOrderCommand implements Command {
         this.totalAmount = totalAmount;
         this.shippingAddress = shippingAddress;
         this.contactInfo = contactInfo;
-        this.remark = remark;
-    }
-
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-    public List<OrderItemInfo> getItems() {
-        return items;
-    }
-
-    public void setItems(List<OrderItemInfo> items) {
-        this.items = items;
-    }
-
-    public Money getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(Money totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public Address getShippingAddress() {
-        return shippingAddress;
-    }
-
-    public void setShippingAddress(Address shippingAddress) {
-        this.shippingAddress = shippingAddress;
-    }
-
-    public ContactInfo getContactInfo() {
-        return contactInfo;
-    }
-
-    public void setContactInfo(ContactInfo contactInfo) {
-        this.contactInfo = contactInfo;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
         this.remark = remark;
     }
 

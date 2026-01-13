@@ -264,8 +264,9 @@ public class XxxAggrRepositoryImpl implements XxxAggrRepository {
 
 **作用**
 
-- 自动生成Domain ↔ DO转换代码
-- 避免手动编写样板代码
+- 使用MapStruct自动生成Domain ↔ DO转换代码
+- 避免手动编写样板代码（减少70%-80%）
+- 编译期类型安全检查
 
 **职责**
 
@@ -276,85 +277,197 @@ public class XxxAggrRepositoryImpl implements XxxAggrRepository {
 
 **编写要点**
 
-1. 普通Java类（不使用@Mapper注解）
-2. 提供`toDO()`方法（Domain → DO）
-3. 提供`updateDO()`方法（更新DO）
-4. 提供`toDomain()`方法（DO → Domain，可选）
-5. 处理null值
+1. 使用 `@Mapper(componentModel = "spring")` 注解
+2. 定义接口（MapStruct自动生成实现类）
+3. 提供 `toDO()` 方法（Domain → DO）
+4. 提供 `updateDO()` 方法（更新DO）
+5. 提供 `toDomain()` 方法（DO → Domain，可选）
+6. 使用 `@Mapping` 注解定义字段映射规则
+7. 使用 `default` 方法实现自定义转换逻辑
 
 **伪代码示例**
 
 ```java
-// DO转换器基本结构
-public class XxxAggrConverter {
+// DO转换器基本结构（MapStruct方式）
+@Mapper(
+    componentModel = "spring",
+    imports = {XxxStatus.class}
+)
+public interface XxxAggrConverter {
 
     // Domain → DO（用于新增）
-    public XxxDO toDO(XxxAggr aggr) {
-        if (aggr == null) {
-            return null;
-        }
-
-        return XxxDO.builder()
-                       .id(aggr.getId().getValue())
-                       .name(aggr.getName())
-                       .status(aggr.getStatus().name())
-                       .amount(aggr.getMoney().getAmount())
-                       .currency(aggr.getMoney().getCurrency())
-                       .build();
-    }
+    @Mapping(target = "amount", source = "money.amount")
+    @Mapping(target = "status", expression = "java(aggr.getStatus().name())")
+    XxxDO toDO(XxxAggr aggr);
 
     // 更新DO（用于修改）
-    public void updateDO(XxxAggr aggr, XxxDO xxxDO) {
-        if (aggr == null || xxxDO == null) {
-            return;
-        }
-
-        xxxDO.setName(aggr.getName());
-        xxxDO.setStatus(aggr.getStatus().name());
-        xxxDO.setAmount(aggr.getMoney().getAmount());
-        xxxDO.setCurrency(aggr.getMoney().getCurrency());
-        // 不更新id和createTime
-    }
+    @Mapping(target = "amount", source = "money.amount")
+    @Mapping(target = "status", expression = "java(aggr.getStatus().name())")
+    @Mapping(target = "id", ignore = true)  // 不更新id
+    @Mapping(target = "createTime", ignore = true)  // 不更新createTime
+    void updateDO(XxxAggr aggr, @MappingTarget XxxDO xxxDO);
 
     // DO → Domain（可选）
-    public XxxAggr toDomain(XxxDO xxxDO) {
-        if (xxxDO == null) {
-            return null;
-        }
+    @InheritInverseConfiguration
+    @Mapping(target = "money", expression = "java(Money.of(xxxDO.getAmount(), xxxDO.getCurrency()))")
+    XxxAggr toDomain(XxxDO xxxDO);
 
-        // 使用反射或其他方式重建聚合根
-        return XxxAggr.reconstitute(
-                XxxId.of(xxxDO.getId()),
-                xxxDO.getName(),
-                XxxStatus.valueOf(xxxDO.getStatus()),
-                Money.of(xxxDO.getAmount(), xxxDO.getCurrency())
-        );
-    }
-
-    // 处理嵌套对象
-    private List<XxxItemDO> toItemDOs(List<XxxItem> items) {
-        if (items == null) {
-            return new ArrayList<>();
-        }
-        return items.stream()
-                       .map(this::toItemDO)
-                       .collect(Collectors.toList());
+    // 自定义枚举转换方法（default方法）
+    default XxxStatus stringToXxxStatus(String status) {
+        return status == null ? null : XxxStatus.valueOf(status);
     }
 
 }
 ```
 
+**实际使用示例**
+
+```java
+// 示例：OrderAggrConverter
+@Mapper(
+    componentModel = "spring",
+    imports = {OrderStatus.class, PaymentMethod.class}
+)
+public interface OrderAggrConverter {
+
+    /**
+     * 领域对象转DO（用于新增）
+     */
+    @Mapping(target = "totalAmount", source = "totalAmount.amount")
+    @Mapping(target = "status", expression = "java(order.getStatus().name())")
+    @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod().name())")
+    OrderAggrDO toDO(OrderAggr order);
+
+    /**
+     * 更新DO（用于修改）
+     */
+    @Mapping(target = "totalAmount", source = "totalAmount.amount")
+    @Mapping(target = "status", expression = "java(order.getStatus().name())")
+    @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod().name())")
+    @Mapping(target = "id", source = "order.id")
+    @Mapping(target = "createTime", source = "order.createTime")
+    @Mapping(target = "updateTime", source = "order.updateTime")
+    void updateDO(OrderAggr order, @MappingTarget OrderAggrDO orderDO);
+
+}
+```
+
+**MapStruct常用注解**
+
+| 注解                             | 说明                | 示例                                                           |
+|--------------------------------|-------------------|--------------------------------------------------------------|
+| `@Mapper`                      | 标记接口为MapStruct转换器 | `@Mapper(componentModel = "spring")`                         |
+| `@Mapping`                     | 定义字段映射规则          | `@Mapping(target = "amount", source = "money.amount")`       |
+| `@InheritInverseConfiguration` | 继承反向映射配置          | `@InheritInverseConfiguration`                               |
+| `@MappingTarget`               | 标记更新方法的目标参数       | `void updateDO(Order order, @MappingTarget OrderDO orderDO)` |
+| `@BeanMapping`                 | 定义Bean级别的映射规则     | `@BeanMapping(ignoreByDefault = true)`                       |
+
+**Maven配置**
+
+```xml
+<!-- infrastructure/pom.xml -->
+<properties>
+    <mapstruct.version>1.6.4</mapstruct.version>
+    <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+</properties>
+
+<dependencies>
+<!-- MapStruct依赖 -->
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct</artifactId>
+    <version>${mapstruct.version}</version>
+</dependency>
+</dependencies>
+
+<build>
+<plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+            <annotationProcessorPaths>
+                <!-- Lombok -->
+                <path>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                    <version>${lombok.version}</version>
+                </path>
+                <!-- MapStruct -->
+                <path>
+                    <groupId>org.mapstruct</groupId>
+                    <artifactId>mapstruct-processor</artifactId>
+                    <version>${mapstruct.version}</version>
+                </path>
+                <!-- Lombok + MapStruct 绑定 -->
+                <path>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok-mapstruct-binding</artifactId>
+                    <version>${lombok-mapstruct-binding.version}</version>
+                </path>
+            </annotationProcessorPaths>
+        </configuration>
+    </plugin>
+</plugins>
+</build>
+```
+
 **与其他组件协作**
 
 - 被RepositoryImpl调用
-- 自动生成转换代码（不使用MapStruct注解处理器）
-- 避免手动编写样板代码
+- MapStruct自动生成实现类（如 `XxxAggrConverterImpl`）
+- 自动注册为Spring Bean（`@Mapper(componentModel = "spring")`）
+- 支持依赖注入（使用 `@Autowired` 或构造器注入）
+
+**使用方式**
+
+```java
+// 在RepositoryImpl中注入Converter
+@RequiredArgsConstructor
+public class OrderAggrRepositoryImpl implements OrderAggrRepository {
+
+    private final OrderAggrMapper orderAggrMapper;   // MyBatis Mapper
+    private final OrderAggrConverter orderAggrConverter;  // MapStruct Converter（自动注入）
+
+    @Override
+    public OrderAggr save(OrderAggr order) {
+        // 转换为DO
+        OrderAggrDO orderDO = orderAggrConverter.toDO(order);
+
+        // 保存到数据库
+        orderAggrMapper.insert(orderDO);
+
+        return order;
+    }
+
+    @Override
+    public void update(OrderAggr order) {
+        // 查询DO
+        OrderAggrDO orderDO = orderAggrMapper.selectOneById(order.getId());
+
+        // 更新DO
+        orderAggrConverter.updateDO(order, orderDO);
+
+        // 保存到数据库
+        orderAggrMapper.update(orderDO);
+    }
+}
+```
 
 **边界**
 
 - 只做转换，不包含业务逻辑
-- 处理null值判断
+- MapStruct自动生成空值检查
 - 不访问数据库
+- 放在 `infrastructure/.../converter/` 包下
+
+**优势**
+
+1. **类型安全**：编译期生成代码，字段映射错误在编译期发现
+2. **性能优异**：无反射开销，性能接近手动编写的代码
+3. **代码简洁**：减少70%-80%的样板代码
+4. **维护性高**：字段新增/修改时，MapStruct自动检测编译错误
+5. **灵活性**：支持复杂映射（嵌套对象、集合、自定义转换）
 
 ---
 

@@ -1,42 +1,36 @@
 package org.smm.archetype.infrastructure._example.order.persistence.converter;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.smm.archetype.domain._example.order.model.OrderItem;
 import org.smm.archetype.domain._example.order.model.valueobject.Money;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.OrderItemDO;
 
 /**
- * 订单项转换器
+ * 订单项转换器（MapStruct实现）
  *
  * <p>职责：
  * <ul>
- *   <li>OrderItem与OrderItemDO之间的转换</li>
+ *   <li>OrderItem（领域对象） → OrderItemDO（数据对象）</li>
+ *   <li>OrderItemDO（数据对象） → OrderItem（领域对象）</li>
+ *   <li>处理值对象转换（Money）</li>
  * </ul>
- * <p>通过OrderConfigure配置类注册为Bean
+ *
+ * <p>通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
  * @author Leonardo
  * @since 2026/1/11
  */
-public class OrderItemConverter {
+@Mapper(componentModel = "spring", imports = {Money.class})
+public interface OrderItemConverter {
 
     /**
      * DO转领域对象
+     * @param itemDO 订单项DO
+     * @return 订单项领域对象
      */
-    public OrderItem toDomain(OrderItemDO itemDO) {
-        if (itemDO == null) {
-            return null;
-        }
-
-        return OrderItem.builder()
-                       .setId(itemDO.getId())
-                       .setProductId(itemDO.getProductId())
-                       .setProductName(itemDO.getProductName())
-                       .setSkuCode(itemDO.getSkuCode())
-                       .setUnitPrice(itemDO.getUnitPrice() != null ? Money.of(itemDO.getUnitPrice()) : null)
-                       .setQuantity(itemDO.getQuantity())
-                       .setCurrency(itemDO.getCurrency())
-                       .setSubtotal(itemDO.getSubtotal() != null ? Money.of(itemDO.getSubtotal()) : null)
-                       .setCreateTime(itemDO.getCreateTime())
-                       .setUpdateTime(itemDO.getUpdateTime())
-                       .build();
-    }
+    @Mapping(target = "unitPrice", expression = "java(itemDO.getUnitPrice() != null ? Money.of(itemDO.getUnitPrice()) : null)")
+    @Mapping(target = "subtotal", expression = "java(itemDO.getSubtotal() != null ? Money.of(itemDO.getSubtotal()) : null)")
+    @Mapping(target = "version", ignore = true)
+    OrderItem toDomain(OrderItemDO itemDO);
 
 }

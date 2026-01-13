@@ -1,14 +1,15 @@
 package org.smm.archetype.infrastructure._example.order.persistence.converter;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.smm.archetype.domain._example.order.model.OrderAggr;
 import org.smm.archetype.domain._example.order.model.OrderStatus;
 import org.smm.archetype.domain._example.order.model.PaymentMethod;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.OrderAggrDO;
 
-import java.math.BigDecimal;
-
 /**
- * 订单聚合根DO转换器
+ * 订单聚合根DO转换器（MapStruct实现）
  *
  * <p>职责：
  * <ul>
@@ -22,95 +23,45 @@ import java.math.BigDecimal;
  *   <li>DO → OrderAggr 转换由 OrderAggrRepositoryImpl 使用反射处理</li>
  *   <li>关联数据（items、address、contactInfo）需要额外查询</li>
  * </ul>
- * <p>通过OrderConfigure配置类注册为Bean
+ *
+ * <p>通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
  * @author Leonardo
  * @since 2026/1/11
  */
-public class OrderAggrConverter {
+@Mapper(
+        componentModel = "spring",
+        imports = {OrderStatus.class, PaymentMethod.class}
+)
+public interface OrderAggrConverter {
 
     /**
      * 领域对象转DO（用于新增）
      * @param order 订单聚合根
      * @return 订单DO
      */
-    public OrderAggrDO toDO(OrderAggr order) {
-        if (order == null) {
-            return null;
-        }
-
-        return OrderAggrDO.builder()
-                       .totalAmount(orderTotalAmountAmount(order))
-                       .status(statusToString(order.getStatus()))
-                       .paymentMethod(paymentMethodToString(order.getPaymentMethod()))
-                       .orderNo(order.getOrderNo())
-                       .customerId(order.getCustomerId())
-                       .customerName(order.getCustomerName())
-                       .currency(order.getCurrency())
-                       .remark(order.getRemark())
-                       .build();
-    }
+    @Mapping(target = "totalAmount", source = "totalAmount.amount")
+    @Mapping(target = "status", expression = "java(order.getStatus().name())")
+    @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod().name())")
+    OrderAggrDO toDO(OrderAggr order);
 
     /**
      * 更新DO（用于修改）
      * @param order   订单聚合根
-     * @param orderDO 订单DO
+     * @param orderDO 订单DO（更新目标）
      */
-    public void updateDO(OrderAggr order, OrderAggrDO orderDO) {
-        if (order == null || orderDO == null) {
-            return;
-        }
-
-        orderDO.setTotalAmount(orderTotalAmountAmount(order));
-        orderDO.setStatus(statusToString(order.getStatus()));
-        orderDO.setPaymentMethod(paymentMethodToString(order.getPaymentMethod()));
-        orderDO.setId(order.getId());
-        orderDO.setCreateTime(order.getCreateTime());
-        orderDO.setUpdateTime(order.getUpdateTime());
-        orderDO.setCreateUser(order.getCreateUser());
-        orderDO.setUpdateUser(order.getUpdateUser());
-        orderDO.setOrderNo(order.getOrderNo());
-        orderDO.setCustomerId(order.getCustomerId());
-        orderDO.setCustomerName(order.getCustomerName());
-        orderDO.setCurrency(order.getCurrency());
-        orderDO.setRemark(order.getRemark());
-    }
-
-    // ==================== 私有转换方法 ====================
-
-    /**
-     * 获取订单总金额数值
-     * @param orderAggr 订单聚合根
-     * @return 金额数值
-     */
-    private BigDecimal orderTotalAmountAmount(OrderAggr orderAggr) {
-        if (orderAggr == null || orderAggr.getTotalAmount() == null) {
-            return null;
-        }
-        return orderAggr.getTotalAmount().getAmount();
-    }
-
-    /**
-     * OrderStatus → String
-     * @param status 订单状态
-     * @return 字符串
-     */
-    private String statusToString(OrderStatus status) {
-        if (status == null) {
-            return null;
-        }
-        return status.name();
-    }
-
-    /**
-     * PaymentMethod → String
-     * @param method 支付方式
-     * @return 字符串
-     */
-    private String paymentMethodToString(PaymentMethod method) {
-        if (method == null) {
-            return null;
-        }
-        return method.name();
-    }
+    @Mapping(target = "totalAmount", source = "totalAmount.amount")
+    @Mapping(target = "status", expression = "java(order.getStatus().name())")
+    @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod().name())")
+    @Mapping(target = "id", source = "order.id")
+    @Mapping(target = "createTime", source = "order.createTime")
+    @Mapping(target = "updateTime", source = "order.updateTime")
+    @Mapping(target = "createUser", source = "order.createUser")
+    @Mapping(target = "updateUser", source = "order.updateUser")
+    @Mapping(target = "orderNo", source = "order.orderNo")
+    @Mapping(target = "customerId", source = "order.customerId")
+    @Mapping(target = "customerName", source = "order.customerName")
+    @Mapping(target = "currency", source = "order.currency")
+    @Mapping(target = "remark", source = "order.remark")
+    void updateDO(OrderAggr order, @MappingTarget OrderAggrDO orderDO);
 
 }
