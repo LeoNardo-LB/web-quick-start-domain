@@ -28,6 +28,7 @@
         <java.version>25</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <!--springboot3 使用 2.x；springboot4 使用 3.0.0-->
         <spring-doc.version>2.8.14</spring-doc.version>
         <mybatis-flex.version>1.11.5</mybatis-flex.version>

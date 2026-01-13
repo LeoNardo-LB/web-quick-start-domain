@@ -1267,9 +1267,7 @@ public class OrderDomainService {
  * 💡 职责：用例编排、事务管理、DTO转换、事件发布
  */
 @Slf4j
-public class Order
-
-AppService {
+public class OrderAppService {
 
     private final OrderAggrRepository orderRepository;
     private final OrderDomainService  orderDomainService;
@@ -1455,15 +1453,8 @@ public class GetOrderByIdQuery {
  * 查询客户订单列表
  */
 @Getter
-public class Get {
-
-    业务
-}
-
-ByCustomerQuery {
-
+public class GetOrderByCustomerQuery {
     private final String customerId;
-
 }
 ```
 
@@ -1517,28 +1508,12 @@ public interface InventoryService {
     /**
      * 锁定库存
      */
-    void lockInventory(Long Order
-
-    Id,
-
-                       String Order
-
-    No,List<
-
-                    Order
-
-    ItemInfo>items);
+    void lockInventory(Long OrderId, String OrderNo, List<OrderItemInfo> items);
 
     /**
      * 释放库存
      */
-    void releaseInventory(Long Order
-
-    Id,
-
-                          String Order
-
-    No);
+    void releaseInventory(Long OrderId, String OrderNo);
 
 }
 ```
@@ -1564,32 +1539,12 @@ public class MockInventoryServiceAdapter implements InventoryService {
     }
 
     @Override
-    public void lockInventory(Long Order
-
-    Id,
-
-                              String Order
-
-    No,List<
-
-                    Order
-
-    ItemInfo>items)
-
-    {
+    public void lockInventory(Long OrderId, String OrderNo, List<OrderItemInfo> items) {
         // 调用外部库存服务锁定库存
     }
 
     @Override
-    public void releaseInventory(Long Order
-
-    Id,
-
-                                 String Order
-
-    No)
-
-    {
+    public void releaseInventory(Long OrderId, String OrderNo) {
         // 调用外部库存服务释放库存
     }
 
@@ -1890,7 +1845,6 @@ stop
 1. **创建值对象类**
 
 ```java
-
 @Getter
 public class Money extends ValueObject {
 
@@ -1917,9 +1871,7 @@ public class Money extends ValueObject {
 2. **在聚合根中使用**
 
 ```java
-public class OrderAggr extends
-
-AggregateRoot {
+public class OrderAggr extends AggregateRoot {
 
     private Money totalAmount;
 
@@ -1938,13 +1890,11 @@ AggregateRoot {
 2. **创建领域服务类**
 
 ```java
-public class Order
-
-DomainService {
+public class OrderDomainService {
 
     private final InventoryService inventoryService;
 
-    public void validateInventory(List<Order ItemInfo >items) {
+    public void validateInventory(List<OrderItemInfo> items) {
         // 跨聚合的业务规则
     }
 
@@ -1954,17 +1904,12 @@ DomainService {
 3. **配置Bean**
 
 ```java
-
 @Configuration
-public class Order
-
-Configure {
+public class OrderConfigure {
 
     @Bean
-    public Order DomainService
-
-    Order DomainService(InventoryService inventoryService) {
-        return new Order DomainService(inventoryService);
+    public OrderDomainService orderDomainService(InventoryService inventoryService) {
+        return new OrderDomainService(inventoryService);
     }
 
 }

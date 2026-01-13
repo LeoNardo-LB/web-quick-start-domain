@@ -41,7 +41,7 @@
 
 ```java
 // ❌ 错误：配置类在adapter模块
-package {adapter}#{groupId}.adapter.{业务模块}.config;
+package {groupId}.adapter.{业务模块}.config;
 
 @Configuration
 public class {业务}
@@ -157,8 +157,8 @@ mvn spring-boot:run -pl start
 1. [文档导航](#文档导航)
 2. [开发工作流](#开发工作流)
 3. [故障排查指南](#故障排查指南)
-5. [代码质量标准](#代码质量标准)
-6. [常见问题FAQ](#常见问题faq)
+4. [代码质量标准](#代码质量标准)
+5. [常见问题FAQ](#常见问题faq)
 
 ---
 
