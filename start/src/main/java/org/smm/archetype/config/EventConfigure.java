@@ -15,7 +15,6 @@ import org.smm.archetype.infrastructure._shared.event.publisher.SpringEventPubli
 import org.smm.archetype.infrastructure._shared.event.publisher.TransactionalEventPublisher;
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +31,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
 /**
@@ -168,19 +168,26 @@ public class EventConfigure implements AsyncConfigurer {
      * <p>包装具体的事件发布器，提供异步发布能力。
      *
      * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式，避免循环依赖）
-     * <p>注意：使用@Autowired(required=false)标记可选依赖，因为KafkaEventPublisher可能不存在
+     * <p>使用Optional处理可选依赖，因为KafkaEventPublisher可能不存在
      * @param kafkaEventPublisher  Kafka事件发布器（可选）
      * @param springEventPublisher Spring事件发布器（可选）
      * @return 异步事件发布器
      */
     @Bean
     public AsyncEventPublisher asyncEventPublisher(
-            @Autowired(required = false) final KafkaEventPublisher kafkaEventPublisher,
-            @Autowired(required = false) final SpringEventPublisher springEventPublisher) {
+            final Optional<KafkaEventPublisher> kafkaEventPublisher,
+            final Optional<SpringEventPublisher> springEventPublisher) {
 
         // 根据哪个Bean存在，选择作为被包装对象
         // Spring的条件装配确保只有一个不为null
-        EventPublisher delegate = (kafkaEventPublisher != null) ? kafkaEventPublisher : springEventPublisher;
+        EventPublisher delegate;
+        if (kafkaEventPublisher.isPresent()) {
+            delegate = kafkaEventPublisher.get();
+        } else {
+            delegate = springEventPublisher
+                               .orElseThrow(() -> new IllegalStateException(
+                                       "Neither KafkaEventPublisher nor SpringEventPublisher is available"));
+        }
 
         return new AsyncEventPublisher(delegate);
     }
@@ -191,19 +198,26 @@ public class EventConfigure implements AsyncConfigurer {
      * <p>确保事件在事务提交后才发布。
      *
      * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式，避免循环依赖）
-     * <p>注意：使用@Autowired(required=false)标记可选依赖，因为KafkaEventPublisher可能不存在
+     * <p>使用Optional处理可选依赖，因为KafkaEventPublisher可能不存在
      * @param kafkaEventPublisher  Kafka事件发布器（可选）
      * @param springEventPublisher Spring事件发布器（可选）
      * @return 事务性事件发布器
      */
     @Bean
     public TransactionalEventPublisher transactionalEventPublisher(
-            @Autowired(required = false) final KafkaEventPublisher kafkaEventPublisher,
-            @Autowired(required = false) final SpringEventPublisher springEventPublisher) {
+            final Optional<KafkaEventPublisher> kafkaEventPublisher,
+            final Optional<SpringEventPublisher> springEventPublisher) {
 
         // 根据哪个Bean存在，选择作为被包装对象
         // Spring的条件装配确保只有一个不为null
-        EventPublisher delegate = (kafkaEventPublisher != null) ? kafkaEventPublisher : springEventPublisher;
+        EventPublisher delegate;
+        if (kafkaEventPublisher.isPresent()) {
+            delegate = kafkaEventPublisher.get();
+        } else {
+            delegate = springEventPublisher
+                               .orElseThrow(() -> new IllegalStateException(
+                                       "Neither KafkaEventPublisher nor SpringEventPublisher is available"));
+        }
 
         return new TransactionalEventPublisher(delegate);
     }

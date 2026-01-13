@@ -22,7 +22,6 @@ import org.smm.archetype.infrastructure._shared.generated.repository.mapper.Orde
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.OrderAggrMapper;
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.OrderContactInfoMapper;
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.OrderItemMapper;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -51,7 +50,6 @@ import java.util.stream.Collectors;
  * @since 2026/1/11
  */
 @Slf4j
-@Repository
 @RequiredArgsConstructor
 public class OrderAggrRepositoryImpl implements OrderAggrRepository {
 

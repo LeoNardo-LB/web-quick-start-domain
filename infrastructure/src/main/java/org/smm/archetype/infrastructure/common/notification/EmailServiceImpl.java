@@ -20,13 +20,15 @@ import java.util.UUID;
  *   <li>配置服务商账号信息</li>
  * </ul>
  *
- * <p>示例接入：
+ * <p>示例接入（实现类）：
  * <pre>{@code
- * @Service
- * @RequiredArgsConstructor
- * public class EmailServiceImpl extends AbstractEmailService {
+ * public class CustomEmailServiceImpl extends AbstractEmailService {
  *
  *     private final JavaMailSender mailSender;
+ *
+ *     public CustomEmailServiceImpl(JavaMailSender mailSender) {
+ *         this.mailSender = mailSender;
+ *     }
  *
  *     @Override
  *     protected EmailResult doSendEmail(EmailRequest request, ServiceProvider provider) {
@@ -34,10 +36,23 @@ import java.util.UUID;
  *         MimeMessageHelper helper = new MimeMessageHelper(message, true);
  *         helper.setTo(request.getTo().toArray(new String[0]));
  *         helper.setSubject(request.getSubject());
- *         helper.setText(request.getBody(), true);
+ *         helper.setText(request.getHtmlBody(), true);
  *         mailSender.send(message);
  *
  *         return EmailResult.success(UUID.randomUUID().toString());
+ *     }
+ * }
+ * }</pre>
+ *
+ * <p>示例接入（配置类注册）：
+ * <pre>{@code
+ * @Configuration
+ * public class NotificationConfigure {
+ *
+ *     @Bean
+ *     @ConditionalOnProperty(prefix = "notification.email", name = "enabled", havingValue = "true")
+ *     public EmailService emailService(JavaMailSender mailSender) {
+ *         return new CustomEmailServiceImpl(mailSender);
  *     }
  * }
  * }</pre>

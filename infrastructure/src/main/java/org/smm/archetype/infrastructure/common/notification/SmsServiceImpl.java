@@ -20,13 +20,15 @@ import java.util.UUID;
  *   <li>配置服务商账号信息</li>
  * </ul>
  *
- * <p>示例接入（阿里云短信）：
+ * <p>示例接入（实现类）：
  * <pre>{@code
- * @Service
- * @RequiredArgsConstructor
- * public class SmsServiceImpl extends AbstractSmsService {
+ * public class AliyunSmsServiceImpl extends AbstractSmsService {
  *
  *     private final SendSmsRequest smsClient;
+ *
+ *     public AliyunSmsServiceImpl(SendSmsRequest smsClient) {
+ *         this.smsClient = smsClient;
+ *     }
  *
  *     @Override
  *     protected SmsResult doSendSms(SmsRequest request, ServiceProvider provider) {
@@ -38,6 +40,19 @@ import java.util.UUID;
  *         SendSmsResponse response = smsClient.send(req);
  *
  *         return SmsResult.success(response.getRequestId());
+ *     }
+ * }
+ * }</pre>
+ *
+ * <p>示例接入（配置类注册）：
+ * <pre>{@code
+ * @Configuration
+ * public class NotificationConfigure {
+ *
+ *     @Bean
+ *     @ConditionalOnProperty(prefix = "notification.sms", name = "enabled", havingValue = "true")
+ *     public SmsService smsService(SendSmsRequest smsClient) {
+ *         return new AliyunSmsServiceImpl(smsClient);
  *     }
  * }
  * }</pre>

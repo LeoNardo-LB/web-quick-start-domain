@@ -1,4 +1,4 @@
-package org.smm.archetype.config;
+package org.smm.archetype.config._example;
 
 import org.smm.archetype.adapter._example.order.listener.OrderCancelledEventHandler;
 import org.smm.archetype.adapter._example.order.listener.OrderCreatedEventHandler;
@@ -11,18 +11,25 @@ import org.smm.archetype.domain._example.order.service.OrderDomainService;
 import org.smm.archetype.domain._example.order.service.PaymentGateway;
 import org.smm.archetype.domain._shared.event.EventPublisher;
 import org.smm.archetype.infrastructure._example.order.adapter.MockInventoryServiceAdapter;
+import org.smm.archetype.infrastructure._example.order.adapter.StripePaymentAdapter;
 import org.smm.archetype.infrastructure._example.order.persistence.OrderAggrRepositoryImpl;
 import org.smm.archetype.infrastructure._example.order.persistence.converter.OrderAggrConverter;
 import org.smm.archetype.infrastructure._example.order.persistence.converter.OrderItemConverter;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.OrderAddressMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.OrderAggrMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.OrderContactInfoMapper;
+import org.smm.archetype.infrastructure._shared.generated.repository.mapper.OrderItemMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 订单聚合根配置
+ * 订单聚合根配置（示例）
  *
  * <p>聚合根：OrderAggr
+ *
  * <p>职责：
  * <ul>
  *   <li>注册订单相关的所有Bean：应用服务、仓储实现、领域服务、事件处理器、中间件服务</li>
@@ -33,9 +40,16 @@ import org.springframework.context.annotation.Configuration;
  * <p>设计原则：
  * <ul>
  *   <li>按聚合根命名配置类（OrderAggr → OrderConfigure）</li>
- *   <li>使用 @Configuration + @Bean 模式</li>
- *   <li>配置类位于 start/src/main/java/org/smm/archetype/config/</li>
+ *   <li>使用 @Configuration + @Bean 模式（而非 @Component/@Service/@Repository）</li>
+ *   <li>示例配置类位于 start/src/main/java/org/smm/archetype/config/_example/</li>
  *   <li>使用构造器注入（而非 @Autowired 字段注入）</li>
+ * </ul>
+ *
+ * <p>说明：
+ * <ul>
+ *   <li>这是一个示例配置类，用于演示如何为订单聚合根配置Bean</li>
+ *   <li>实际项目中，应该将此配置类移到config包下，并删除_example后缀</li>
+ *   <li>通过@ConditionalOnMissingBean确保用户可以自定义配置</li>
  * </ul>
  * @author Leonardo
  * @since 2026/1/11
@@ -66,13 +80,30 @@ public class OrderConfigure {
     /**
      * 订单聚合根仓储Bean
      * <p>如果用户未提供自定义实现，使用默认的OrderAggrRepositoryImpl
-     * @param impl OrderAggrRepositoryImpl实例（由Spring自动创建）
+     * @param orderAggrConverter     订单聚合根转换器
+     * @param orderItemConverter     订单项转换器
+     * @param orderAggrMapper        订单聚合根Mapper
+     * @param orderItemMapper        订单项Mapper
+     * @param orderAddressMapper     订单地址Mapper
+     * @param orderContactInfoMapper 订单联系人Mapper
      * @return OrderAggrRepository
      */
     @Bean
     @ConditionalOnMissingBean(OrderAggrRepository.class)
-    public OrderAggrRepository orderAggrRepository(OrderAggrRepositoryImpl impl) {
-        return impl;
+    public OrderAggrRepository orderAggrRepository(
+            OrderAggrConverter orderAggrConverter,
+            OrderItemConverter orderItemConverter,
+            OrderAggrMapper orderAggrMapper,
+            OrderItemMapper orderItemMapper,
+            OrderAddressMapper orderAddressMapper,
+            OrderContactInfoMapper orderContactInfoMapper) {
+        return new OrderAggrRepositoryImpl(
+                orderAggrConverter,
+                orderItemConverter,
+                orderAggrMapper,
+                orderItemMapper,
+                orderAddressMapper,
+                orderContactInfoMapper);
     }
 
     // ==================== 领域服务 ====================
@@ -103,7 +134,19 @@ public class OrderConfigure {
     }
 
     /**
-     * 支付网关Bean
+     * 支付网关Bean（Stripe实现）
+     * <p>职责：处理支付请求、查询支付状态
+     * <p>通过配置文件控制是否启用（payment.stripe.enabled）
+     * @return Stripe支付网关实现
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "payment.stripe", name = "enabled", havingValue = "true", matchIfMissing = false)
+    public PaymentGateway stripePaymentGateway() {
+        return new StripePaymentAdapter();
+    }
+
+    /**
+     * 支付网关Bean（默认实现）
      * <p>职责：处理支付请求、查询支付状态
      * <p>支持多种支付方式：Stripe、支付宝、微信支付等
      * <p>默认情况下返回null，用户可以通过配置启用特定的支付适配器

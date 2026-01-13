@@ -3,8 +3,6 @@ package org.smm.archetype.infrastructure._example.order.adapter;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._example.order.model.PaymentMethod;
 import org.smm.archetype.domain._example.order.service.PaymentGateway;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -24,13 +22,12 @@ import java.util.UUID;
  *   <li>这是一个Mock实现，仅用于演示</li>
  *   <li>实际生产环境需要集成Stripe SDK</li>
  *   <li>通过配置文件控制是否启用（payment.stripe.enabled）</li>
+ *   <li>通过OrderConfigure配置类注册为Bean（遵循规范：不使用@Component注解）</li>
  * </ul>
  * @author Leonardo
  * @since 2026/1/11
  */
 @Slf4j
-@Component
-@ConditionalOnProperty(prefix = "payment.stripe", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class StripePaymentAdapter implements PaymentGateway {
 
     @Override
