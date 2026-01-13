@@ -140,7 +140,7 @@ public class OrderConfigure {
      * @return Stripe支付网关实现
      */
     @Bean
-    @ConditionalOnProperty(prefix = "payment.stripe", name = "enabled", havingValue = "true", matchIfMissing = false)
+    @ConditionalOnProperty(prefix = "payment.stripe", name = "enabled", havingValue = "true")
     public PaymentGateway stripePaymentGateway() {
         return new StripePaymentAdapter();
     }
