@@ -40,8 +40,8 @@ public interface OrderAggrConverter {
      * @return 订单DO
      */
     @Mapping(target = "totalAmount", source = "totalAmount.amount")
-    @Mapping(target = "status", expression = "java(order.getStatus().name())")
-    @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod().name())")
+    @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().name() : null)")
+    @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod() != null ? order.getPaymentMethod().name() : null)")
     OrderAggrDO toDO(OrderAggr order);
 
     /**
@@ -50,8 +50,8 @@ public interface OrderAggrConverter {
      * @param orderDO 订单DO（更新目标）
      */
     @Mapping(target = "totalAmount", source = "totalAmount.amount")
-    @Mapping(target = "status", expression = "java(order.getStatus().name())")
-    @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod().name())")
+    @Mapping(target = "status", expression = "java(order.getStatus() != null ? order.getStatus().name() : null)")
+    @Mapping(target = "paymentMethod", expression = "java(order.getPaymentMethod() != null ? order.getPaymentMethod().name() : null)")
     @Mapping(target = "id", source = "order.id")
     @Mapping(target = "createTime", source = "order.createTime")
     @Mapping(target = "updateTime", source = "order.updateTime")
