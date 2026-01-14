@@ -5,6 +5,18 @@ spring:
     virtual:
       enabled: true
 
+  # Elasticsearch配置
+  elasticsearch:
+    # 连接地址（逗号分隔多个地址）
+    uris: http://localhost:9200
+    # 如果ES启用了安全认证，需要配置用户名和密码
+    #username: elastic
+    #password: your-password
+    # 连接超时（默认：10s）
+    #connection-timeout: 10s
+    # 读取超时（默认：30s）
+    #socket-timeout: 30s
+
   # Kafka配置
   kafka:
     listener:
@@ -288,9 +300,11 @@ middleware:
       # ES服务器地址（默认：localhost:9200）
       endpoint: http://localhost:9200
       # 用户名（默认：elastic）
-      username: leonardo123
+      # 注意：当前配置未被使用，Spring Boot ElasticsearchClient 使用 spring.elasticsearch.* 配置
+      # 如果ES启用了安全认证，需要在 spring.elasticsearch.* 下配置用户名密码
+      #username: leonardo123
       # 密码（默认：changeme）
-      password: changeme
+      #password: changeme
       # 连接超时（默认：5s）
       # connect-timeout: 5s  # 暂未使用，使用Spring Boot Elasticsearch默认配置
       # 读取超时（默认：30s）
