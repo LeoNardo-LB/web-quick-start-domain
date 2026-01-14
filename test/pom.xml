@@ -18,6 +18,13 @@
             <artifactId>domain</artifactId>
         </dependency>
 
+        <!-- Infrastructure层单元测试依赖 -->
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>infrastructure</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- 集成测试需要完整的Spring上下文，通过start模块传递依赖所有业务模块 -->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
