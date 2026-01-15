@@ -130,11 +130,11 @@
 
 ```bash
 # 查找所有重构记录
-grep "#重构" _dev_log/search_dev_log.md
+grep "#重构" dev_log/searchdev_log.md
 
 # 查找特定日期的记录
-grep "## 2026-01-15" _dev_log/search_dev_log.md
+grep "## 2026-01-15" dev_log/searchdev_log.md
 
 # 查找涉及某文件的所有记录
-grep "DisabledEsClientImpl" _dev_log/search_dev_log.md
+grep "DisabledEsClientImpl" dev_log/searchdev_log.md
 ```

@@ -3,8 +3,8 @@ package org.smm.archetype.infrastructure.common.file;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain._shared.client.OssClient;
-import org.smm.archetype.domain.common.file.CommonFileRepository;
-import org.smm.archetype.domain.common.file.CommonFileService;
+import org.smm.archetype.domain.common.file.FileRepository;
+import org.smm.archetype.domain.common.file.FileDomainService;
 import org.smm.archetype.domain.common.file.FileBusiness;
 import org.smm.archetype.domain.common.file.FileMetadata;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,16 +15,16 @@ import java.util.List;
 /**
  * 通用文件服务实现
  *
- * <p>整合OssClient、CommonFileRepository，提供完整的文件管理功能
+ * <p>整合OssClient、FileRepository，提供完整的文件管理功能
  * @author Leonardo
  * @since 2026/01/10
  */
 @Slf4j
 @RequiredArgsConstructor
-public class CommonFileServiceImpl implements CommonFileService {
+public class FileDomainServiceImpl implements FileDomainService {
 
-    private final OssClient            ossClient;
-    private final CommonFileRepository commonFileRepository;
+    private final OssClient      ossClient;
+    private final FileRepository fileRepository;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -50,7 +50,7 @@ public class CommonFileServiceImpl implements CommonFileService {
         fileBusiness.setFileMetadata(fileMetadata);
 
         // 4. 保存到数据库（ID由数据库自动生成）
-        commonFileRepository.save(fileBusiness);
+        fileRepository.save(fileBusiness);
 
         log.info("File uploaded successfully: businessId={}", fileBusiness.getBusinessId());
     }
@@ -61,14 +61,14 @@ public class CommonFileServiceImpl implements CommonFileService {
                                                 FileBusiness.Usage usage) {
         log.debug("Listing business files: businessId={}, type={}, usage={}", businessId, type, usage);
 
-        return commonFileRepository.findByBusinessIdAndTypeAndUsage(businessId, type, usage);
+        return fileRepository.findByBusinessIdAndTypeAndUsage(businessId, type, usage);
     }
 
     @Override
     public FileBusiness getFileBusiness(String id) {
         log.debug("Getting business file: id={}", id);
 
-        return commonFileRepository.findById(id)
+        return fileRepository.findById(id)
                        .orElseThrow(() -> new IllegalArgumentException("Business file not found: " + id));
     }
 
@@ -76,7 +76,7 @@ public class CommonFileServiceImpl implements CommonFileService {
     public FileMetadata getFileMeta(String id) {
         log.debug("Getting file meta: id={}", id);
 
-        return commonFileRepository.findFileMetaByFileId(id)
+        return fileRepository.findFileMetaByFileId(id)
                        .orElseThrow(() -> new IllegalArgumentException("File meta not found: " + id));
     }
 

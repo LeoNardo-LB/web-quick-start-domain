@@ -10,7 +10,7 @@ import java.util.Optional;
  * @author Leonardo
  * @since 2026/01/10
  */
-public interface CommonFileRepository {
+public interface FileRepository {
 
     /**
      * 保存业务文件（包含元数据）

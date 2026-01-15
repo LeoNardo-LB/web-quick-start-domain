@@ -51,10 +51,11 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
-        <!-- Kafka -->
+        <!-- Kafka（可选依赖，分布式事件驱动） -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Jackson for JSON serialization -->
@@ -89,28 +90,6 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>dm20151123</artifactId>
-        </dependency>
-
-        <!-- Lucene（内存ES实现） -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>9.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>9.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analysis-common</artifactId>
-            <version>9.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-sandbox</artifactId>
-            <version>9.10.0</version>
         </dependency>
 
         <!--ES-->

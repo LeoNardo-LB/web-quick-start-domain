@@ -2,7 +2,6 @@ package org.smm.archetype.config;
 
 import lombok.RequiredArgsConstructor;
 import org.smm.archetype.config.properties.EventProperties;
-import org.smm.archetype.config.properties.KafkaProperties;
 import org.smm.archetype.config.properties.RetryDelayProperties;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.EventPublisher;
@@ -19,18 +18,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 
@@ -45,18 +36,15 @@ import java.util.concurrent.Executor;
  * @since 2026-01-10
  */
 @Configuration
-@EnableKafka
 @EnableAsync
 @EnableConfigurationProperties({
         EventProperties.class,
-        KafkaProperties.class,
         RetryDelayProperties.class
 })
 @RequiredArgsConstructor
 public class EventConfigure implements AsyncConfigurer {
 
     private final EventProperties eventProperties;
-    private final KafkaProperties kafkaProperties;
 
     /**
      * 事件消费仓储
@@ -76,67 +64,6 @@ public class EventConfigure implements AsyncConfigurer {
     @Bean
     public EventPublishRepository eventPublishRepository(final EventPublishMapper eventPublishMapper) {
         return new EventPublishRepository(eventPublishMapper);
-    }
-
-    /**
-     * Kafka监听器容器工厂
-     *
-     * <p>配置JsonDeserializer，实现自动反序列化。
-     * @return Kafka监听器容器工厂
-     */
-    @Bean
-    @ConditionalOnProperty(
-            prefix = "middleware.event.publisher",
-            name = "type",
-            havingValue = "kafka"
-    )
-    public ConcurrentKafkaListenerContainerFactory<String, DomainEvent> kafkaListenerContainerFactory() {
-        Map<String, Object> props = new HashMap<>();
-
-        // 使用KafkaProperties配置
-        props.put("bootstrap.servers", kafkaProperties.getBootstrapServers());
-        props.put("group.id", kafkaProperties.getGroupId());
-        props.put("key.deserializer", kafkaProperties.getKeyDeserializer());
-        props.put("value.deserializer", kafkaProperties.getValueDeserializer());
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, kafkaProperties.getTrustedPackages());
-        props.put("enable.auto.commit", kafkaProperties.getEnableAutoCommit());
-        props.put("auto.offset.reset", kafkaProperties.getAutoOffsetReset());
-        props.put("max.poll.records", kafkaProperties.getMaxPollRecords());
-        props.put("max.poll.interval.ms", kafkaProperties.getMaxPollIntervalMs());
-
-        ConsumerFactory<String, DomainEvent> consumerFactory =
-                new DefaultKafkaConsumerFactory<>(
-                        props,
-                        new org.apache.kafka.common.serialization.StringDeserializer(),
-                        new JsonDeserializer<>(DomainEvent.class)
-                );
-
-        ConcurrentKafkaListenerContainerFactory<String, DomainEvent> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
-
-        return factory;
-    }
-
-    /**
-     * Kafka事件发布器
-     *
-     * <p>条件：middleware.event.publisher.type=kafka
-     *
-     * <p>注意：不使用@Primary注解，Primary由EventPublisherConfig中的代理Bean统一提供。
-     * @param kafkaTemplate      Kafka模板
-     * @param eventPublishMapper 事件发布Mapper
-     * @return Kafka事件发布器
-     */
-    @Bean
-    @ConditionalOnProperty(
-            prefix = "middleware.event.publisher",
-            name = "type",
-            havingValue = "kafka"
-    )
-    public KafkaEventPublisher kafkaEventPublisher(KafkaTemplate<String, DomainEvent> kafkaTemplate,
-                                                   EventPublishMapper eventPublishMapper) {
-        return new KafkaEventPublisher(kafkaTemplate, eventPublishMapper, eventProperties.getPublisher().getKafka().getTopicPrefix());
     }
 
     /**

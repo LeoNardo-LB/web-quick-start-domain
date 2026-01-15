@@ -1,9 +1,11 @@
 package org.smm.archetype.adapter.access.listener;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
 import org.smm.archetype.domain._shared.event.ConsumeStatus;
+import org.smm.archetype.domain._shared.event.RetryStrategy;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
 import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.EventConsumeDO;
@@ -21,7 +23,7 @@ import java.util.List;
  * <ul>
  *   <li>幂等性控制</li>
  *   <li>状态流转管理</li>
- *   <li>重试机制</li>
+ *   <li>重试机制（可插拔的RetryStrategy）</li>
  *   <li>异常处理</li>
  * </ul>
  *
@@ -32,25 +34,26 @@ import java.util.List;
  *   <li>RETRY → CONSUMED：重试成功</li>
  *   <li>RETRY → FAILED：达到最大重试次数</li>
  * </ul>
+ *
+ * <p>重试策略：
+ * <ul>
+ *   <li>默认：指数退避（ExponentialBackoffRetryStrategy）</li>
+ *   <li>外部调度：ExternalSchedulerRetryStrategy（支持XXL-JOB、PowerJob等）</li>
+ *   <li>自定义：实现RetryStrategy接口</li>
+ * </ul>
+ *
  * @param <T> 领域事件类型
  * @author Leonardo
  * @since 2026/01/09
  */
 @Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractEventConsumer<T extends DomainEvent> implements EventConsumer<T> {
 
     protected final EventConsumeRepository          eventConsumeRepository;
     protected final EventPublishRepository eventPublishRepository;
     protected final List<EventHandler<DomainEvent>> eventHandlers;
-
-    protected AbstractEventConsumer(
-            EventConsumeRepository eventConsumeRepository,
-            EventPublishRepository eventPublishRepository,
-            List<EventHandler<DomainEvent>> eventHandlers) {
-        this.eventConsumeRepository = eventConsumeRepository;
-        this.eventPublishRepository = eventPublishRepository;
-        this.eventHandlers = eventHandlers;
-    }
+    protected final RetryStrategy                    retryStrategy;
 
     /**
      * 获取消费者组名称
@@ -202,6 +205,9 @@ public abstract class AbstractEventConsumer<T extends DomainEvent> implements Ev
 
     /**
      * 处理消费失败
+     *
+     * <p>使用注入的RetryStrategy计算下次重试时间和判断是否应该重试。
+     *
      * @param event         领域事件
      * @param idempotentKey 幂等键
      * @param consumerGroup 消费者组
@@ -220,11 +226,12 @@ public abstract class AbstractEventConsumer<T extends DomainEvent> implements Ev
         int currentRetryTimes = consumeDO.getRetryTimes() != null ? consumeDO.getRetryTimes() : 0;
         int maxRetryTimes = consumeDO.getMaxRetryTimes() != null ? consumeDO.getMaxRetryTimes() : 3;
 
-        if (currentRetryTimes < maxRetryTimes) {
-            // 还可以重试
+        // 使用RetryStrategy判断是否应该重试
+        if (retryStrategy.shouldRetry(currentRetryTimes, maxRetryTimes)) {
+            // 还可以重试，使用RetryStrategy计算下次重试时间
             consumeDO.setConsumeStatus(ConsumeStatus.RETRY.name());
             consumeDO.setRetryTimes(currentRetryTimes + 1);
-            consumeDO.setNextRetryTime(calculateNextRetryTime(currentRetryTimes + 1));
+            consumeDO.setNextRetryTime(retryStrategy.calculateNextRetryTime(currentRetryTimes + 1));
             consumeDO.setErrorMessage(e.getMessage());
 
             eventConsumeRepository.updateStatusWithVersion(consumeDO);
@@ -243,18 +250,6 @@ public abstract class AbstractEventConsumer<T extends DomainEvent> implements Ev
             // 调用失败处理钩子
             onMaxRetriesExceeded(event, consumeDO, e);
         }
-    }
-
-    /**
-     * 计算下次重试时间（指数退避策略）
-     * @param retryTimes 当前重试次数
-     * @return 下次重试时间
-     */
-    private Instant calculateNextRetryTime(int retryTimes) {
-        // 指数退避：1分钟, 5分钟, 15分钟, 30分钟, 60分钟
-        int[] delays = {1, 5, 15, 30, 60};
-        int index = Math.min(retryTimes - 1, delays.length - 1);
-        return Instant.now().plusSeconds(delays[index] * 60L);
     }
 
     /**

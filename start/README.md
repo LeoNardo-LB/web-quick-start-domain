@@ -802,11 +802,11 @@ public XxxRepository xxxRepository() {}
 
 ## 9. 相关文档
 
-- [项目根README.md](../README.md) - 项目整体架构说明
-- [业务代码编写规范.md](../业务代码编写规范.md) - 编码标准详细参考
-- [app/README.md](../app/README.md) - 应用层开发指南
-- [infrastructure/README.md](../infrastructure/README.md) - 基础设施层开发指南
-- [domain/README.md](../domain/README.md) - 领域层开发指南
+- `../README.md` - 项目根README.md（项目整体架构说明）
+- `../_docs/业务代码编写规范.md` - 业务代码编写规范（编码标准详细参考）
+- `app/README.md` - 应用层开发指南（在 app 模块）
+- `infrastructure/README.md` - 基础设施层开发指南（在 infrastructure 模块）
+- `domain/README.md` - 领域层开发指南（在 domain 模块）
 
 ---
 

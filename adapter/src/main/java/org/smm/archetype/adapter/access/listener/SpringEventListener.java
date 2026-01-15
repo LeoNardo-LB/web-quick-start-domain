@@ -3,6 +3,7 @@ package org.smm.archetype.adapter.access.listener;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
+import org.smm.archetype.domain._shared.event.RetryStrategy;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
 import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
 import org.springframework.context.event.EventListener;
@@ -25,8 +26,9 @@ public class SpringEventListener extends AbstractEventConsumer<DomainEvent>
     public SpringEventListener(
             EventConsumeRepository eventConsumeRepository,
             EventPublishRepository eventPublishRepository,
-            List<EventHandler<DomainEvent>> eventHandlers) {
-        super(eventConsumeRepository, eventPublishRepository, eventHandlers);
+            List<EventHandler<DomainEvent>> eventHandlers,
+            RetryStrategy retryStrategy) {
+        super(eventConsumeRepository, eventPublishRepository, eventHandlers, retryStrategy);
     }
 
     @Override

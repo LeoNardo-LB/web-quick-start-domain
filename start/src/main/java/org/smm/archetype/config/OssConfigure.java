@@ -4,13 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.config.properties.OssProperties;
 import org.smm.archetype.domain._shared.client.IdClient;
 import org.smm.archetype.domain._shared.client.OssClient;
-import org.smm.archetype.domain.common.file.CommonFileRepository;
+import org.smm.archetype.domain.common.file.FileRepository;
+import org.smm.archetype.domain.common.file.FileDomainService;
 import org.smm.archetype.infrastructure._shared.client.oss.impl.LocalOssClientImpl;
 import org.smm.archetype.infrastructure._shared.client.oss.impl.RustFsOssClientImpl;
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.FileBusinessMapper;
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.FileMetadataMapper;
-import org.smm.archetype.infrastructure.common.file.CommonFileRepositoryImpl;
-import org.smm.archetype.infrastructure.common.file.CommonFileServiceImpl;
+import org.smm.archetype.infrastructure.common.file.FileRepositoryImpl;
+import org.smm.archetype.infrastructure.common.file.FileDomainServiceImpl;
 import org.smm.archetype.infrastructure.common.file.FileBusinessConverter;
 import org.smm.archetype.infrastructure.common.file.FileMetaConverter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -146,27 +147,27 @@ public class OssConfigure {
      * @return 通用文件仓储实现
      */
     @Bean
-    public CommonFileRepository commonFileRepository(
+    public FileRepository commonFileRepository(
             final FileBusinessMapper businessMapper,
             final FileMetadataMapper metadataMapper,
             final FileBusinessConverter fileBusinessConverter,
             final FileMetaConverter fileMetaConverter) {
-        return new CommonFileRepositoryImpl(businessMapper, metadataMapper, fileBusinessConverter, fileMetaConverter);
+        return new FileRepositoryImpl(businessMapper, metadataMapper, fileBusinessConverter, fileMetaConverter);
     }
 
     /**
      * 通用文件服务
      *
-     * <p>整合OssClient、CommonFileRepository，提供完整的文件管理功能
+     * <p>整合OssClient、FileRepository，提供完整的文件管理功能
      * @param ossClient            对象存储服务
-     * @param commonFileRepository 通用文件仓储
+     * @param fileRepository 通用文件仓储
      * @return 通用文件服务实现
      */
     @Bean
-    public org.smm.archetype.domain.common.file.CommonFileService commonFileService(
+    public FileDomainService commonFileService(
             final OssClient ossClient,
-            final CommonFileRepository commonFileRepository) {
-        return new CommonFileServiceImpl(ossClient, commonFileRepository);
+            final FileRepository fileRepository) {
+        return new FileDomainServiceImpl(ossClient, fileRepository);
     }
 
 }

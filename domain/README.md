@@ -613,7 +613,7 @@ Domain层本身不需要配置类，所有Bean由start模块统一配置。
 
 ### 配置示例
 
-Domain层的Bean配置在start模块完成，详细配置说明见[start/README.md](../start/README.md)。
+Domain层的Bean配置在start模块完成，详细配置说明见`start/README.md`（在start模块）。
 
 ---
 
@@ -712,11 +712,11 @@ order.updateItemQuantity(0, 10); // 通过聚合根，包含验证逻辑
 
 ## 9. 相关文档
 
-- [项目根README.md](../README.md) - 项目整体架构说明
-- [业务代码编写规范.md](../业务代码编写规范.md) - 编码标准详细参考
-- [app/README.md](../app/README.md) - 应用层开发指南
-- [infrastructure/README.md](../infrastructure/README.md) - 基础设施层开发指南
-- [start/README.md](../start/README.md) - 启动模块配置指南
+- `../README.md` - 项目根README.md（项目整体架构说明）
+- `../_docs/业务代码编写规范.md` - 业务代码编写规范（编码标准详细参考）
+- `app/README.md` - 应用层开发指南（在 app 模块）
+- `infrastructure/README.md` - 基础设施层开发指南（在 infrastructure 模块）
+- `start/README.md` - 启动模块配置指南（在 start 模块）
 
 ---
 

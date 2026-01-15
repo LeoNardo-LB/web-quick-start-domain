@@ -755,7 +755,6 @@ public class SearchServiceImpl implements SearchService {
 
             // 执行搜索，委托给具体的EsClient实现
             // ElasticsearchClientImpl会使用ES的function_score
-            // MemoryEsClientImpl会在Java中实现算法
             Map<String, Object> response = esClient.search(index, queryDsl, query.getFrom(), query.getSize());
 
             // 转换结果

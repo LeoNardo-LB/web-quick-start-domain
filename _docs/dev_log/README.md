@@ -10,12 +10,12 @@
 本目录按DDD分包组织，每个模块一个独立的日志文件：
 
 ```
-_dev_log/
+dev_log/
 ├── README.md                # 本使用指南
-├── order_dev_log.md         # 订单模块开发日志
-├── search_dev_log.md        # 搜索模块开发日志
-├── payment_dev_log.md       # 支付模块开发日志
-└── [module]_dev_log.md      # 其他模块日志
+├── orderdev_log.md         # 订单模块开发日志
+├── searchdev_log.md        # 搜索模块开发日志
+├── paymentdev_log.md       # 支付模块开发日志
+└── [module]dev_log.md      # 其他模块日志
 ```
 
 ---
@@ -90,7 +90,7 @@ _dev_log/
 grep "#新功能" *.md
 
 # 查找订单模块的优化记录
-grep "#优化" order_dev_log.md
+grep "#优化" orderdev_log.md
 ```
 
 ### 按日期查找
@@ -111,10 +111,10 @@ grep "OrderSnapshot.java" *.md
 
 ```bash
 # 查看订单模块的所有记录
-cat order_dev_log.md
+cat orderdev_log.md
 
 # 查看最近7天的记录
-head -100 order_dev_log.md
+head -100 orderdev_log.md
 ```
 
 ---
@@ -207,9 +207,9 @@ AI在生成记录时，应遵循以下模板：
 
 ## 📖 相关文档
 
-- [项目主文档](../CLAUDE.md) - AI开发元指南（查看"AI工作记录"章节）
-- [业务代码编写规范](../业务代码编写规范.md) - 编码标准
-- [代码AI生成工作流](../AI生成代码工作流.md) - 代码生成流程
+- [项目主文档]`../CLAUDE.md` - AI开发元指南（查看"AI工作记录"章节，在项目根目录）
+- [业务代码编写规范]`../业务代码编写规范.md` - 编码标准（在项目根目录）
+- [验证流程指南]`../验证流程指南.md` - 代码生成工作流（在 _docs 目录）
 
 ---
 

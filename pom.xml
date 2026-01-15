@@ -40,6 +40,8 @@
         <!-- 测试框架版本 - 兼容 JDK 25 -->
         <mockito.version>5.14.2</mockito.version>
         <assertj.version>3.27.3</assertj.version>
+        <!-- JaCoCo 代码覆盖率工具（支持 JDK 25） -->
+        <jacoco.version>0.8.14</jacoco.version>
     </properties>
 
     <dependencies>
@@ -261,11 +263,12 @@
                 <version>9.5.0</version>
             </dependency>
 
-            <!-- 消息队列 -->
+            <!-- 消息队列（可选，用于分布式事件驱动） -->
             <dependency>
                 <groupId>org.springframework.kafka</groupId>
                 <artifactId>spring-kafka</artifactId>
                 <version>3.3.11</version>
+                <optional>true</optional>
             </dependency>
 
             <!-- JSON序列化 -->

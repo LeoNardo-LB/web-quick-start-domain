@@ -1,9 +1,9 @@
 package org.smm.archetype.config;
 
-import org.smm.archetype.adapter.access.listener.KafkaEventListener;
 import org.smm.archetype.adapter.access.listener.SpringEventListener;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.base.DomainEvent;
+import org.smm.archetype.domain._shared.event.RetryStrategy;
 import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
 import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -29,6 +29,7 @@ public class AdapterListenerConfig {
      * @param eventConsumeRepository 事件消费仓储
      * @param eventPublishRepository 事件发布仓储
      * @param eventHandlers          所有事件处理器
+     * @param retryStrategy          重试策略
      * @return Spring事件监听器
      */
     @Bean
@@ -40,30 +41,9 @@ public class AdapterListenerConfig {
     public SpringEventListener springEventListener(
             final EventConsumeRepository eventConsumeRepository,
             final EventPublishRepository eventPublishRepository,
-            final List<EventHandler<DomainEvent>> eventHandlers) {
-        return new SpringEventListener(eventConsumeRepository, eventPublishRepository, eventHandlers);
-    }
-
-    /**
-     * Kafka事件监听器
-     *
-     * <p>监听Kafka消息队列事件。
-     * @param eventConsumeRepository 事件消费仓储
-     * @param eventPublishRepository 事件发布仓储
-     * @param eventHandlers          所有事件处理器
-     * @return Kafka事件监听器
-     */
-    @Bean
-    @ConditionalOnProperty(
-            prefix = "middleware.event.publisher",
-            name = "type",
-            havingValue = "kafka"
-    )
-    public KafkaEventListener kafkaEventListener(
-            final EventConsumeRepository eventConsumeRepository,
-            final EventPublishRepository eventPublishRepository,
-            final List<EventHandler<DomainEvent>> eventHandlers) {
-        return new KafkaEventListener(eventConsumeRepository, eventPublishRepository, eventHandlers);
+            final List<EventHandler<DomainEvent>> eventHandlers,
+            final RetryStrategy retryStrategy) {
+        return new SpringEventListener(eventConsumeRepository, eventPublishRepository, eventHandlers, retryStrategy);
     }
 
 }

@@ -11,7 +11,7 @@ import java.util.List;
  * @author Leonardo
  * @since 2026/01/09
  */
-public interface CommonFileService {
+public interface FileDomainService {
 
     /**
      * 上传文件

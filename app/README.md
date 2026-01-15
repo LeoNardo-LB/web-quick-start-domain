@@ -631,7 +631,7 @@ public class XxxAppService {
 
 ## 7. 配置说明
 
-应用服务的Bean配置在start模块完成，详细配置说明见[start/README.md](../start/README.md)。
+应用服务的Bean配置在start模块完成，详细配置说明见`start/README.md`（在start模块）。
 
 ### 配置原则
 
@@ -755,11 +755,11 @@ public XxxDTO createXxx(CreateXxxCommand command) {
 
 ## 9. 相关文档
 
-- [项目根README.md](../README.md) - 项目整体架构说明
-- [业务代码编写规范.md](../业务代码编写规范.md) - 编码标准详细参考
-- [domain/README.md](../domain/README.md) - 领域层开发指南
-- [adapter/README.md](../adapter/README.md) - 接口层开发指南
-- [start/README.md](../start/README.md) - 启动模块配置指南
+- `../README.md` - 项目根README.md（项目整体架构说明）
+- `../_docs/业务代码编写规范.md` - 业务代码编写规范（编码标准详细参考）
+- `domain/README.md` - 领域层开发指南（在 domain 模块）
+- `adapter/README.md` - 接口层开发指南（在 adapter 模块）
+- `start/README.md` - 启动模块配置指南（在 start 模块）
 
 ---
 

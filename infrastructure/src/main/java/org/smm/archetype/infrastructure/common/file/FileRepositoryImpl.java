@@ -3,7 +3,7 @@ package org.smm.archetype.infrastructure.common.file;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.common.file.CommonFileRepository;
+import org.smm.archetype.domain.common.file.FileRepository;
 import org.smm.archetype.domain.common.file.FileBusiness;
 import org.smm.archetype.domain.common.file.FileMetadata;
 import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileBusinessDO;
@@ -26,7 +26,7 @@ import static org.smm.archetype.infrastructure._shared.generated.repository.enti
  */
 @Slf4j
 @RequiredArgsConstructor
-public class CommonFileRepositoryImpl implements CommonFileRepository {
+public class FileRepositoryImpl implements FileRepository {
 
     private final FileBusinessMapper    businessMapper;
     private final FileMetadataMapper    metadataMapper;
