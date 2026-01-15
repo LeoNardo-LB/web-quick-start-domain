@@ -14,21 +14,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class SearchProperties {
 
     /**
-     * 搜索类型（elasticsearch | memory）
+     * 是否启用搜索功能（默认：false）
      *
-     * <p>默认: elasticsearch
+     * <p>false: 使用禁用实现，所有ES操作抛出异常（不强制ES依赖）
+     * <p>true: 使用真实Elasticsearch，启动时会检查连接可用性
      */
-    private String type = "elasticsearch";
+    private boolean enabled = false;
 
     /**
      * Elasticsearch配置
      */
     private Elasticsearch elasticsearch = new Elasticsearch();
-
-    /**
-     * 内存ES配置
-     */
-    private Memory memory = new Memory();
 
     /**
      * Elasticsearch配置
@@ -53,16 +49,4 @@ public class SearchProperties {
         private String password = "changeme";
     }
 
-    /**
-     * 内存ES配置
-     */
-    @Data
-    public static class Memory {
-        /**
-         * 数据路径
-         *
-         * <p>null表示纯内存，非null表示持久化到指定路径
-         */
-        private String dataPath = null;
-    }
 }

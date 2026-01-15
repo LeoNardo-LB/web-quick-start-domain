@@ -54,11 +54,9 @@ middleware:
   object-storage:
     type: local
 
-  # 搜索服务配置（测试环境使用内存ES）
+  # 搜索服务配置（测试环境使用禁用实现）
   search:
-    type: memory  # elasticsearch | memory
-    memory:
-      data-path: null  # null表示纯内存
+    enabled: false  # false: 使用禁用实现，抛出异常（测试环境不需要ES）
 
   # 短信服务配置（测试环境禁用）
   sms:

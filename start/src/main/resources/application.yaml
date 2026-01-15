@@ -290,33 +290,19 @@ middleware:
 
   # 搜索服务配置
   search:
-    # 搜索客户端类型：elasticsearch（真实ES） | memory（内存ES）
-    # - elasticsearch: 使用真实Elasticsearch服务，默认实现（matchIfMissing=true）
-    # - memory: 使用内存ES（基于Lucene），无需外部依赖
-    type: elasticsearch
+    # 是否启用搜索功能（默认：false）
+    # - false: 使用禁用实现，所有ES操作抛出异常（不强制ES依赖）
+    # - true: 使用真实Elasticsearch，启动时会检查连接可用性
+    enabled: false
 
-    # Elasticsearch 配置（type=elasticsearch 时生效）
+    # Elasticsearch 配置（enabled=true 时生效）
     elasticsearch:
-      # ES服务器地址（默认：localhost:9200）
+      # ES服务器地址
       endpoint: http://localhost:9200
-      # 用户名（默认：elastic）
-      # 注意：当前配置未被使用，Spring Boot ElasticsearchClient 使用 spring.elasticsearch.* 配置
-      # 如果ES启用了安全认证，需要在 spring.elasticsearch.* 下配置用户名密码
-      #username: leonardo123
-      # 密码（默认：changeme）
-      #password: changeme
-      # 连接超时（默认：5s）
-      # connect-timeout: 5s  # 暂未使用，使用Spring Boot Elasticsearch默认配置
-      # 读取超时（默认：30s）
-      # read-timeout: 30s  # 暂未使用，使用Spring Boot Elasticsearch默认配置
-
-    # 内存ES配置（type=memory 时生效）
-    # 基于Apache Lucene实现，适合测试和开发环境
-    memory:
-      # 数据存储路径（可选）
-      # null表示纯内存模式（数据不持久化）
-      # 指定路径则持久化到磁盘（重启后数据保留）
-      data-path: null
+      # 用户名（如需认证）
+      username: elastic
+      # 密码（如需认证）
+      password: changeme
 
 server:
   port: 9101
