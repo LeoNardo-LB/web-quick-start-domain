@@ -141,7 +141,7 @@ mvn test -Dtest=ApplicationStartupTests -pl test
 | **Infrastructure** | 基础设施 | Repository实现、EventPublisher、CacheService |
 | **Adapter** | 接口适配 | Controller、EventListener、Schedule |
 
-详细指南：[domain/README.md](domain/README.md) | [app/README.md](app/README.md) | [adapter/README.md](adapter/README.md) | [infrastructure/README.md](infrastructure/README.md)
+
 
 ---
 
@@ -355,7 +355,6 @@ web-quick-start-domain/
 │   └── 测试代码编写规范.md     # 测试规范
 │
 ├── README.md            # 本文件
-├── CLAUDE.md            # AI开发指南
 └── pom.xml              # Maven配置
 ```
 
@@ -384,7 +383,7 @@ public interface ProductRepository {
 }
 ```
 
-参考：[domain/README.md](domain/README.md)
+
 
 #### 2. 实现应用服务（Application层）
 
@@ -407,7 +406,7 @@ public class ProductAppService {
 }
 ```
 
-参考：[app/README.md](app/README.md)
+
 
 #### 3. 开发Controller（Adapter层）
 
@@ -425,7 +424,7 @@ public class ProductController {
 }
 ```
 
-参考：[adapter/README.md](adapter/README.md)
+
 
 #### 4. 实现Repository（Infrastructure层）
 
@@ -442,7 +441,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 }
 ```
 
-参考：[infrastructure/README.md](infrastructure/README.md)
+
 
 #### 5. 编写测试
 
@@ -464,7 +463,7 @@ class ProductControllerTest extends IntegrationTestBase {
 }
 ```
 
-参考：[test/README.md](test/README.md)
+
 
 #### 6. 验证代码质量
 
@@ -494,11 +493,6 @@ mvn test -Dtest=ApplicationStartupTests -pl test
 | **[测试示例指南](_docs/测试示例指南.md)** | 测试示例 | 开发者 |
 | **[业务代码编写规范](_docs/业务代码编写规范.md)** | 编码标准 | 开发者 |
 | **[测试代码编写规范](_docs/测试代码编写规范.md)** | 测试规范 | 开发者 |
-| **[CLAUDE.md](CLAUDE.md)** | AI开发指南 | AI、开发者 |
-| **[domain/README.md](domain/README.md)** | 领域层开发 | 开发者 |
-| **[app/README.md](app/README.md)** | 应用层开发 | 开发者 |
-| **[adapter/README.md](adapter/README.md)** | 接口层开发 | 开发者 |
-| **[infrastructure/README.md](infrastructure/README.md)** | 基础设施层开发 | 开发者 |
 
 ### 🎯 按角色查找文档
 
@@ -509,13 +503,12 @@ mvn test -Dtest=ApplicationStartupTests -pl test
 
 #### 有经验开发者
 1. 阅读 [快速上手指南](_docs/快速上手指南.md) - 快速上手
-2. 阅读 [domain/README.md](domain/README.md) - 领域层开发
-3. 阅读 [业务代码编写规范](_docs/业务代码编写规范.md) - 编码规范
+2. 阅读 [业务代码编写规范](_docs/业务代码编写规范.md) - 编码规范
+3. 参考订单示例代码 - 学习DDD概念
 
 #### 架构师
 1. 阅读 [README.md](README.md) - 项目架构
-2. 阅读各层README - 架构设计
-3. 查看订单模块示例 - DDD实战
+2. 查看订单模块示例 - DDD实战
 
 ---
 
@@ -559,8 +552,7 @@ mvn verify -pl test
 **A**: 推荐阅读顺序：
 1. [快速上手指南](_docs/快速上手指南.md) - 快速上手
 2. [README.md](README.md) - 项目架构
-3. [domain/README.md](domain/README.md) - 领域层开发
-4. 订单示例代码 - 75个类，涵盖所有DDD概念
+3. 订单示例代码 - 75个类，涵盖所有DDD概念
 
 ### Q6: 配置类应该放哪里？
 
@@ -615,7 +607,7 @@ middleware:
 
 **下一步**：
 1. 阅读 [快速上手指南](_docs/快速上手指南.md) 快速上手
-2. 阅读 [业务代码编写规范.md](业务代码编写规范.md) 学习编码规范
+2. 阅读 [业务代码编写规范](_docs/业务代码编写规范.md) 学习编码规范
 3. 参考订单示例代码，开始开发
 
 ---
