@@ -57,8 +57,6 @@ mvn spring-boot:run -pl start
 curl http://localhost:8080/api/orders
 ```
 
-详细指南：[快速上手指南](_docs/快速上手指南.md)
-
 ### 环境要求
 
 - **JDK**: 25+（项目使用JDK 25，JaCoCo 0.8.14已兼容）
@@ -78,7 +76,7 @@ mvn test
 mvn test -Dtest=ApplicationStartupTests -pl test
 ```
 
-详细流程：[验证流程指南](_docs/验证流程指南.md)
+详细流程：[验证流程指南](_docs/specification/验证流程指南.md)
 
 ---
 
@@ -348,7 +346,6 @@ web-quick-start-domain/
 │   └── pom.xml          # JaCoCo配置
 │
 ├── _docs/               # 文档目录
-│   ├── 快速上手指南.md         # 快速上手 ⭐
 │   ├── 验证流程指南.md        # 验证流程 ⭐
 │   ├── 测试示例指南.md         # 测试示例
 │   ├── 业务代码编写规范.md     # 编码规范
@@ -478,7 +475,7 @@ mvn test
 mvn test -Dtest=ApplicationStartupTests -pl test
 ```
 
-详细流程：[验证流程指南](_docs/验证流程指南.md)
+详细流程：[验证流程指南](_docs/specification/验证流程指南.md)
 
 ---
 
@@ -488,23 +485,20 @@ mvn test -Dtest=ApplicationStartupTests -pl test
 
 | 文档 | 用途 | 读者 |
 |------|------|------|
-| **[快速上手指南](_docs/快速上手指南.md)** | 快速上手（5分钟） | 所有人 ⭐ |
-| **[验证流程指南](_docs/验证流程指南.md)** | 验证流程 | 开发者 ⭐ |
-| **[测试示例指南](_docs/测试示例指南.md)** | 测试示例 | 开发者 |
-| **[业务代码编写规范](_docs/业务代码编写规范.md)** | 编码标准 | 开发者 |
-| **[测试代码编写规范](_docs/测试代码编写规范.md)** | 测试规范 | 开发者 |
+| **[验证流程指南](_docs/specification/验证流程指南.md)** | 验证流程 | 开发者 ⭐ |
+| **[测试示例指南](_docs/specification/测试示例指南.md)** | 测试示例 | 开发者 |
+| **[业务代码编写规范](_docs/specification/业务代码编写规范.md)** | 编码标准 | 开发者 |
+| **[测试代码编写规范](_docs/specification/测试代码编写规范.md)** | 测试规范 | 开发者 |
 
 ### 🎯 按角色查找文档
 
 #### 初学者
-1. 阅读 [快速上手指南](_docs/快速上手指南.md) - 快速上手
-2. 阅读 [业务代码编写规范](_docs/业务代码编写规范.md) 第1-3章 - 编码规范
-3. 参考订单示例代码 - 学习DDD概念
+1. 阅读 [业务代码编写规范](_docs/specification/业务代码编写规范.md) 第1-3章 - 编码规范
+2. 参考订单示例代码 - 学习DDD概念
 
 #### 有经验开发者
-1. 阅读 [快速上手指南](_docs/快速上手指南.md) - 快速上手
-2. 阅读 [业务代码编写规范](_docs/业务代码编写规范.md) - 编码规范
-3. 参考订单示例代码 - 学习DDD概念
+1. 阅读 [业务代码编写规范](_docs/specification/业务代码编写规范.md) - 编码规范
+2. 参考订单示例代码 - 学习DDD概念
 
 #### 架构师
 1. 阅读 [README.md](README.md) - 项目架构
@@ -516,7 +510,7 @@ mvn test -Dtest=ApplicationStartupTests -pl test
 
 ### Q1: 如何快速上手？
 
-**A**: 阅读 [快速上手指南](_docs/快速上手指南.md)，5分钟快速上手。
+**A**: 阅读 README.md - 项目架构和快速开始部分。
 
 ### Q2: 代码修改后如何验证？
 
@@ -527,7 +521,7 @@ mvn test          # 单元测试验证
 mvn test -Dtest=ApplicationStartupTests -pl test  # 启动验证
 ```
 
-详细流程：[验证流程指南](_docs/验证流程指南.md)
+详细流程：[验证流程指南](_docs/specification/验证流程指南.md)
 
 ### Q3: 如何解决循环依赖？
 
@@ -535,7 +529,7 @@ mvn test -Dtest=ApplicationStartupTests -pl test  # 启动验证
 - 跨配置类：使用构造器注入 + Optional
 - 同配置类：使用@Bean方法参数注入
 
-参考：[业务代码编写规范](_docs/业务代码编写规范.md) 2.6节
+参考：[业务代码编写规范](_docs/specification/业务代码编写规范.md) 2.6节
 
 ### Q4: 如何查看测试覆盖率？
 
@@ -550,9 +544,8 @@ mvn verify -pl test
 ### Q5: 如何学习DDD？
 
 **A**: 推荐阅读顺序：
-1. [快速上手指南](_docs/快速上手指南.md) - 快速上手
-2. [README.md](README.md) - 项目架构
-3. 订单示例代码 - 75个类，涵盖所有DDD概念
+1. [README.md](README.md) - 项目架构和快速开始部分
+2. 订单示例代码 - 75个类，涵盖所有DDD概念
 
 ### Q6: 配置类应该放哪里？
 
@@ -566,7 +559,7 @@ start/src/main/java/org/smm/archetype/config/
 
 **禁止**：在adapter/infrastructure模块创建配置类。
 
-参考：[业务代码编写规范](_docs/业务代码编写规范.md) 2.6节
+参考：[业务代码编写规范](_docs/specification/业务代码编写规范.md) 2.6节
 
 ### Q7: 如何使用外部调度框架（XXL-JOB、PowerJob）？
 
@@ -606,9 +599,8 @@ middleware:
 - ⭐⭐ 企业级应用（需要根据业务调整）
 
 **下一步**：
-1. 阅读 [快速上手指南](_docs/快速上手指南.md) 快速上手
-2. 阅读 [业务代码编写规范](_docs/业务代码编写规范.md) 学习编码规范
-3. 参考订单示例代码，开始开发
+1. 阅读 [业务代码编写规范](_docs/specification/业务代码编写规范.md) 学习编码规范
+2. 参考订单示例代码，开始开发
 
 ---
 

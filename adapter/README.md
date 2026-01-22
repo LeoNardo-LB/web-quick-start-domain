@@ -826,7 +826,7 @@ public BaseResult<Void> handleValidationException(MethodArgumentNotValidExceptio
 ## 9. 相关文档
 
 - `../README.md` - 项目根README.md（项目整体架构说明）
-- `../_docs/业务代码编写规范.md` - 业务代码编写规范（编码标准详细参考）
+- `../_docs/specification/业务代码编写规范.md` - 业务代码编写规范（编码标准详细参考）
 - `app/README.md` - 应用层开发指南（在 app 模块）
 - `domain/README.md` - 领域层开发指南（在 domain 模块）
 - `start/README.md` - 启动模块配置指南（在 start 模块）

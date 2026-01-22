@@ -333,7 +333,7 @@ mvn spring-boot:run -pl start
 | 3️⃣ | `mvn test`                                          | 单元测试验证   | Tests run > 0, Failures: 0           |
 | 4️⃣ | `mvn test -Dtest=ApplicationStartupTests -pl start` | **启动验证** | Tests run: 1, Failures: 0, Errors: 0 |
 
-> **⚠️ 提醒**: 详细验证流程和故障排查见[验证流程指南](_docs/验证流程指南.md)
+> **⚠️ 提醒**: 详细验证流程和故障排查见[验证流程指南](_docs/specification/验证流程指南.md)
 
 ---
 
@@ -354,30 +354,30 @@ mvn spring-boot:run -pl start
 
 | 文档                                                                                                  | 用途           | 目标读者       | 何时使用                | 重要性   |
 |-----------------------------------------------------------------------------------------------------|--------------|------------|---------------------|-------|
-| **[业务代码编写规范](_docs/业务代码编写规范.md)**                                                                      | **编码标准详细参考** | **开发者、AI** | **⭐ 写代码前必读，必须严格遵守** | ⭐⭐⭐⭐⭐ |
+| **[业务代码编写规范](_docs/specification/业务代码编写规范.md)**                                                                      | **编码标准详细参考** | **开发者、AI** | **⭐ 写代码前必读，必须严格遵守** | ⭐⭐⭐⭐⭐ |
 | [README.md](README.md)                                                                              | 项目概览和架构说明    | 所有人        | 了解项目整体架构            | ⭐⭐⭐⭐  |
-| [验证流程指南](_docs/验证流程指南.md)                                                                        | 强制性代码生成流程    | AI、开发者     | **每次代码生成必须遵循**      | ⭐⭐⭐⭐⭐ |
+| [验证流程指南](_docs/specification/验证流程指南.md)                                                                        | 强制性代码生成流程    | AI、开发者     | **每次代码生成必须遵循**      | ⭐⭐⭐⭐⭐ |
 
 ### 🎯 按任务类型查找文档
 
 #### 新增功能开发
 
 1. **阅读**: [README.md](README.md#项目架构) - 了解四层架构
-2. **阅读**: [业务代码编写规范](_docs/业务代码编写规范.md) - 了解编码规范
-3. **阅读**: [验证流程指南](_docs/验证流程指南.md) - **遵循4步验证流程**
+2. **阅读**: [业务代码编写规范](_docs/specification/业务代码编写规范.md) - 了解编码规范
+3. **阅读**: [验证流程指南](_docs/specification/验证流程指南.md) - **遵循4步验证流程**
 
 #### Bug修复
 
 1. **定位**: 使用Grep/Glob工具查找相关代码
-2. **阅读**: [业务代码编写规范](_docs/业务代码编写规范.md) - 确认修复方案符合规范
-3. **遵循**: [验证流程指南](_docs/验证流程指南.md) - 完成4步验证
+2. **阅读**: [业务代码编写规范](_docs/specification/业务代码编写规范.md) - 确认修复方案符合规范
+3. **遵循**: [验证流程指南](_docs/specification/验证流程指南.md) - 完成4步验证
 4. **验证**: 运行启动测试确保无副作用
 
 #### 代码重构
 
 1. **阅读**: [业务代码编写规范.md#8-代码设计原则](业务代码编写规范.md#8-代码设计原则) - 确保符合设计原则
 2. **阅读**: [业务代码编写规范.md#84-接口实现分离模式](业务代码编写规范.md#84-接口实现分离模式三层架构) - 三层架构模式
-3. **验证**: [验证流程指南](_docs/验证流程指南.md) - 确保启动测试通过
+3. **验证**: [验证流程指南](_docs/specification/验证流程指南.md) - 确保启动测试通过
 
 ### 📖 各文档核心内容速查
 
@@ -458,34 +458,6 @@ mvn spring-boot:run -pl start
 ### 📁 文件组织
 
 **目录结构**：
-```
-项目根目录/
-└── dev_log/
-    ├── README.md                # 本使用指南
-    ├── orderdev_log.md         # 订单模块开发日志
-    ├── searchdev_log.md        # 搜索模块开发日志
-    ├── paymentdev_log.md       # 支付模块开发日志
-    └── [module]dev_log.md      # 其他模块日志
-```
-
-**命名规则**：按DDD分包划分，格式为 `{模块名}dev_log.md`
-
-### 🔄 记录流程
-
-#### 触发时机
-AI完成用户的一个需求后，会询问：
-> 📋 是否需要将本次开发记录到 `dev_log/[module]dev_log.md`？
-
-#### 记录规则
-- ✅ **按天划分**：以每天凌晨4点为分界点
-- ✅ **当天可编辑**：同一天内可追加、修改当天内容
-- ❌ **历史不可改**：历史日期内容只读，不可修改
-- ✅ **自动追加**：AI自动生成并追加到对应模块日志文件
-
-### 📋 记录格式
-
-每条记录包含以下核心章节：
-
 ```markdown
 ## YYYY-MM-DD
 
@@ -587,7 +559,7 @@ grep "OrderSnapshot.java" dev_log/*.md
 
 ## 开发工作流
 
-**详细工作流程**：[验证流程指南](_docs/验证流程指南.md)
+**详细工作流程**：[验证流程指南](_docs/specification/验证流程指南.md)
 
 本章节只保留快速参考，详细流程请参考工作流文档。
 
@@ -664,9 +636,9 @@ grep "OrderSnapshot.java" dev_log/*.md
 
 **不包含**：
 
-- ❌ 详细编码规范 → [业务代码编写规范](_docs/业务代码编写规范.md)
-- ❌ 验证流程细节 → [验证流程指南](_docs/验证流程指南.md)
-- ❌ 测试生成规范 → [测试代码编写规范](_docs/测试代码编写规范.md)
+- ❌ 详细编码规范 → [业务代码编写规范](_docs/specification/业务代码编写规范.md)
+- ❌ 验证流程细节 → [验证流程指南](_docs/specification/验证流程指南.md)
+- ❌ 测试生成规范 → [测试代码编写规范](_docs/specification/测)试代码编写规范.md)
 - ❌ 架构详细说明 → [README.md](README.md) + 各模块README
 
 **定位**：AI开发的入口和导航中心
@@ -686,8 +658,8 @@ grep "OrderSnapshot.java" dev_log/*.md
 
 **不包含**：
 
-- ❌ 详细开发指南 → [验证流程指南](_docs/验证流程指南.md)
-- ❌ 完整工作流程 → [验证流程指南](_docs/验证流程指南.md)
+- ❌ 详细开发指南 → [验证流程指南](_docs/specification/验证流程指南.md)
+- ❌ 完整工作流程 → [验证流程指南](_docs/specification/验证流程指南.md)
 - ❌ 故障排查信息 → [CLAUDE.md](CLAUDE.md)
 
 **定位**：对外项目介绍，快速了解项目价值
@@ -708,9 +680,9 @@ grep "OrderSnapshot.java" dev_log/*.md
 
 **不包含**：
 
-- ❌ 详细编码规范 → [业务代码编写规范](_docs/业务代码编写规范.md)
-- ❌ 测试代码编写细节 → [测试代码编写规范](_docs/测试代码编写规范.md)
-- ❌ 架构设计原则 → [业务代码编写规范](_docs/业务代码编写规范.md)
+- ❌ 详细编码规范 → [业务代码编写规范](_docs/specification/业务代码编写规范.md)
+- ❌ 测试代码编写细节 → [测试代码编写规范](_docs/specification/测)试代码编写规范.md)
+- ❌ 架构设计原则 → [业务代码编写规范](_docs/specification/业务代码编写规范.md)
 
 **定位**：强制执行的验证流程，确保代码质量
 
@@ -726,9 +698,9 @@ grep "OrderSnapshot.java" dev_log/*.md
 
 **不包含**：
 
-- ❌ 验证流程命令 → [验证流程指南](_docs/验证流程指南.md)
+- ❌ 验证流程命令 → [验证流程指南](_docs/specification/验证流程指南.md)
 - ❌ 文档导航信息 → [CLAUDE.md](CLAUDE.md)
-- ❌ 测试规范详细内容 → [测试代码编写规范](_docs/测试代码编写规范.md)
+- ❌ 测试规范详细内容 → [测试代码编写规范](_docs/specification/测)试代码编写规范.md)
 
 **定位**：编码标准权威参考，AI和开发者的编码手册
 
@@ -749,8 +721,8 @@ grep "OrderSnapshot.java" dev_log/*.md
 
 **不包含**：
 
-- ❌ 业务代码编码规范 → [业务代码编写规范](_docs/业务代码编写规范.md)
-- ❌ 验证流程细节 → [验证流程指南](_docs/验证流程指南.md)
+- ❌ 业务代码编码规范 → [业务代码编写规范](_docs/specification/业务代码编写规范.md)
+- ❌ 验证流程细节 → [验证流程指南](_docs/specification/验证流程指南.md)
 
 **定位**：测试代码生成的唯一标准
 
@@ -768,7 +740,7 @@ grep "OrderSnapshot.java" dev_log/*.md
 **不包含**：
 
 - ❌ 跨层内容
-- ❌ 通用编码规范 → [业务代码编写规范](_docs/业务代码编写规范.md)
+- ❌ 通用编码规范 → [业务代码编写规范](_docs/specification/业务代码编写规范.md)
 
 **定位**：该层开发的详细指南
 
@@ -783,24 +755,24 @@ grep "OrderSnapshot.java" dev_log/*.md
 
 ### 场景2：开始编写代码
 
-1. 先读 [业务代码编写规范](_docs/业务代码编写规范.md) - 了解编码规范
+1. 先读 [业务代码编写规范](_docs/specification/业务代码编写规范.md) - 了解编码规范
 2. 再读对应模块README - 了解该层开发模式
 
 ### 场景3：AI生成代码
 
-1. 先读 [业务代码编写规范](_docs/业务代码编写规范.md) - 了解编码规范
-2. 再读 [测试代码编写规范](_docs/测试代码编写规范.md) - 了解测试生成要求
-3. 最后执行 [验证流程指南](_docs/验证流程指南.md) - 完成4步验证
+1. 先读 [业务代码编写规范](_docs/specification/业务代码编写规范.md) - 了解编码规范
+2. 再读 [测试代码编写规范](_docs/specification/测)试代码编写规范.md) - 了解测试生成要求
+3. 最后执行 [验证流程指南](_docs/specification/验证流程指南.md) - 完成4步验证
 
 ### 场景4：验证失败
 
-1. 先读 [验证流程指南](_docs/验证流程指南.md) - 查看故障排查决策树
+1. 先读 [验证流程指南](_docs/specification/验证流程指南.md) - 查看故障排查决策树
 2. 再读 [CLAUDE.md](CLAUDE.md) - 查看常见问题FAQ
 
 ### 场景5：开发特定层功能
 
 1. 直接阅读对应模块README - 获取该层详细指南
-2. 参考 [业务代码编写规范](_docs/业务代码编写规范.md) - 确保符合规范
+2. 参考 [业务代码编写规范](_docs/specification/业务代码编写规范.md) - 确保符合规范
 
 ---
 
@@ -825,7 +797,7 @@ grep "OrderSnapshot.java" dev_log/*.md
 2. 确保添加了`lombok-mapstruct-binding`
 3. 运行`mvn clean compile`重新生成
 
-**参考**: [验证流程指南 - 编译验证](_docs/验证流程指南.md#步骤2编译验证)
+**参考**: [验证流程指南 - 编译验证](_docs/specification/验证流程指南.md#步骤2编译验证)
 
 #### 类型转换错误
 
@@ -842,7 +814,7 @@ grep "OrderSnapshot.java" dev_log/*.md
 1. 使用`@Mapping(expression="java(...)")`
 2. 或使用`@Mapping(target="...", ignore=true)`
 
-**参考**: [验证流程指南 - 常见编译问题](_docs/验证流程指南.md#常见编译问题)
+**参考**: [验证流程指南 - 常见编译问题](_docs/specification/验证流程指南.md#常见编译问题)
 
 ### 🧪 单元测试失败
 
@@ -856,7 +828,7 @@ grep "OrderSnapshot.java" dev_log/*.md
 2. 确保使用正确的mock实例
 3. 验证Mock设置在调用之前完成
 
-**参考**: [验证流程指南 - 测试失败处理](_docs/验证流程指南.md#测试失败处理流程)
+**参考**: [验证流程指南 - 测试失败处理](_docs/specification/验证流程指南.md#测试失败处理流程)
 
 #### 断言失败
 
@@ -868,7 +840,7 @@ grep "OrderSnapshot.java" dev_log/*.md
 2. 验证测试用例是否合理
 3. 查看失败的详细堆栈信息
 
-**参考**: [验证流程指南 - 测试失败示例](_docs/验证流程指南.md#附录c-常见错误示例)
+**参考**: [验证流程指南 - 测试失败示例](_docs/specification/验证流程指南.md#附录c-常见错误示例)
 
 ### 🚀 启动测试失败
 
@@ -888,7 +860,7 @@ org.springframework.beans.factory.BeanCreationException
 2. 确保依赖完整
 3. 查看详细堆栈定位失败Bean
 
-**参考**: [验证流程指南 - 启动失败处理](_docs/验证流程指南.md#步骤4主启动类启动验证-最关键)
+**参考**: [验证流程指南 - 启动失败处理](_docs/specification/验证流程指南.md#步骤4主启动类启动验证-最关键)
 
 #### 循环依赖
 
@@ -913,7 +885,7 @@ The dependencies of some of the beans in the application context form a cycle
 
 **参考**:
 
-- [验证流程指南 - 循环依赖解决](_docs/验证流程指南.md#⚠️-循环依赖解决原则)
+- [验证流程指南 - 循环依赖解决](_docs/specification/验证流程指南.md#⚠️-循环依赖解决原则)
 - [业务代码编写规范.md - Bean管理](业务代码编写规范.md#26-springboot-bean管理规范)
 
 #### NoSuchBeanDefinitionException
@@ -932,13 +904,13 @@ No qualifying bean of type 'com.xxx.XxxService' available
 2. 确保条件装配（@ConditionalOnBean）满足
 3. 验证依赖Bean已创建
 
-**参考**: [验证流程指南 - 常见启动失败问题](_docs/验证流程指南.md#常见启动失败问题)
+**参考**: [验证流程指南 - 常见启动失败问题](_docs/specification/验证流程指南.md#常见启动失败问题)
 
 ---
 
 ## 代码质量标准
 
-**详细质量检查清单**：[验证流程指南 - 代码质量检查清单](_docs/验证流程指南.md#代码质量检查清单)
+**详细质量检查清单**：[验证流程指南 - 代码质量检查清单](_docs/specification/验证流程指南.md#代码质量检查清单)
 
 ### 快速参考
 
@@ -973,7 +945,7 @@ No qualifying bean of type 'com.xxx.XxxService' available
 3. 单元测试验证确保测试覆盖
 4. 启动验证确保应用可以正常运行
 
-**详细流程**: [验证流程指南](_docs/验证流程指南.md)
+**详细流程**: [验证流程指南](_docs/specification/验证流程指南.md)
 
 ### Q3: 如何解决循环依赖？
 
@@ -991,7 +963,7 @@ No qualifying bean of type 'com.xxx.XxxService' available
 - 使用ApplicationContext.getBean()依赖查找
 - 使用@PostConstruct延迟初始化
 
-**详细说明**: [验证流程指南 - 循环依赖解决](_docs/验证流程指南.md#⚠️-循环依赖解决原则)
+**详细说明**: [验证流程指南 - 循环依赖解决](_docs/specification/验证流程指南.md#⚠️-循环依赖解决原则)
 
 ### Q4: 何时使用三层架构（接口-抽象基类-实现）？
 
@@ -1037,7 +1009,7 @@ No qualifying bean of type 'com.xxx.XxxService' available
 **v5.0 更新说明**：
 
 - **重大重构**: 将CLAUDE.md转换为AI元指南
-- **移除内容**: 所有详细编码规范迁移到[业务代码编写规范](_docs/业务代码编写规范.md)
+- **移除内容**: 所有详细编码规范迁移到[业务代码编写规范](_docs/specification/业务代码编写规范.md)
 - **移除内容**: 所有架构详情迁移到[README.md](README.md)
 - **新增**: 文档导航系统
 - **新增**: 开发工作流（新增功能、Bug修复、重构）
@@ -1047,5 +1019,5 @@ No qualifying bean of type 'com.xxx.XxxService' available
 **相关文档**:
 
 - [README.md](README.md) - 项目概览
-- [业务代码编写规范](_docs/业务代码编写规范.md) - 编码标准
-- [验证流程指南](_docs/验证流程指南.md) - 代码生成流程
+- [业务代码编写规范](_docs/specification/业务代码编写规范.md) - 编码标准
+- [验证流程指南](_docs/specification/验证流程指南.md) - 代码生成流程
