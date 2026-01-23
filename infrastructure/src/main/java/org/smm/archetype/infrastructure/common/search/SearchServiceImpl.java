@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain._shared.client.EsClient;
+import org.smm.archetype.domain._shared.client.SearchClient;
 import org.smm.archetype.domain.common.search.SearchService;
 import org.smm.archetype.domain.common.search.query.AiSearchQuery;
 import org.smm.archetype.domain.common.search.query.HybridSearchQuery;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SearchServiceImpl implements SearchService {
 
-    private final EsClient esClient;
+    private final SearchClient searchClient;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -53,7 +53,7 @@ public class SearchServiceImpl implements SearchService {
             String queryDsl = buildQueryDsl(query);
 
             // 执行搜索
-            Map<String, Object> response = esClient.search(index, queryDsl, query.getFrom(), query.getSize());
+            Map<String, Object> response = searchClient.search(index, queryDsl, query.getFrom(), query.getSize());
 
             // 转换结果
             return convertSearchResult(response, documentClass);
@@ -68,7 +68,7 @@ public class SearchServiceImpl implements SearchService {
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> documentMap = objectMapper.convertValue(document, Map.class);
-            esClient.index(index, id, documentMap);
+            searchClient.index(index, id, documentMap);
         } catch (Exception e) {
             log.error("Failed to index document: index={}, id={}", index, id, e);
             throw new RuntimeException("Failed to index document", e);
@@ -86,7 +86,7 @@ public class SearchServiceImpl implements SearchService {
                 ))
                 .collect(Collectors.toList());
 
-            esClient.bulkIndex(index, documentsList);
+            searchClient.bulkIndex(index, documentsList);
         } catch (Exception e) {
             log.error("Failed to bulk index: index={}, count={}", index, documents.size(), e);
             throw new RuntimeException("Failed to bulk index", e);
@@ -95,18 +95,18 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public void delete(String index, String id) {
-        esClient.delete(index, id);
+        searchClient.delete(index, id);
     }
 
     @Override
     public void bulkDelete(String index, List<String> ids) {
-        esClient.bulkDelete(index, ids);
+        searchClient.bulkDelete(index, ids);
     }
 
     @Override
     public <T> T get(String index, String id, Class<T> documentClass) {
         try {
-            Map<String, Object> source = esClient.get(index, id);
+            Map<String, Object> source = searchClient.get(index, id);
             if (source == null) {
                 return null;
             }
@@ -120,7 +120,7 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public <T> Map<String, T> bulkGet(String index, List<String> ids, Class<T> documentClass) {
         try {
-            Map<String, Map<String, Object>> results = esClient.bulkGet(index, ids);
+            Map<String, Map<String, Object>> results = searchClient.bulkGet(index, ids);
 
             Map<String, T> documents = new HashMap<>();
             for (Map.Entry<String, Map<String, Object>> entry : results.entrySet()) {
@@ -136,22 +136,22 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public void refresh(String index) {
-        esClient.refresh(index);
+        searchClient.refresh(index);
     }
 
     @Override
     public boolean existsIndex(String index) {
-        return esClient.existsIndex(index);
+        return searchClient.existsIndex(index);
     }
 
     @Override
     public void createIndex(String index, String mapping) {
-        esClient.createIndex(index, mapping);
+        searchClient.createIndex(index, mapping);
     }
 
     @Override
     public void deleteIndex(String index) {
-        esClient.deleteIndex(index);
+        searchClient.deleteIndex(index);
     }
 
     // ========== 私有方法 ==========
@@ -434,7 +434,7 @@ public class SearchServiceImpl implements SearchService {
             String queryDsl = buildKnnQueryDsl(query);
 
             // 执行向量搜索
-            Map<String, Object> response = esClient.vectorSearch(index, queryDsl);
+            Map<String, Object> response = searchClient.vectorSearch(index, queryDsl);
 
             // 转换结果
             return convertVectorSearchResult(response, documentClass);
@@ -451,7 +451,7 @@ public class SearchServiceImpl implements SearchService {
             String indexTypeStr = indexType.name().toLowerCase();
             String distanceTypeStr = convertDistanceType(distanceType);
 
-            esClient.createVectorIndex(index, vectorField, dimension, indexTypeStr, distanceTypeStr);
+            searchClient.createVectorIndex(index, vectorField, dimension, indexTypeStr, distanceTypeStr);
         } catch (Exception e) {
             log.error("Failed to create vector index: index={}, field={}", index, vectorField, e);
             throw new RuntimeException("Failed to create vector index", e);
@@ -755,7 +755,7 @@ public class SearchServiceImpl implements SearchService {
 
             // 执行搜索，委托给具体的EsClient实现
             // ElasticsearchClientImpl会使用ES的function_score
-            Map<String, Object> response = esClient.search(index, queryDsl, query.getFrom(), query.getSize());
+            Map<String, Object> response = searchClient.search(index, queryDsl, query.getFrom(), query.getSize());
 
             // 转换结果
             return convertAiSearchResult(response, documentClass, query.getRerankStrategy());
@@ -776,7 +776,7 @@ public class SearchServiceImpl implements SearchService {
             String queryDsl = buildHybridSearchQueryDsl(query);
 
             // 执行搜索
-            Map<String, Object> response = esClient.search(index, queryDsl, query.getFrom(), query.getSize());
+            Map<String, Object> response = searchClient.search(index, queryDsl, query.getFrom(), query.getSize());
 
             // 转换结果
             return convertSearchResult(response, documentClass);

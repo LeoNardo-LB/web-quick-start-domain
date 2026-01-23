@@ -1,7 +1,7 @@
-package org.smm.archetype.infrastructure._shared.client.es;
+package org.smm.archetype.infrastructure._shared.client.search.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain._shared.client.EsClient;
+import org.smm.archetype.infrastructure._shared.client.search.AbstractSearchClient;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,7 @@ import java.util.Map;
  * @since 2026-01-15
  */
 @Slf4j
-public class DisabledEsClientImpl extends AbstractEsClient {
+public class DisabledSearchClientImpl extends AbstractSearchClient {
 
     private static final String ES_DISABLED_MESSAGE =
         "Elasticsearch is disabled (middleware.search.enabled=false). " +

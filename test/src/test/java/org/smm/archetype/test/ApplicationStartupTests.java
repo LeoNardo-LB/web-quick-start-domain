@@ -2,9 +2,9 @@ package org.smm.archetype.test;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.smm.archetype.domain._shared.client.SearchClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.smm.archetype.domain._shared.client.EsClient;
 import org.smm.archetype.domain.common.search.SearchService;
 import support.ITestBase;
 
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ApplicationStartupTests extends ITestBase {
 
     @Autowired(required = false)
-    private EsClient esClient;
+    private SearchClient searchClient;
 
     @Autowired(required = false)
     private SearchService searchService;
@@ -32,8 +32,8 @@ class ApplicationStartupTests extends ITestBase {
     @DisplayName("验证EsClient Bean成功装配")
     void verifyEsClientBeanLoaded() {
         // Assert
-        assertThat(esClient).isNotNull();
-        System.out.println("✅ EsClient Bean successfully loaded: " + esClient.getClass().getSimpleName());
+        assertThat(searchClient).isNotNull();
+        System.out.println("✅ SearchClient Bean successfully loaded: " + searchClient.getClass().getSimpleName());
     }
 
     @Test

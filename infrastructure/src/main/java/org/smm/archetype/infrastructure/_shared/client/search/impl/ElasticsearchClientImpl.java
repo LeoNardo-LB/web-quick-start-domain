@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure._shared.client.es;
+package org.smm.archetype.infrastructure._shared.client.search.impl;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.*;
@@ -8,7 +8,7 @@ import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain._shared.client.EsClient;
+import org.smm.archetype.infrastructure._shared.client.search.AbstractSearchClient;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * @since 2026-01-14
  */
 @Slf4j
-public class ElasticsearchClientImpl extends AbstractEsClient {
+public class ElasticsearchClientImpl extends AbstractSearchClient {
 
     private final ElasticsearchClient client;
 

@@ -18,7 +18,7 @@
             <artifactId>domain</artifactId>
         </dependency>
 
-        <!-- MapStruct（版本由根POM的dependencyManagement管理）-->
+        <!-- MapStruct-->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
@@ -68,7 +68,7 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
-        <!-- Caffeine本地缓存 -->
+        <!-- Caffeine 本地缓存 -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>

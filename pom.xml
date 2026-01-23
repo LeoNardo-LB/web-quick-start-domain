@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.9</version>
+        <version>4.0.2</version>
     </parent>
     <groupId>org.smm.archetype</groupId>
     <artifactId>web-quick-start-domain</artifactId>
@@ -30,7 +30,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <!--springboot3 使用 2.x；springboot4 使用 3.0.0-->
-        <spring-doc.version>2.8.14</spring-doc.version>
+        <spring-doc.version>3.0.1</spring-doc.version>
         <mybatis-flex.version>1.11.5</mybatis-flex.version>
         <lombok.version>1.18.42</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
@@ -64,6 +64,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+            <version>4.0.0-M2</version>
         </dependency>
 
         <!-- 代码生成 -->

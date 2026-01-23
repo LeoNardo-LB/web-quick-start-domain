@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableScheduling
 @RestController
 @SpringBootApplication
-@EnableAspectJAutoProxy
 @MapperScan("org.smm.archetype.infrastructure.**.mapper")
 public class ApplicationBootstrap implements CommandLineRunner {
 

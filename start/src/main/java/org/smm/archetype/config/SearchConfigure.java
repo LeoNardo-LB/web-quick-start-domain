@@ -9,12 +9,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
-import org.smm.archetype.domain._shared.client.EsClient;
-import org.smm.archetype.domain.common.search.SearchService;
-import org.smm.archetype.infrastructure._shared.client.es.DisabledEsClientImpl;
-import org.smm.archetype.infrastructure._shared.client.es.ElasticsearchClientImpl;
-import org.smm.archetype.infrastructure.common.search.SearchServiceImpl;
 import org.smm.archetype.config.properties.SearchProperties;
+import org.smm.archetype.domain._shared.client.SearchClient;
+import org.smm.archetype.domain.common.search.SearchService;
+import org.smm.archetype.infrastructure._shared.client.search.impl.DisabledSearchClientImpl;
+import org.smm.archetype.infrastructure._shared.client.search.impl.ElasticsearchClientImpl;
+import org.smm.archetype.infrastructure.common.search.SearchServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +34,8 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class SearchConfigure {
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper     objectMapper;
+    private final SearchProperties searchProperties;
 
     /**
      * Elasticsearch REST 客户端
@@ -76,6 +77,7 @@ public class SearchConfigure {
             restClient,
             new JacksonJsonpMapper(objectMapper)
         );
+
         return new ElasticsearchClient(transport);
     }
 
@@ -92,7 +94,7 @@ public class SearchConfigure {
         name = "enabled",
         havingValue = "true"
     )
-    public EsClient esClient(ElasticsearchClient elasticsearchClient, SearchProperties properties) {
+    public SearchClient esClient(ElasticsearchClient elasticsearchClient, SearchProperties properties) {
         // ES 健康检查：确保 ES 可用
         try {
             HealthResponse health = elasticsearchClient.cluster().health();
@@ -131,16 +133,16 @@ public class SearchConfigure {
         havingValue = "false",
         matchIfMissing = true  // 默认启用
     )
-    public EsClient disabledEsClient() {
+    public SearchClient disabledEsClient() {
         log.info("Elasticsearch is disabled (middleware.search.enabled=false)");
-        return new DisabledEsClientImpl();
+        return new DisabledSearchClientImpl();
     }
 
     /**
      * 搜索服务
      */
     @Bean
-    public SearchService searchService(EsClient esClient) {
-        return new SearchServiceImpl(esClient, objectMapper);
+    public SearchService searchService(SearchClient searchClient) {
+        return new SearchServiceImpl(searchClient, objectMapper);
     }
 }

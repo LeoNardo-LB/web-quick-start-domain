@@ -91,12 +91,11 @@ public class LogConfigure {
      *
      * <p>拦截需要记录日志的方法，自动收集和持久化日志信息。
      * @param persistenceHandlers 所有持久化处理器
-     * @param stringifyHandlers   所有字符串化处理器
      * @return 日志切面
      */
     @Bean
-    public LogAspect logAspect(List<PersistenceHandler> persistenceHandlers, List<StringifyHandler> stringifyHandlers) {
-        return new LogAspect(persistenceHandlers, stringifyHandlers);
+    public LogAspect logAspect(List<PersistenceHandler> persistenceHandlers) {
+        return new LogAspect(persistenceHandlers);
     }
 
 }

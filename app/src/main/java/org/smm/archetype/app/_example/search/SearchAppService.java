@@ -35,9 +35,7 @@ import org.smm.archetype.domain.common.search.result.SearchResult;
 import org.smm.archetype.domain.common.search.result.VectorSearchResult;
 import org.smm.archetype.domain.common.search.result.VectorSearchHit;
 import org.smm.archetype.domain.common.search.result.AiSearchResult;
-import org.smm.archetype.domain.common.search.result.AiSearchHit;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,12 +43,10 @@ import java.util.stream.Collectors;
  * 搜索应用服务
  *
  * <p>负责搜索用例的编排和DTO转换
- *
  * @author Leonardo
- * @since 2026-01-14
+ * @since 2026/01/14
  */
 @Slf4j
-@Service
 @RequiredArgsConstructor
 public class SearchAppService {
 

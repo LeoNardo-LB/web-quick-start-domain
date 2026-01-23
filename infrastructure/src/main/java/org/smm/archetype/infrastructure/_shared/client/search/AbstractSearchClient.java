@@ -1,7 +1,7 @@
-package org.smm.archetype.infrastructure._shared.client.es;
+package org.smm.archetype.infrastructure._shared.client.search;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain._shared.client.EsClient;
+import org.smm.archetype.domain._shared.client.SearchClient;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.Map;
  * @since 2026-01-14
  */
 @Slf4j
-public abstract class AbstractEsClient implements EsClient {
+public abstract class AbstractSearchClient implements SearchClient {
 
     @Override
     public final void index(String index, String id, Map<String, Object> document) {

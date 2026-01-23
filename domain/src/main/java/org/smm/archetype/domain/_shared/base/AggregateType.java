@@ -17,35 +17,33 @@ public enum AggregateType {
     /**
      * 订单聚合根
      */
-    ORDER("Order", "订单"),
+    ORDER("Order"),
 
     /**
      * 用户聚合根
      */
-    USER("User", "用户"),
+    USER("User"),
 
     /**
      * 产品聚合根
      */
-    PRODUCT("Product", "产品"),
+    PRODUCT("Product"),
 
     /**
      * 支付聚合根
      */
-    PAYMENT("Payment", "支付"),
+    PAYMENT("Payment"),
 
     /**
      * 未知类型
      */
-    UNKNOWN("Unknown", "未知");
+    UNKNOWN("Unknown");
 
     private static final Logger log = LoggerFactory.getLogger(AggregateType.class);
     private final String code;
-    private final String description;
 
-    AggregateType(String code, String description) {
+    AggregateType(String code) {
         this.code = code;
-        this.description = description;
     }
 
     /**

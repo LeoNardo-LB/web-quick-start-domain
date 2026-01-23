@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Elasticsearch技术客户端接口
+ * Elasticsearch 技术客户端接口
  *
  * <p>提供底层ES操作，无业务语义
  *
  * @author Leonardo
  * @since 2026-01-14
  */
-public interface EsClient {
+public interface SearchClient {
 
     /**
      * 索引文档

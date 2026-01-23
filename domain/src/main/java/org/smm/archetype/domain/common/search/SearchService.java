@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * 搜索服务接口
  *
- * <p>提供业务层的搜索能力，封装技术客户端（EsClient）提供的方法
+ * <p>提供业务层的搜索能力，封装技术客户端（SearchClient）提供的方法
  *
  * @author Leonardo
  * @since 2026-01-14

@@ -6,12 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.smm.archetype.domain._shared.client.EsClient;
-import org.smm.archetype.domain.common.search.SearchService;
+import org.smm.archetype.domain._shared.client.SearchClient;
 import org.smm.archetype.domain.common.search.enums.FilterOperator;
-import org.smm.archetype.domain.common.search.enums.SearchStrategy;
 import org.smm.archetype.domain.common.search.enums.SortOrder;
 import org.smm.archetype.domain.common.search.query.SearchFilter;
 import org.smm.archetype.domain.common.search.query.SearchQuery;
@@ -22,7 +19,6 @@ import org.smm.archetype.domain.common.search.enums.VectorIndexType;
 import org.smm.archetype.domain.common.search.query.AiSearchQuery;
 import org.smm.archetype.domain.common.search.query.VectorSearchQuery;
 import org.smm.archetype.domain.common.search.query.HybridSearchQuery;
-import org.smm.archetype.domain.common.search.result.SearchHit;
 import org.smm.archetype.domain.common.search.result.SearchResult;
 import org.smm.archetype.domain.common.search.result.VectorSearchResult;
 import org.smm.archetype.domain.common.search.result.AiSearchResult;
@@ -63,7 +59,7 @@ class SearchServiceImplUTest extends UnitTestBase {
     }
 
     @Mock
-    private EsClient esClient;
+    private SearchClient searchClient;
 
     private SearchServiceImpl searchService;
 
@@ -71,7 +67,7 @@ class SearchServiceImplUTest extends UnitTestBase {
 
     @Override
     protected void setUpMocks() {
-        searchService = new SearchServiceImpl(esClient, objectMapper);
+        searchService = new SearchServiceImpl(searchClient, objectMapper);
     }
 
     // ========== search测试 ==========
@@ -88,7 +84,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(1);
-        when(esClient.search(anyString(), anyString(), anyInt(), anyInt()))
+        when(searchClient.search(anyString(), anyString(), anyInt(), anyInt()))
             .thenReturn(mockResponse);
 
         // Act
@@ -111,7 +107,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         assertThat(result.getHits()).hasSize(1);
         assertThat(result.getHits().get(0).getId()).isEqualTo("P001");
 
-        verify(esClient, times(1)).search(eq(index), anyString(), eq(0), eq(10));
+        verify(searchClient, times(1)).search(eq(index), anyString(), eq(0), eq(10));
     }
 
     @Test
@@ -130,7 +126,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(2);
-        when(esClient.search(eq(index), anyString(), eq(0), eq(10)))
+        when(searchClient.search(eq(index), anyString(), eq(0), eq(10)))
             .thenReturn(mockResponse);
 
         // Act
@@ -138,7 +134,7 @@ class SearchServiceImplUTest extends UnitTestBase {
 
         // Assert
         assertThat(result.getTotalHits()).isEqualTo(2);
-        verify(esClient, times(1)).search(eq(index), anyString(), eq(0), eq(10));
+        verify(searchClient, times(1)).search(eq(index), anyString(), eq(0), eq(10));
     }
 
     @Test
@@ -157,7 +153,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(3);
-        when(esClient.search(eq(index), anyString(), eq(0), eq(10)))
+        when(searchClient.search(eq(index), anyString(), eq(0), eq(10)))
             .thenReturn(mockResponse);
 
         // Act
@@ -165,7 +161,7 @@ class SearchServiceImplUTest extends UnitTestBase {
 
         // Assert
         assertThat(result.getTotalHits()).isEqualTo(3);
-        verify(esClient, times(1)).search(eq(index), anyString(), eq(0), eq(10));
+        verify(searchClient, times(1)).search(eq(index), anyString(), eq(0), eq(10));
     }
 
     @Test
@@ -179,7 +175,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(5);
-        when(esClient.search(eq(index), anyString(), eq(0), eq(10)))
+        when(searchClient.search(eq(index), anyString(), eq(0), eq(10)))
             .thenReturn(mockResponse);
 
         // Act
@@ -187,7 +183,7 @@ class SearchServiceImplUTest extends UnitTestBase {
 
         // Assert
         assertThat(result.getTotalHits()).isEqualTo(5);
-        verify(esClient, times(1)).search(eq(index), anyString(), eq(0), eq(10));
+        verify(searchClient, times(1)).search(eq(index), anyString(), eq(0), eq(10));
     }
 
     // ========== index测试 ==========
@@ -204,7 +200,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         searchService.index(index, id, document);
 
         // Assert
-        verify(esClient, times(1)).index(eq(index), eq(id), any(Map.class));
+        verify(searchClient, times(1)).index(eq(index), eq(id), any(Map.class));
     }
 
     // ========== bulkIndex测试 ==========
@@ -226,7 +222,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         searchService.bulkIndex(index, documents);
 
         // Assert
-        verify(esClient, times(1)).bulkIndex(eq(index), any());
+        verify(searchClient, times(1)).bulkIndex(eq(index), any());
     }
 
     // ========== delete测试 ==========
@@ -242,7 +238,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         searchService.delete(index, id);
 
         // Assert
-        verify(esClient, times(1)).delete(eq(index), eq(id));
+        verify(searchClient, times(1)).delete(eq(index), eq(id));
     }
 
     // ========== bulkDelete测试 ==========
@@ -258,7 +254,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         searchService.bulkDelete(index, ids);
 
         // Assert
-        verify(esClient, times(1)).bulkDelete(eq(index), eq(ids));
+        verify(searchClient, times(1)).bulkDelete(eq(index), eq(ids));
     }
 
     // ========== get测试 ==========
@@ -273,7 +269,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         source.put("name", "iPhone 15");
         source.put("price", 799.99);
 
-        when(esClient.get(index, id)).thenReturn(source);
+        when(searchClient.get(index, id)).thenReturn(source);
 
         // Act
         TestDocument result = searchService.get(index, id, TestDocument.class);
@@ -282,7 +278,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo("iPhone 15");
         assertThat(result.getPrice()).isEqualTo(799.99);
-        verify(esClient, times(1)).get(eq(index), eq(id));
+        verify(searchClient, times(1)).get(eq(index), eq(id));
     }
 
     @Test
@@ -292,14 +288,14 @@ class SearchServiceImplUTest extends UnitTestBase {
         String index = "products";
         String id = "P999";
 
-        when(esClient.get(index, id)).thenReturn(null);
+        when(searchClient.get(index, id)).thenReturn(null);
 
         // Act
         TestDocument result = searchService.get(index, id, TestDocument.class);
 
         // Assert
         assertThat(result).isNull();
-        verify(esClient, times(1)).get(eq(index), eq(id));
+        verify(searchClient, times(1)).get(eq(index), eq(id));
     }
 
     // ========== bulkGet测试 ==========
@@ -322,7 +318,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         doc2.put("price", 699.99);
         mockResults.put("P002", doc2);
 
-        when(esClient.bulkGet(index, ids)).thenReturn(mockResults);
+        when(searchClient.bulkGet(index, ids)).thenReturn(mockResults);
 
         // Act
         Map<String, TestDocument> result = searchService.bulkGet(index, ids, TestDocument.class);
@@ -331,7 +327,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         assertThat(result).hasSize(2);
         assertThat(result.get("P001").getName()).isEqualTo("iPhone 15");
         assertThat(result.get("P002").getName()).isEqualTo("Samsung Galaxy");
-        verify(esClient, times(1)).bulkGet(eq(index), eq(ids));
+        verify(searchClient, times(1)).bulkGet(eq(index), eq(ids));
     }
 
     // ========== refresh测试 ==========
@@ -346,7 +342,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         searchService.refresh(index);
 
         // Assert
-        verify(esClient, times(1)).refresh(eq(index));
+        verify(searchClient, times(1)).refresh(eq(index));
     }
 
     // ========== existsIndex测试 ==========
@@ -356,14 +352,14 @@ class SearchServiceImplUTest extends UnitTestBase {
     void existsIndex_ExistingIndex_ReturnsTrue() {
         // Arrange
         String index = "products";
-        when(esClient.existsIndex(index)).thenReturn(true);
+        when(searchClient.existsIndex(index)).thenReturn(true);
 
         // Act
         boolean result = searchService.existsIndex(index);
 
         // Assert
         assertThat(result).isTrue();
-        verify(esClient, times(1)).existsIndex(eq(index));
+        verify(searchClient, times(1)).existsIndex(eq(index));
     }
 
     @Test
@@ -371,14 +367,14 @@ class SearchServiceImplUTest extends UnitTestBase {
     void existsIndex_NonExistingIndex_ReturnsFalse() {
         // Arrange
         String index = "products";
-        when(esClient.existsIndex(index)).thenReturn(false);
+        when(searchClient.existsIndex(index)).thenReturn(false);
 
         // Act
         boolean result = searchService.existsIndex(index);
 
         // Assert
         assertThat(result).isFalse();
-        verify(esClient, times(1)).existsIndex(eq(index));
+        verify(searchClient, times(1)).existsIndex(eq(index));
     }
 
     // ========== createIndex测试 ==========
@@ -394,7 +390,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         searchService.createIndex(index, mapping);
 
         // Assert
-        verify(esClient, times(1)).createIndex(eq(index), eq(mapping));
+        verify(searchClient, times(1)).createIndex(eq(index), eq(mapping));
     }
 
     // ========== deleteIndex测试 ==========
@@ -409,7 +405,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         searchService.deleteIndex(index);
 
         // Assert
-        verify(esClient, times(1)).deleteIndex(eq(index));
+        verify(searchClient, times(1)).deleteIndex(eq(index));
     }
 
     // ========== vectorSearch测试 ==========
@@ -428,7 +424,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockVectorSearchResponse(2);
-        when(esClient.vectorSearch(eq(index), anyString())).thenReturn(mockResponse);
+        when(searchClient.vectorSearch(eq(index), anyString())).thenReturn(mockResponse);
 
         // Act
         VectorSearchResult<TestDocument> result = searchService.vectorSearch(index, query, TestDocument.class);
@@ -436,7 +432,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getHits()).hasSize(2);
-        verify(esClient, times(1)).vectorSearch(eq(index), anyString());
+        verify(searchClient, times(1)).vectorSearch(eq(index), anyString());
     }
 
     // ========== aiSearch测试 ==========
@@ -454,7 +450,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(3);
-        when(esClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
+        when(searchClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
 
         // Act
         AiSearchResult<TestDocument> result = searchService.aiSearch(index, query, TestDocument.class);
@@ -462,7 +458,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getTotalHits()).isEqualTo(3);
-        verify(esClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
+        verify(searchClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
     }
 
     @Test
@@ -479,7 +475,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(3);
-        when(esClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
+        when(searchClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
 
         // Act
         AiSearchResult<TestDocument> result = searchService.aiSearch(index, query, TestDocument.class);
@@ -487,7 +483,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getTotalHits()).isEqualTo(3);
-        verify(esClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
+        verify(searchClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
     }
 
     @Test
@@ -503,7 +499,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(3);
-        when(esClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
+        when(searchClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
 
         // Act
         AiSearchResult<TestDocument> result = searchService.aiSearch(index, query, TestDocument.class);
@@ -511,7 +507,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getTotalHits()).isEqualTo(3);
-        verify(esClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
+        verify(searchClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
     }
 
     // ========== hybridSearch测试 ==========
@@ -534,7 +530,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(3);
-        when(esClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
+        when(searchClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
 
         // Act
         SearchResult<TestDocument> result = searchService.hybridSearch(index, query, TestDocument.class);
@@ -542,7 +538,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getTotalHits()).isEqualTo(3);
-        verify(esClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
+        verify(searchClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
     }
 
     @Test
@@ -563,7 +559,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(3);
-        when(esClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
+        when(searchClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
 
         // Act
         SearchResult<TestDocument> result = searchService.hybridSearch(index, query, TestDocument.class);
@@ -571,7 +567,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getTotalHits()).isEqualTo(3);
-        verify(esClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
+        verify(searchClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
     }
 
     @Test
@@ -592,7 +588,7 @@ class SearchServiceImplUTest extends UnitTestBase {
             .build();
 
         Map<String, Object> mockResponse = buildMockSearchResponse(2);
-        when(esClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
+        when(searchClient.search(eq(index), anyString(), anyInt(), anyInt())).thenReturn(mockResponse);
 
         // Act
         SearchResult<TestDocument> result = searchService.hybridSearch(index, query, TestDocument.class);
@@ -600,7 +596,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getTotalHits()).isEqualTo(2);
-        verify(esClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
+        verify(searchClient, times(1)).search(eq(index), anyString(), anyInt(), anyInt());
     }
 
     // ========== createVectorIndex测试 ==========
@@ -619,7 +615,7 @@ class SearchServiceImplUTest extends UnitTestBase {
         searchService.createVectorIndex(index, vectorField, dimension, indexType, distanceType);
 
         // Assert
-        verify(esClient, times(1)).createVectorIndex(eq(index), eq(vectorField), eq(dimension),
+        verify(searchClient, times(1)).createVectorIndex(eq(index), eq(vectorField), eq(dimension),
             eq("hnsw"), eq("cosine"));
     }
 
