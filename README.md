@@ -76,7 +76,7 @@ mvn test
 mvn test -Dtest=ApplicationStartupTests -pl test
 ```
 
-详细流程：[验证流程指南](_docs/specification/验证流程指南.md)
+详细流程：[验证流程指南](_docs/specification/业务代码生成(AI)流程.md)
 
 ---
 
@@ -346,7 +346,7 @@ web-quick-start-domain/
 │   └── pom.xml          # JaCoCo配置
 │
 ├── _docs/               # 文档目录
-│   ├── 验证流程指南.md        # 验证流程 ⭐
+│   ├── 业务代码生成(AI)流程.md        # 验证流程 ⭐
 │   ├── 测试示例指南.md         # 测试示例
 │   ├── 业务代码编写规范.md     # 编码规范
 │   └── 测试代码编写规范.md     # 测试规范
@@ -475,7 +475,7 @@ mvn test
 mvn test -Dtest=ApplicationStartupTests -pl test
 ```
 
-详细流程：[验证流程指南](_docs/specification/验证流程指南.md)
+详细流程：[验证流程指南](_docs/specification/业务代码生成(AI)流程.md)
 
 ---
 
@@ -485,7 +485,7 @@ mvn test -Dtest=ApplicationStartupTests -pl test
 
 | 文档 | 用途 | 读者 |
 |------|------|------|
-| **[验证流程指南](_docs/specification/验证流程指南.md)** | 验证流程 | 开发者 ⭐ |
+| **[验证流程指南](_docs/specification/业务代码生成(AI)流程.md)** | 验证流程 | 开发者 ⭐ |
 | **[测试示例指南](_docs/specification/测试示例指南.md)** | 测试示例 | 开发者 |
 | **[业务代码编写规范](_docs/specification/业务代码编写规范.md)** | 编码标准 | 开发者 |
 | **[测试代码编写规范](_docs/specification/测试代码编写规范.md)** | 测试规范 | 开发者 |
@@ -521,7 +521,7 @@ mvn test          # 单元测试验证
 mvn test -Dtest=ApplicationStartupTests -pl test  # 启动验证
 ```
 
-详细流程：[验证流程指南](_docs/specification/验证流程指南.md)
+详细流程：[验证流程指南](_docs/specification/业务代码生成(AI)流程.md)
 
 ### Q3: 如何解决循环依赖？
 
