@@ -379,6 +379,8 @@ public interface ProductRepository {
 }
 ```
 
+> **详细规范**：[业务代码编写规范](_docs/specification/业务代码编写规范.md) - 领域层设计模式
+
 
 
 #### 2. 实现应用服务（Application层）
@@ -401,6 +403,8 @@ public class ProductAppService {
     }
 }
 ```
+
+> **详细规范**：[业务代码编写规范](_docs/specification/业务代码编写规范.md) - 配置类命名和Bean装配
 
 
 
@@ -458,6 +462,8 @@ class ProductControllerTest extends IntegrationTestBase {
     }
 }
 ```
+
+> **详细规范**：[测试代码编写规范](_docs/specification/测试代码编写规范.md) - 测试编写最佳实践
 
 
 
