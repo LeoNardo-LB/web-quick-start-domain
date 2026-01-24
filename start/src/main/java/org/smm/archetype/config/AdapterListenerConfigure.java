@@ -20,7 +20,7 @@ import java.util.List;
  * @since 2026-01-10
  */
 @Configuration
-public class AdapterListenerConfig {
+public class AdapterListenerConfigure {
 
     /**
      * Spring事件监听器

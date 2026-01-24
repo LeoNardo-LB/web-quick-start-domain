@@ -25,7 +25,7 @@ public class TestController {
      * @param request 键值对请求参数
      * @return 包含键值对的二维列表
      */
-    @GetMapping("hello")
+    @GetMapping
     @LogAnno(persistence = PersistenceType.DB)
     List<List<String>> hello(KVRequest request) throws InterruptedException {
         if (request == null || request.key() == null || request.value() == null) {

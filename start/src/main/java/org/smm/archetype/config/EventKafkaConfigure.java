@@ -11,10 +11,11 @@ import org.smm.archetype.infrastructure._shared.generated.repository.mapper.Even
 import org.smm.archetype.adapter.access.listener.KafkaEventListener;
 import org.smm.archetype.app._shared.event.EventHandler;
 import org.smm.archetype.domain._shared.event.RetryStrategy;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -29,14 +30,17 @@ import java.util.Map;
 /**
  * Kafka 事件相关配置
  *
- * <p>当 middleware.event.publisher.type=kafka 时生效。
+ * <p>条件：KafkaTemplate Bean存在时生效（即Kafka依赖已添加）。
  *
  * <p>包含：
  * <ul>
  *   <li>Kafka 监听器容器工厂</li>
- *   <li>Kafka 事件发布器</li>
+ *   <li>Kafka 事件发布器（标注@Primary，优先于Spring事件发布器）</li>
  *   <li>Kafka 事件监听器</li>
  * </ul>
+ *
+ * <p>使用@ConditionalOnBean(KafkaTemplate.class)检测Kafka依赖的存在性，
+ * 替代原有的@ConditionalOnProperty配置方式，实现自动依赖检测。
  *
  * @author Leonardo
  * @since 2026-01-16
@@ -44,25 +48,22 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 @EnableConfigurationProperties(KafkaProperties.class)
-@ConditionalOnProperty(
-        prefix = "middleware.event.publisher",
-        name = "type",
-        havingValue = "kafka"
-)
+@ConditionalOnBean(KafkaTemplate.class)
 @RequiredArgsConstructor
 public class EventKafkaConfigure {
 
     private final EventProperties eventProperties;
-    private final KafkaProperties kafkaProperties;
 
     /**
      * Kafka监听器容器工厂
      *
      * <p>配置JsonDeserializer，实现自动反序列化。
+     * @param kafkaProperties Kafka配置属性
      * @return Kafka监听器容器工厂
      */
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, DomainEvent> kafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, DomainEvent> kafkaListenerContainerFactory(
+            KafkaProperties kafkaProperties) {
         Map<String, Object> props = new HashMap<>();
 
         // 使用KafkaProperties配置
@@ -92,11 +93,15 @@ public class EventKafkaConfigure {
 
     /**
      * Kafka事件发布器
+     *
+     * <p>标注@Primary，确保当Kafka依赖存在时，此Bean优先于SpringEventPublisher被注入。
+     *
      * @param kafkaTemplate      Kafka模板
      * @param eventPublishMapper 事件发布Mapper
      * @return Kafka事件发布器
      */
     @Bean
+    @Primary
     public KafkaEventPublisher kafkaEventPublisher(KafkaTemplate<String, DomainEvent> kafkaTemplate,
                                                    EventPublishMapper eventPublishMapper) {
         return new KafkaEventPublisher(kafkaTemplate, eventPublishMapper, eventProperties.getPublisher().getKafka().getTopicPrefix());

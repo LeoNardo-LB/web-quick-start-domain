@@ -58,13 +58,20 @@
         </encoder>
     </appender>
 
-    <!-- 唯一的root配置 -->
+    <!-- Spring Profile配置（配置级别） -->
+    <springProfile name="dev,test,default">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_CURRENT"/>
+        </root>
+    </springProfile>
+
+    <!-- 默认root配置（无profile时） -->
     <root level="${LOG_LEVEL}">
         <appender-ref ref="ERROR_FILE"/>
         <appender-ref ref="ASYNC_FILE"/>
         <appender-ref ref="ASYNC_CURRENT"/>
-        <springProfile name="dev,test,default">
-            <appender-ref ref="CONSOLE"/>
-        </springProfile>
     </root>
 </configuration>

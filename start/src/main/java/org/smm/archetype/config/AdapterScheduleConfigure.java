@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService;
  */
 @Configuration
 @EnableScheduling
-public class AdapterScheduleConfig {
+public class AdapterScheduleConfigure {
 
     /**
      * 事件重试调度器

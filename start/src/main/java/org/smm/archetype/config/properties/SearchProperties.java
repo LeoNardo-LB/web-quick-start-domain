@@ -6,47 +6,24 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * 搜索配置属性
  *
+ * <p>搜索功能是否启用由 Spring Boot 自动配置决定：
+ * <ul>
+ *   <li>当 {@code ElasticsearchOperations} Bean 存在时，使用 Elasticsearch 搜索实现</li>
+ *   <li>当 {@code ElasticsearchOperations} Bean 不存在时，使用禁用实现（所有操作抛出异常）</li>
+ * </ul>
+ *
+ * <p>Elasticsearch 连接配置使用 Spring Boot 标准配置：
+ * <pre>
+ * spring.elasticsearch.uris: http://localhost:9200
+ * spring.elasticsearch.username: elastic
+ * spring.elasticsearch.password: changeme
+ * </pre>
+ *
  * @author Leonardo
  * @since 2026-01-14
  */
 @Data
 @ConfigurationProperties(prefix = "middleware.search")
 public class SearchProperties {
-
-    /**
-     * 是否启用搜索功能（默认：false）
-     *
-     * <p>false: 使用禁用实现，所有ES操作抛出异常（不强制ES依赖）
-     * <p>true: 使用真实Elasticsearch，启动时会检查连接可用性
-     */
-    private boolean enabled = false;
-
-    /**
-     * Elasticsearch配置
-     */
-    private Elasticsearch elasticsearch = new Elasticsearch();
-
-    /**
-     * Elasticsearch配置
-     */
-    @Data
-    public static class Elasticsearch {
-        /**
-         * ES端点
-         *
-         * <p>默认: http://localhost:9200
-         */
-        private String endpoint = "http://localhost:9200";
-
-        /**
-         * 用户名
-         */
-        private String username = "elastic";
-
-        /**
-         * 密码
-         */
-        private String password = "changeme";
-    }
 
 }

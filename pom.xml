@@ -158,6 +158,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+                <dependency>
+                    <groupId>com.mybatis-flex</groupId>
+                    <artifactId>mybatis-flex-dependencies</artifactId>
+                    <version>${mybatis-flex.version}</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
             <!--bomEnd-->
             <!--基础依赖Start-->
             <dependency>
@@ -171,16 +178,14 @@
                 <version>${spring-doc.version}</version>
             </dependency>
             <!--mybatis-flex-->
-            <dependency>
-                <groupId>com.mybatis-flex</groupId>
-                <artifactId>mybatis-flex-spring-boot3-starter</artifactId>
-                <version>${mybatis-flex.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.mybatis-flex</groupId>
-                <artifactId>mybatis-flex-codegen</artifactId>
-                <version>${mybatis-flex.version}</version>
-            </dependency>
+            <!--<dependency>-->
+            <!--    <groupId>com.mybatis-flex</groupId>-->
+            <!--    <artifactId>mybatis-flex-spring-boot4-starter</artifactId>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+            <!--    <groupId>com.mybatis-flex</groupId>-->
+            <!--    <artifactId>mybatis-flex-codegen</artifactId>-->
+            <!--</dependency>-->
 
             <!-- Caffeine本地缓存 -->
             <dependency>
@@ -256,7 +261,7 @@
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
-                <version>6.3.3</version>
+                <version>7.0.2</version>
             </dependency>
             <dependency>
                 <groupId>com.mysql</groupId>
@@ -284,22 +289,7 @@
                 <version>2.19.4</version>
             </dependency>
 
-            <!-- Spring Boot Web相关 -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>3.5.9</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-actuator</artifactId>
-                <version>3.5.9</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-data-redis</artifactId>
-                <version>3.5.9</version>
-            </dependency>
+            <!-- Spring Boot Web相关（由Spring Boot parent 4.0.2管理版本） -->
 
             <!-- 根POM全局依赖（显式声明以便于版本控制）-->
             <!-- 工具库 -->
@@ -372,7 +362,6 @@
                         <path>
                             <groupId>com.mybatis-flex</groupId>
                             <artifactId>mybatis-flex-processor</artifactId>
-                            <version>${mybatis-flex.version}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>

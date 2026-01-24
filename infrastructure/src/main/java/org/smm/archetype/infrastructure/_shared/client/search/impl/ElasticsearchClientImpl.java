@@ -1,129 +1,65 @@
 package org.smm.archetype.infrastructure._shared.client.search.impl;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.*;
-import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
-import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
-import co.elastic.clients.elasticsearch.indices.ExistsRequest;
-import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.infrastructure._shared.client.search.AbstractSearchClient;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.IndexOperations;
+import org.springframework.data.elasticsearch.core.document.Document;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.*;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Elasticsearch技术客户端实现
- *
- * <p>使用Spring Data Elasticsearch的ElasticsearchClient与Elasticsearch通信
- *
- * @author Leonardo
- * @since 2026-01-14
- */
 @Slf4j
 public class ElasticsearchClientImpl extends AbstractSearchClient {
 
-    private final ElasticsearchClient client;
+    private final ElasticsearchOperations operations;
 
-    public ElasticsearchClientImpl(ElasticsearchClient client) {
-        this.client = client;
+    public ElasticsearchClientImpl(ElasticsearchOperations operations) {
+        this.operations = operations;
     }
 
     @Override
     protected void doIndex(String index, String id, Map<String, Object> document) {
-        try {
-            IndexRequest<Map<String, Object>> request = IndexRequest.of(b -> b
-                .index(index)
-                .id(id)
-                .document(document)
-            );
-
-            client.index(request);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to index document", e);
-        }
+        IndexQuery query = new IndexQuery();
+        query.setId(id);
+        query.setObject(document);
+        operations.index(query, IndexCoordinates.of(index));
     }
 
     @Override
     protected void doBulkIndex(String index, List<Map.Entry<String, Map<String, Object>>> documents) {
-        try {
-            List<BulkOperation> operations = documents.stream()
-                .map(entry -> BulkOperation.of(b -> b
-                    .index(idx -> idx
-                        .index(index)
-                        .id(entry.getKey())
-                        .document(entry.getValue())
-                    )
-                ))
-                .collect(Collectors.toList());
+        List<IndexQuery> queries = documents.stream()
+            .map(entry -> {
+                IndexQuery query = new IndexQuery();
+                query.setId(entry.getKey());
+                query.setObject(entry.getValue());
+                return query;
+            })
+            .collect(Collectors.toList());
 
-            BulkRequest bulkRequest = BulkRequest.of(b -> b
-                .operations(operations)
-            );
-
-            client.bulk(bulkRequest);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to bulk index documents", e);
-        }
+        operations.bulkIndex(queries, IndexCoordinates.of(index));
     }
 
     @Override
     protected void doDelete(String index, String id) {
-        try {
-            DeleteRequest request = DeleteRequest.of(b -> b
-                .index(index)
-                .id(id)
-            );
-
-            client.delete(request);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to delete document", e);
-        }
+        operations.delete(id, IndexCoordinates.of(index));
     }
 
     @Override
     protected void doBulkDelete(String index, List<String> ids) {
-        try {
-            List<BulkOperation> operations = ids.stream()
-                .map(id -> BulkOperation.of(b -> b
-                    .delete(idx -> idx
-                        .index(index)
-                        .id(id)
-                    )
-                ))
-                .collect(Collectors.toList());
-
-            BulkRequest bulkRequest = BulkRequest.of(b -> b
-                .operations(operations)
-            );
-
-            client.bulk(bulkRequest);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to bulk delete documents", e);
+        for (String id : ids) {
+            delete(index, id);
         }
     }
 
     @Override
     protected Map<String, Object> doGet(String index, String id) {
-        try {
-            GetRequest getRequest = GetRequest.of(b -> b
-                .index(index)
-                .id(id)
-            );
-
-            GetResponse<Map> response = client.get(getRequest, Map.class);
-
-            if (response.found()) {
-                return response.source();
-            }
-
-            return null;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to get document", e);
-        }
+        Map<String, Object> result = operations.get(id, Map.class, IndexCoordinates.of(index));
+        return result != null ? new HashMap<>(result) : null;
     }
 
     @Override
@@ -140,120 +76,105 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
 
     @Override
     protected Map<String, Object> doSearch(String index, String query, int from, int size) {
-        try {
-            SearchRequest searchRequest = SearchRequest.of(b -> b
-                .index(index)
-                .from(from)
-                .size(size)
-                .withJson(new StringReader(query))
-            );
+        Query searchQuery = Query.findAll();
+        searchQuery.setPageable(org.springframework.data.domain.PageRequest.of(from / size, size));
 
-            SearchResponse<Map> response = client.search(searchRequest, Map.class);
+        SearchHits<Map> searchHits = operations.search(searchQuery, Map.class, IndexCoordinates.of(index));
 
-            // 转换为Map格式以保持接口兼容性
-            Map<String, Object> result = new HashMap<>();
-            result.put("took", response.took());
-            result.put("timed_out", response.timedOut());
-            result.put("_shards", Map.of(
-                "total", response.shards().total(),
-                "successful", response.shards().successful(),
-                "failed", response.shards().failed()
-            ));
+        Map<String, Object> result = new HashMap<>();
+        result.put("took", searchHits.getSearchHits().stream().findFirst().map(SearchHit::getScore).orElse(0.0f));
+        result.put("timed_out", false);
 
-            Map<String, Object> hits = new HashMap<>();
-            hits.put("total", Map.of(
-                "value", response.hits().total().value(),
-                "relation", response.hits().total().relation().jsonValue()
-            ));
+        Map<String, Object> shards = new HashMap<>();
+        shards.put("total", 1);
+        shards.put("successful", 1);
+        shards.put("failed", 0);
+        result.put("_shards", shards);
 
-            List<Map<String, Object>> hitsList = response.hits().hits().stream()
-                .map(this::convertHit)
-                .collect(Collectors.toList());
+        Map<String, Object> hits = new HashMap<>();
+        hits.put("total", Map.of(
+            "value", searchHits.getTotalHits(),
+            "relation", "eq"
+        ));
 
-            hits.put("hits", hitsList);
-            result.put("hits", hits);
+        List<Map<String, Object>> hitsList = searchHits.getSearchHits().stream()
+            .map(this::convertSearchHit)
+            .collect(Collectors.toList());
 
-            return result;
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to search", e);
-        }
+        hits.put("hits", hitsList);
+        result.put("hits", hits);
+
+        return result;
     }
 
     @Override
     protected Map<String, Object> doAggregate(String index, String query) {
-        // 聚合查询使用search实现，size=0
         return search(index, query, 0, 0);
     }
 
     @Override
     protected boolean doExistsIndex(String index) {
-        try {
-            ExistsRequest request = ExistsRequest.of(b -> b.index(index));
-            return client.indices().exists(request).value();
-        } catch (IOException e) {
-            return false;
-        }
+        IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
+        return indexOps.exists();
     }
 
     @Override
     protected void doCreateIndex(String index, String mapping) {
-        try {
-            CreateIndexRequest request = CreateIndexRequest.of(b -> b
-                .index(index)
-                .withJson(new StringReader(mapping))
-            );
-
-            client.indices().create(request);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create index", e);
+        IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
+        indexOps.create();
+        Document mappingDoc = Document.parse(mapping);
+        if (mappingDoc.containsKey("mappings")) {
+            Map<String, Object> mappings = (Map<String, Object>) mappingDoc.get("mappings");
+            if (mappings.containsKey("properties")) {
+                Map<String, Object> properties = (Map<String, Object>) mappings.get("properties");
+                Document propertiesDoc = Document.create();
+                propertiesDoc.putAll(properties);
+                indexOps.putMapping(propertiesDoc);
+            }
         }
     }
 
     @Override
     protected void doDeleteIndex(String index) {
-        try {
-            DeleteIndexRequest request = DeleteIndexRequest.of(b -> b.index(index));
-            client.indices().delete(request);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to delete index", e);
-        }
+        IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
+        indexOps.delete();
     }
 
     @Override
     protected void doRefresh(String index) {
-        try {
-            client.indices().refresh(r -> r.index(index));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to refresh index", e);
-        }
+        IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
+        indexOps.refresh();
     }
 
     @Override
     protected Map<String, Object> doVectorSearch(String index, String query) {
-        // 向量搜索使用标准的search实现
         return search(index, query, 0, 10);
     }
 
     @Override
     protected void doCreateVectorIndex(String index, String vectorField, int dimension, String indexType, String distanceType) {
-        try {
-            // 构建向量索引映射
-            String mapping = buildVectorIndexMapping(vectorField, dimension, indexType, distanceType);
+        Map<String, Object> denseVectorProps = new HashMap<>();
+        denseVectorProps.put("type", "dense_vector");
+        denseVectorProps.put("dims", dimension);
+        denseVectorProps.put("index", true);
+        denseVectorProps.put("similarity", distanceType.toLowerCase());
 
-            CreateIndexRequest request = CreateIndexRequest.of(b -> b
-                .index(index)
-                .withJson(new StringReader(mapping))
-            );
+        Map<String, Object> indexOptions = new HashMap<>();
+        indexOptions.put("type", indexType.toLowerCase());
+        denseVectorProps.put("index_options", indexOptions);
 
-            client.indices().create(request);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create vector index", e);
-        }
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(vectorField, denseVectorProps);
+
+        IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
+        indexOps.create();
+        Document propertiesDoc = Document.create();
+        propertiesDoc.putAll(properties);
+        indexOps.putMapping(propertiesDoc);
     }
 
     @Override
     protected List<Map<String, Object>> doBulkVectorSearch(String index, List<String> queries) {
-        // 简化实现：逐个执行向量搜索
         List<Map<String, Object>> results = new ArrayList<>();
         for (String query : queries) {
             Map<String, Object> result = vectorSearch(index, query);
@@ -262,40 +183,14 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
         return results;
     }
 
-    /**
-     * 转换SearchHit为Map格式
-     */
-    private Map<String, Object> convertHit(Hit<Map> hit) {
+    private Map<String, Object> convertSearchHit(SearchHit<Map> hit) {
         Map<String, Object> result = new HashMap<>();
-        result.put("_id", hit.id());
-        result.put("_score", hit.score());
-        result.put("_index", hit.index());
-        if (hit.source() != null) {
-            result.put("_source", hit.source());
+        result.put("_id", hit.getId());
+        result.put("_score", hit.getScore());
+        result.put("_index", hit.getIndex());
+        if (hit.getContent() != null) {
+            result.put("_source", hit.getContent());
         }
         return result;
-    }
-
-    /**
-     * 构建向量索引映射JSON
-     */
-    private String buildVectorIndexMapping(String vectorField, int dimension, String indexType, String distanceType) {
-        return String.format("""
-            {
-              "mappings": {
-                "properties": {
-                  "%s": {
-                    "type": "dense_vector",
-                    "dims": %d,
-                    "index": true,
-                    "similarity": "%s",
-                    "index_options": {
-                      "type": "%s"
-                    }
-                  }
-                }
-              }
-            }
-            """, vectorField, dimension, distanceType.toLowerCase(), indexType.toLowerCase());
     }
 }

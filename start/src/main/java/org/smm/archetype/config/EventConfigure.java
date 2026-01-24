@@ -14,15 +14,17 @@ import org.smm.archetype.infrastructure._shared.event.publisher.SpringEventPubli
 import org.smm.archetype.infrastructure._shared.event.publisher.TransactionalEventPublisher;
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
 import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.Optional;
 import java.util.concurrent.Executor;
 
 /**
@@ -30,8 +32,24 @@ import java.util.concurrent.Executor;
  *
  * <p>负责创建事件发布、事件消费、序列化等相关的Bean。
  *
+ * <h3>事件发布器自动检测机制</h3>
+ *
+ * <p>本配置使用Spring Boot的自动配置机制，根据Kafka依赖的存在性自动选择事件发布器：
+ *
+ * <ul>
+ *   <li><b>Kafka场景</b>：当KafkaTemplate Bean存在时（即Kafka依赖已添加），
+ *       EventKafkaConfigure中的kafkaEventPublisher会被创建，并且标注为@Primary，
+ *       因此成为主要的事件发布器。</li>
+ *   <li><b>本地场景</b>：当KafkaTemplate Bean不存在时（即未添加Kafka依赖），
+ *       springEventPublisher会被创建，作为默认的本地事件发布器。</li>
+ * </ul>
+ *
+ * <p>异步事件发布器（asyncEventPublisher）和事务性事件发布器（transactionalEventPublisher）
+ * 仅在KafkaTemplate存在时创建，因为它们主要用于Kafka事件的异步和事务发布场景。
+ *
  * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式）
  * 对于跨配置类的Bean依赖，使用构造器注入（遵循文档第2.6节规范）
+ *
  * @author Leonardo
  * @since 2026-01-10
  */
@@ -69,20 +87,17 @@ public class EventConfigure implements AsyncConfigurer {
     /**
      * Spring事件发布器
      *
-     * <p>条件：middleware.event.publisher.type=spring
+     * <p>条件：Kafka依赖不存在时，使用Spring事件发布器（本地默认方案）。
      *
-     * <p>注意：不使用@Primary注解，Primary由EventPublisherConfig中的代理Bean统一提供。
+     * <p>使用@ConditionalOnMissingBean确保只有当KafkaTemplate不存在时才创建此Bean，
+     * 与kafkaEventPublisher形成互斥关系。
+     *
      * @param applicationEventPublisher Application事件发布器
      * @param eventPublishMapper        事件发布Mapper
      * @return Spring事件发布器
      */
     @Bean
-    @ConditionalOnProperty(
-            prefix = "middleware.event.publisher",
-            name = "type",
-            havingValue = "spring",
-            matchIfMissing = true
-    )
+    @ConditionalOnMissingBean(KafkaTemplate.class)
     public SpringEventPublisher springEventPublisher(
             final org.springframework.context.ApplicationEventPublisher applicationEventPublisher,
             final EventPublishMapper eventPublishMapper) {
@@ -94,29 +109,18 @@ public class EventConfigure implements AsyncConfigurer {
      *
      * <p>包装具体的事件发布器，提供异步发布能力。
      *
+     * <p>条件：KafkaTemplate Bean存在时创建，支持异步Kafka事件发布。
+     *
      * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式，避免循环依赖）
-     * <p>使用Optional处理可选依赖，因为KafkaEventPublisher可能不存在
-     * @param kafkaEventPublisher  Kafka事件发布器（可选）
-     * @param springEventPublisher Spring事件发布器（可选）
+     *
+     * @param kafkaEventPublisher  Kafka事件发布器
      * @return 异步事件发布器
      */
     @Bean
+    @ConditionalOnBean(KafkaTemplate.class)
     public AsyncEventPublisher asyncEventPublisher(
-            final Optional<KafkaEventPublisher> kafkaEventPublisher,
-            final Optional<SpringEventPublisher> springEventPublisher) {
-
-        // 根据哪个Bean存在，选择作为被包装对象
-        // Spring的条件装配确保只有一个不为null
-        EventPublisher delegate;
-        if (kafkaEventPublisher.isPresent()) {
-            delegate = kafkaEventPublisher.get();
-        } else {
-            delegate = springEventPublisher
-                               .orElseThrow(() -> new IllegalStateException(
-                                       "Neither KafkaEventPublisher nor SpringEventPublisher is available"));
-        }
-
-        return new AsyncEventPublisher(delegate);
+            final KafkaEventPublisher kafkaEventPublisher) {
+        return new AsyncEventPublisher(kafkaEventPublisher);
     }
 
     /**
@@ -124,29 +128,18 @@ public class EventConfigure implements AsyncConfigurer {
      *
      * <p>确保事件在事务提交后才发布。
      *
+     * <p>条件：KafkaTemplate Bean存在时创建，支持事务性Kafka事件发布。
+     *
      * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式，避免循环依赖）
-     * <p>使用Optional处理可选依赖，因为KafkaEventPublisher可能不存在
-     * @param kafkaEventPublisher  Kafka事件发布器（可选）
-     * @param springEventPublisher Spring事件发布器（可选）
+     *
+     * @param kafkaEventPublisher  Kafka事件发布器
      * @return 事务性事件发布器
      */
     @Bean
+    @ConditionalOnBean(KafkaTemplate.class)
     public TransactionalEventPublisher transactionalEventPublisher(
-            final Optional<KafkaEventPublisher> kafkaEventPublisher,
-            final Optional<SpringEventPublisher> springEventPublisher) {
-
-        // 根据哪个Bean存在，选择作为被包装对象
-        // Spring的条件装配确保只有一个不为null
-        EventPublisher delegate;
-        if (kafkaEventPublisher.isPresent()) {
-            delegate = kafkaEventPublisher.get();
-        } else {
-            delegate = springEventPublisher
-                               .orElseThrow(() -> new IllegalStateException(
-                                       "Neither KafkaEventPublisher nor SpringEventPublisher is available"));
-        }
-
-        return new TransactionalEventPublisher(delegate);
+            final KafkaEventPublisher kafkaEventPublisher) {
+        return new TransactionalEventPublisher(kafkaEventPublisher);
     }
 
     /**

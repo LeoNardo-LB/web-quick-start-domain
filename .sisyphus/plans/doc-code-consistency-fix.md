@@ -1,0 +1,451 @@
+# Documentation-Code Consistency Fix
+
+## Context
+
+### Original Request
+检查代码与文档是否有对不上的地方？如果有则进行修复或重构，同时去除文档冗余部分，使用超链接进行文档之间简略或详细的说明
+
+### User Decisions
+- **保留现有内容**：_docs/business/README.md 中的979行示例内容保持不变
+- **添加更多链接**：在文档间添加更多超链接以改善导航
+
+---
+
+## Work Objectives
+
+### Core Objective
+修复代码与文档之间的一致性问题，改善文档导航链接，确保配置类命名符合规范
+
+### Concrete Deliverables
+1. 重命名2个配置类以符合命名约定
+2. 在文档间添加更多超链接
+3. 更新所有受影响文件中的引用
+
+### Definition of Done
+- [ ] `AdapterListenerConfig` 重命名为 `AdapterListenerConfigure`
+- [ ] `AdapterScheduleConfig` 重命名为 `AdapterScheduleConfigure`
+- [ ] 所有引用已更新（通过编译验证）
+- [ ] 在 README.md 中添加更多文档超链接
+- [ ] 在业务文档中添加规范文档链接
+
+### Must Have
+- 严格按照 `Configure` 后缀规范重命名配置类
+- 保持 _docs/business/README.md 示例内容不变
+- 仅添加导航超链接，不修改其他内容
+
+### Must NOT Have (Guardrails)
+- 不重命名其他配置类（仅处理2个已识别的类）
+- 不修改 _docs/business/README.md 示例内容
+- 不重构 adapter/config/ 目录结构
+- 不修改除链接外的其他文档内容
+- 不添加新功能或代码
+
+---
+
+## Verification Strategy (MANDATORY)
+
+### Test Decision
+- **Infrastructure exists**: N/A (文档修改，无测试)
+- **User wants tests**: Manual verification only
+- **Framework**: None (文档检查为主)
+
+### Manual Verification
+
+**对于配置类重命名**：
+- [ ] 重命名命令执行：`git mv` 或 IDE 重命名
+- [ ] 验证编译：`mvn clean compile` → PASS
+- [ ] 验证应用启动：`mvn spring-boot:run -pl start` → 成功启动
+- [ ] 验证无导入错误：IDE无红色波浪线
+
+**对于文档超链接**：
+- [ ] 使用IDE或Markdown预览验证超链接可点击
+- [ ] 手动测试所有新增超链接：点击可跳转到正确文档
+- [ ] 验证相对路径正确
+
+**证据要求**：
+- [ ] 记录重命名前后的文件路径
+- [ ] 保存编译成功截图（可选）
+- [ ] 记录所有修改的文档路径
+
+---
+
+## Task Flow
+
+```
+Task 1: 重命名 AdapterListenerConfig
+Task 2: 重命名 AdapterScheduleConfig
+Task 3: 更新所有引用（Java 文件）
+Task 4: 更新配置类内部引用（如有）
+Task 5: 在 README.md 中添加文档超链接
+Task 6: 在 _docs/business/README.md 中添加规范文档链接
+```
+
+## Parallelization
+
+| Group | Tasks | Reason |
+|-------|--------|--------|
+| A | 1, 2 | 独立文件操作，可并行（但要确认无相互引用）|
+| B | 3, 4 | 依赖重命名完成 |
+| C | 5, 6 | 文档修改，独立进行 |
+
+---
+
+## TODOs
+
+- [x] 1. 重命名 AdapterListenerConfig.java → AdapterListenerConfigure.java
+
+  **What to do**:
+  - 使用 IDE 重命名或 `git mv` 命令重命名文件
+  - 更新类名从 `AdapterListenerConfig` 到 `AdapterListenerConfigure`
+
+  **Must NOT do**:
+  - 不修改类内部的逻辑代码（仅重命名）
+  - 不修改其他配置类
+
+  **Parallelizable**: NO (顺序执行)
+
+  **References** (CRITICAL - Be Exhaustive):
+
+  **Pattern References** (existing code to follow):
+  - 其他配置类命名模式：`AppConfigure`, `CacheConfigure`, `EventConfigure` 等
+  - 参考：`start/src/main/java/org/smm/archetype/config/AppConfigure.java`
+
+  **API/Type References** (contracts to implement against):
+  - 无特定接口约束，仅遵循命名约定
+
+  **Test References** (testing patterns to follow):
+  - 无
+
+  **Documentation References** (specs and requirements):
+  - `_docs/specification/业务代码编写规范.md` 2.1.1节：配置类命名规范
+  - 具体要求："配置类必须按聚合根命名（{业务}Aggr → {业务}Configure），禁止按层命名！"
+
+  **External References** (libraries and frameworks):
+  - Spring Configuration 规范：`@Configuration` 注解
+
+  **WHY Each Reference Matters** (explain the relevance):
+  - **业务代码编写规范.md 2.1.1节**：定义了配置类的命名规则，`Configure` 是必须的后缀
+  - **其他配置类**：作为命名模式的参考，确保一致性
+  - **Spring Framework**：`@Configuration` 注解是配置类的标准
+
+  **Acceptance Criteria**:
+
+  > CRITICAL: Acceptance = EXECUTION, not just "it should work".
+  > The executor MUST run these commands and verify output.
+
+  **Manual Execution Verification**:
+
+  **For Java file renaming**:
+  - [ ] 文件重命名：
+    ```bash
+    cd start/src/main/java/org/smm/archetype/config
+    git mv AdapterListenerConfig.java AdapterListenerConfigure.java
+    ```
+  - [ ] 类名更新：打开文件，将 `public class AdapterListenerConfig` 改为 `public class AdapterListenerConfigure`
+  - [ ] 验证编译：
+    ```bash
+    mvn clean compile
+    ```
+    Expected: BUILD SUCCESS（0 errors）
+  - [ ] 验证启动：
+    ```bash
+    mvn spring-boot:run -pl start
+    ```
+    Expected: 应用成功启动（无ClassNotFoundException）
+
+  **Evidence Required**:
+  - [ ] 重命名前的文件路径：`start/src/main/java/org/smm/archetype/config/AdapterListenerConfig.java`
+  - [ ] 重命名后的文件路径：`start/src/main/java/org/smm/archetype/config/AdapterListenerConfigure.java`
+  - [ ] 编译命令输出：记录 `mvn clean compile` 的成功输出
+  - [ ] Git status：`git status` 显示重命名文件
+
+  **Commit**: YES (groups with 2)
+  - Message: `refactor(config): rename AdapterListenerConfig to AdapterListenerConfigure for naming consistency`
+  - Files: `start/src/main/java/org/smm/archetype/config/AdapterListenerConfig.java`
+  - Pre-commit: `mvn clean compile`
+
+---
+
+- [x] 2. 重命名 AdapterScheduleConfig.java → AdapterScheduleConfigure.java
+
+  **What to do**:
+  - 使用 IDE 重命名或 `git mv` 命令重命名文件
+  - 更新类名从 `AdapterScheduleConfig` 到 `AdapterScheduleConfigure`
+
+  **Must NOT do**:
+  - 不修改类内部的逻辑代码（仅重命名）
+
+  **Parallelizable**: NO (depends on 0 for verification)
+
+  **References** (CRITICAL - Be Exhaustive):
+
+  **Pattern References**:
+  - 其他配置类命名模式：参考 Task 1 中的引用
+
+  **Documentation References**:
+  - `_docs/specification/业务代码编写规范.md` 2.1.1节：同 Task 1
+
+  **WHY Each Reference Matters**:
+  - 与 Task 1 相同，确保命名一致性
+
+  **Acceptance Criteria**:
+
+  **Manual Execution Verification**:
+  - [ ] 文件重命名：
+    ```bash
+    cd start/src/main/java/org/smm/archetype/config
+    git mv AdapterScheduleConfig.java AdapterScheduleConfigure.java
+    ```
+  - [ ] 类名更新：将 `public class AdapterScheduleConfig` 改为 `public class AdapterScheduleConfigure`
+  - [ ] 验证编译：
+    ```bash
+    mvn clean compile
+    ```
+    Expected: BUILD SUCCESS
+  - [ ] 验证启动：
+    ```bash
+    mvn spring-boot:run -pl start
+    ```
+    Expected: 应用成功启动
+
+  **Evidence Required**:
+  - [ ] 重命名前后文件路径记录
+  - [ ] 编译成功输出
+  - [ ] Git status 显示
+
+  **Commit**: YES (groups with 1)
+  - Message: `refactor(config): rename AdapterScheduleConfig to AdapterScheduleConfigure for naming consistency`
+  - Files: `start/src/main/java/org/smm/archetype/config/AdapterScheduleConfig.java`
+  - Pre-commit: `mvn clean compile`
+
+---
+
+ - [x] 3. 查找并更新所有对重命名类的引用（Java 文件）
+
+  **What to do**:
+  - 在所有 Java 文件中搜索 `AdapterListenerConfig` 和 `AdapterScheduleConfig`
+  - 更新所有导入语句和类型引用
+  - 验证无遗漏引用
+
+  **Must NOT do**:
+  - 不修改非 Java 文件中的引用（配置文件等）
+  - 不修改类内部的业务逻辑
+
+  **Parallelizable**: NO (depends on 1, 2)
+
+  **References** (CRITICAL - Be Exhaustive):
+
+  **Pattern References**:
+  - 使用 `grep -r` 或 IDE 的 "Find in Path" 功能
+
+  **Documentation References**:
+  - `_docs/specification/业务代码编写规范.md`：命名规范（同前）
+
+  **WHY Each Reference Matters**:
+  - 确保所有引用都已更新，避免编译错误
+  - 验证没有遗漏的引用导致运行时异常
+
+  **Acceptance Criteria**:
+
+  **Manual Execution Verification**:
+  - [ ] 搜索 AdapterListenerConfig：
+    ```bash
+    grep -r "AdapterListenerConfig" --include="*.java"
+    ```
+    Expected: 0 results（所有引用已更新）
+  - [ ] 搜索 AdapterScheduleConfig：
+    ```bash
+    grep -r "AdapterScheduleConfig" --include="*.java"
+    ```
+    Expected: 0 results
+  - [ ] 验证新名称存在：
+    ```bash
+    grep -r "AdapterListenerConfigure" --include="*.java" | head -3
+    grep -r "AdapterScheduleConfigure" --include="*.java" | head -3
+    ```
+    Expected: 多个结果（表明新名称被使用）
+  - [ ] 最终验证：
+    ```bash
+    mvn clean compile
+    ```
+    Expected: BUILD SUCCESS
+
+  **Evidence Required**:
+  - [ ] 搜索命令输出（0结果证明所有引用已更新）
+  - [ ] 新名称搜索输出（证明新名称存在）
+  - [ ] 编译成功输出
+
+  **Commit**: YES (single task, all reference updates)
+  - Message: `refactor: update all references to renamed configuration classes`
+  - Files: 所有包含引用更新的 Java 文件
+  - Pre-commit: `mvn clean compile`
+
+---
+
+- [ ] 4. 在 README.md 中添加更多文档超链接
+
+  **What to do**:
+  - 在 README.md 的适当位置添加对规范文档的链接
+  - 特别是在相关章节末尾或文档导航部分
+
+  **Must NOT do**:
+  - 不修改其他文档内容
+  - 不添加新的章节或内容
+
+  **Parallelizable**: YES (with 5)
+
+  **References** (CRITICAL - Be Exhaustive):
+
+  **Pattern References**:
+  - 现有超链接格式：`[文档名](path/to/document.md)`
+
+  **Documentation References**:
+  - `_docs/specification/业务代码编写规范.md`：编码规范详细文档
+  - `_docs/specification/测试代码编写规范.md`：测试规范
+  - `_docs/specification/测试示例指南.md`：测试示例
+
+  **WHY Each Reference Matters**:
+  - 改善文档间的导航，帮助用户快速找到相关规范
+  - 减少用户搜索和浏览时间
+
+  **Acceptance Criteria**:
+
+  **Manual Execution Verification**:
+  - [ ] 识别需要添加链接的位置：
+    - 开发指南章节（第4-6节）
+    - 配置类相关说明
+    - 测试相关说明
+  - [ ] 添加链接示例：
+    ```markdown
+    详细规范：[业务代码编写规范](_docs/specification/业务代码编写规范.md)
+    测试指南：[测试代码编写规范](_docs/specification/测试代码编写规范.md)
+    ```
+  - [ ] 使用 Markdown 预览验证超链接：
+    - 使用 IDE 的 Markdown Preview 功能
+    - 或使用 VSCode 预览插件
+    - 点击所有新增超链接，验证跳转正确
+  - [ ] 验证文件路径：
+    ```bash
+    ls -la _docs/specification/业务代码编写规范.md
+    ls -la _docs/specification/测试代码编写规范.md
+    ```
+    Expected: 文件存在
+
+  **Evidence Required**:
+  - [ ] 添加超链接的代码片段
+  - [ ] Markdown 预览截图（可选）
+  - [ ] 超链接点击测试结果
+
+  **Commit**: YES (groups with 5)
+  - Message: `docs: add more navigation links to specification documents in README.md`
+  - Files: `README.md`
+  - Pre-commit: 手动检查超链接
+
+---
+
+- [ ] 5. 在 _docs/business/README.md 中添加规范文档链接
+
+  **What to do**:
+  - 在业务文档索引中添加对规范文档的链接
+  - 在"相关文档"部分或使用指南部分添加
+
+  **Must NOT do**:
+  - 不修改现有示例内容
+  - 不删除或重新组织示例内容
+
+  **Parallelizable**: YES (with 4)
+
+  **References** (CRITICAL - Be Exhaustive):
+
+  **Pattern References**:
+  - 现有链接格式：参考 [业务代码编写规范](_docs/specification/业务代码编写规范.md)
+
+  **Documentation References**:
+  - `_docs/specification/README.md`：规范文档索引
+  - `_docs/specification/业务代码编写规范.md`：编码规范
+
+  **WHY Each Reference Matters**:
+  - 帮助业务文档读者快速找到相关技术规范
+  - 建立业务文档与技术规范之间的清晰连接
+
+  **Acceptance Criteria**:
+
+  **Manual Execution Verification**:
+  - [ ] 找到"相关文档"章节（约第92行）：
+    ```markdown
+    ### 📖 相关文档
+    ### 项目规范文档（编码、测试、验证）
+    - **[业务代码编写规范](../specification/业务代码编写规范.md)** - 业务代码编码标准
+    - **[测试代码编写规范](../specification/测试代码编写规范.md)** - 测试代码编写标准
+    ```
+  - [ ] 添加更多链接（如果需要）：
+    ```markdown
+    ### 📖 相关文档
+    ### 项目规范文档（编码、测试、验证）
+    - **[业务代码编写规范](../specification/业务代码编写规范.md)** - 业务代码编码标准
+    - **[测试代码编写规范](../specification/测试代码编写规范.md)** - 测试代码编写标准
+    - **[验证流程指南](../specification/业务代码生成(AI)流程.md)** - 代码验证强制流程
+    - **[测试示例指南](../specification/测试示例指南.md)** - 测试示例和最佳实践
+    ```
+  - [ ] 验证相对路径正确：
+    - 从 `_docs/business/` 到 `_docs/specification/` 使用 `../specification/`
+  - [ ] 使用 Markdown 预览验证超链接可点击
+  - [ ] 手动点击所有新增超链接，验证跳转正确
+
+  **Evidence Required**:
+  - [ ] 添加超链接的代码片段
+  - [ ] Markdown 预览截图（可选）
+  - [ ] 超链接点击测试结果
+
+  **Commit**: YES (groups with 4)
+  - Message: `docs: add navigation links to specification documents in business README`
+  - Files: `_docs/business/README.md`
+  - Pre-commit: 手动检查超链接
+
+---
+
+## Commit Strategy
+
+| After Task | Message | Files | Verification |
+|------------|---------|-------|--------------|
+| 1 | `refactor(config): rename AdapterListenerConfig to AdapterListenerConfigure for naming consistency` | AdapterListenerConfig.java | mvn clean compile |
+| 2 | `refactor(config): rename AdapterScheduleConfig to AdapterScheduleConfigure for naming consistency` | AdapterScheduleConfig.java | mvn clean compile |
+| 3 | `refactor: update all references to renamed configuration classes` | All reference updates | mvn clean compile |
+| 4, 5 | `docs: add navigation links between README and specification documents` | README.md, _docs/business/README.md | Manual link verification |
+
+---
+
+## Success Criteria
+
+### Verification Commands
+```bash
+# 验证配置类重命名
+mvn clean compile  # Expected: BUILD SUCCESS
+
+# 验证重命名后的类存在
+ls start/src/main/java/org/smm/archetype/config/AdapterListenerConfigure.java
+ls start/src/main/java/org/smm/archetype/config/AdapterScheduleConfigure.java
+
+# 验证无旧名称引用
+grep -r "AdapterListenerConfig" --include="*.java"  # Expected: 0 results
+grep -r "AdapterScheduleConfig" --include="*.java"  # Expected: 0 results
+
+# 验证文档超链接
+ls _docs/specification/业务代码编写规范.md  # Expected: File exists
+```
+
+### Final Checklist
+- [ ] 配置类已重命名（AdapterListenerConfig → AdapterListenerConfigure）
+- [ ] 配置类已重命名（AdapterScheduleConfig → AdapterScheduleConfigure）
+- [ ] 所有引用已更新（无编译错误）
+- [ ] README.md 添加了文档超链接
+- [ ] _docs/business/README.md 添加了规范文档链接
+- [ ] _docs/business/README.md 示例内容保持不变
+- [ ] 所有超链接可点击且跳转正确
+- [ ] 应用可正常启动（mvn spring-boot:run -pl start）
+
+---
+
+**文档版本**: v1.0
+**创建日期**: 2026-01-24
+**维护者**: Prometheus (Planning Agent)
