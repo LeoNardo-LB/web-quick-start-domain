@@ -24,7 +24,7 @@ spring:
     bootstrap-servers: localhost:9092
 
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/testdb?characterEncoding=utf-8&useInformationSchema=true
+    url: jdbc:mysql://host.docker.internal:3306/testdb?characterEncoding=utf-8&useInformationSchema=true
     driverClassName: com.mysql.cj.jdbc.Driver
     username: root
     password: leonardo123
