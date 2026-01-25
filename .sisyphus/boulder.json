@@ -1,8 +1,8 @@
 {
-  "active_plan": "D:\\Develop\\code\\mine\\archetype\\web-quick-start-domain\\.sisyphus\\plans\\mysql-ddl-generation.md",
-  "started_at": "2026-01-24T18:51:32.835Z",
-  "session_ids": [
-    "ses_40fac18fbffeRJEXlH4Wr4NWku"
-  ],
-  "plan_name": "mysql-ddl-generation"
+  "active_plan": ".sisyphus/plans/upgrade-es-to-9.2.3.md",
+  "started_at": "2026-01-25T08:31:18.777Z",
+  "completed_at": "2026-01-25T09:40:00.000Z",
+  "session_ids": ["ses_40e01af22ffeyWg7j4XwpZ72uT", "ses_40bb3087affeTyB6sAcHL31S3N", "ses_40ba483a3ffenpQ75GqPW0b7nX", "ses_40ba6d94abffeDRIEJbY9AhY003", "ses_40b994be7ffeoiU96IiZqfT64i", "ses_40b904bc5ffesNK6T6CfgQ8siq", "ses_40b954963ffedmqsjhcRLrHA4y", "ses_40b94f8caffefRP4a9K44yKrUi", "ses_40b94db85ffePA1YQDthk59HNs", "ses_40b821ba0ffeWHfOEaHaBAz3Og", "ses_40b852cb9ffeAkk2bilNv1J4s6", "ses_40b904bc5ffesNK6T6CfgQ8siq"],
+  "plan_name": "upgrade-es-to-9.2.3",
+  "status": "completed"
 }
