@@ -13,6 +13,7 @@
 - [项目架构](#项目架构)
 - [核心概念](#核心概念)
 - [目录结构](#目录结构)
+- [架构路线图](#架构路线图architecture-roadmap)
 - [开发指南](#开发指南)
 - [文档导航](#文档导航)
 - [常见问题](#常见问题)
@@ -58,9 +59,9 @@ curl http://localhost:8080/api/orders
 
 ### 环境要求
 
-- **JDK**: 25+（项目使用JDK 25，JaCoCo 0.8.14已兼容）
+- **JDK**: 25+（项目使用JDK 25）
 - **Maven**: 3.8+
-- **MySQL**: 8.0+（可选，默认使用H2内存数据库）
+- **MySQL**: 8.0+
 
 ### 验证代码质量
 
@@ -356,6 +357,49 @@ web-quick-start-domain/
 
 ---
 
+## 架构路线图（Architecture Roadmap）
+
+以下模块是计划中但尚未实现的模块：
+
+### 📦 Product 模块 [尚未实现]
+
+**状态：** 计划中，代码示例仅作演示
+
+**目标功能：**
+- 产品管理的核心业务逻辑
+- 产品创建、查询、更新、删除
+- 产品库存管理
+
+**示例代码：**
+
+```java
+// 创建聚合根
+public class ProductAggr extends AggregateRoot<ProductAggr, ProductId> {
+    // 业务逻辑
+}
+
+// 创建仓储接口
+public interface ProductRepository {
+    Product findById(ProductId id);
+    void save(Product product);
+}
+```
+
+> **注意**：上述代码仅为架构示例，实际实现尚未开始。
+
+### 👤 User 模块 [尚未实现]
+
+**状态：** 计划中，尚未开始设计
+
+**目标功能：**
+- 用户注册、登录
+- 用户信息管理
+- 用户权限管理
+
+> **注意**：该模块目前仅处于规划阶段。
+
+---
+
 ## 开发指南
 
 ### 开发新功能的步骤
@@ -364,18 +408,42 @@ web-quick-start-domain/
 
 ```java
 // 1.1 创建聚合根
-public class ProductAggr extends AggregateRoot<ProductAggr, ProductId> {
-    // 业务逻辑
+public class OrderAggr extends AggregateRoot<OrderAggr, OrderId> {
+    private OrderId id;
+    private List<OrderItem> items;
+    private OrderStatus status;
+
+    // 业务逻辑方法
+    public static OrderAggr create(String customerId, Money totalAmount) {
+        OrderAggr order = new OrderAggr();
+        order.id = OrderId.generate();
+        order.status = OrderStatus.CREATED;
+        order.recordEvent(new OrderCreatedEvent(order.id));
+        return order;
+    }
+
+    public void pay(PaymentMethod method) {
+        if (this.status != OrderStatus.CREATED) {
+            throw new IllegalStateException("只有已创建的订单可以支付");
+        }
+        this.status = OrderStatus.PAID;
+        this.recordEvent(new OrderPaidEvent(this.id));
+    }
 }
 
 // 1.2 创建实体和值对象
 @ValueObject
-public class Money { ... }
+public class Money {
+    private BigDecimal amount;
+    private String currency;
+    // 值对象逻辑
+}
 
 // 1.3 创建仓储接口
-public interface ProductRepository {
-    Product findById(ProductId id);
-    void save(Product product);
+public interface OrderAggrRepository {
+    void save(OrderAggr order);
+    OrderAggr findById(OrderId id);
+    List<OrderAggr> findByCustomerId(String customerId);
 }
 ```
 
@@ -388,18 +456,29 @@ public interface ProductRepository {
 ```java
 // 2.1 创建ApplicationService
 @Configuration
-public class ProductConfigure {
+public class OrderConfigure {
     @Bean
-    public ProductAppService productAppService(
-        ProductRepository productRepository) {
-        return new ProductAppService(productRepository);
+    public OrderAppService orderAppService(
+        OrderAggrRepository orderRepository) {
+        return new OrderAppService(orderRepository);
     }
 }
 
 // 2.2 实现用例编排
-public class ProductAppService {
-    public ProductId create(CreateProductCommand command) {
+public class OrderAppService {
+    public OrderId create(CreateOrderCommand command) {
         // 编排业务逻辑
+        OrderAggr order = OrderAggr.create(command.getCustomerId(), command.getTotalAmount());
+        orderRepository.save(order);
+        return order.getId();
+    }
+
+    public List<OrderDTO> query(OrderQuery query) {
+        // 查询逻辑
+        return orderRepository.findByCustomerId(query.getCustomerId())
+            .stream()
+            .map(this::toDTO)
+            .toList();
     }
 }
 ```
@@ -413,13 +492,20 @@ public class ProductAppService {
 ```java
 // 3.1 创建Controller
 @RestController
-@RequestMapping("/api/products")
-public class ProductController {
-    private ProductAppService productAppService;
+@RequestMapping("/api/orders")
+public class OrderController {
+    private OrderAppService orderAppService;
 
     @PostMapping
-    public Response<ProductDTO> create(@RequestBody CreateProductRequest request) {
+    public Response<OrderDTO> create(@RequestBody CreateOrderRequest request) {
         // 调用应用服务
+        OrderId orderId = orderAppService.create(new CreateOrderCommand(request));
+        return Response.success(orderAppService.queryById(orderId));
+    }
+
+    @GetMapping
+    public Response<List<OrderDTO>> list(@RequestParam String customerId) {
+        return Response.success(orderAppService.query(new OrderQuery(customerId)));
     }
 }
 ```
@@ -430,13 +516,26 @@ public class ProductController {
 
 ```java
 // 4.1 实现仓储
-public class ProductRepositoryImpl implements ProductRepository {
-    private ProductMapper productMapper;
-    private ProductBusinessConverter converter;
+public class OrderAggrRepositoryImpl implements OrderAggrRepository {
+    private OrderMapper orderMapper;
+    private OrderBusinessConverter converter;
 
     @Override
-    public void save(Product product) {
-        // DO转换和持久化
+    public void save(OrderAggr order) {
+        OrderDO orderDO = converter.toDO(order);
+        orderMapper.insertOrUpdate(orderDO);
+    }
+
+    @Override
+    public OrderAggr findById(OrderId id) {
+        OrderDO orderDO = orderMapper.selectById(id.getValue());
+        return converter.toDomain(orderDO);
+    }
+
+    @Override
+    public List<OrderAggr> findByCustomerId(String customerId) {
+        List<OrderDO> orderDOList = orderMapper.selectByCustomerId(customerId);
+        return converter.toDomainList(orderDOList);
     }
 }
 ```
@@ -447,18 +546,37 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 ```java
 // 5.1 单元测试
-class ProductAppServiceTest extends UnitTestBase {
+class OrderAppServiceTest extends UnitTestBase {
+    @Mock
+    private OrderAggrRepository orderRepository;
+
     @Test
-    void testCreateProduct() {
+    void testCreateOrder() {
         // Given-When-Then
+        CreateOrderCommand command = new CreateOrderCommand("customer123", new Money("100.00", "CNY"));
+        when(orderRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        OrderId orderId = orderAppService.create(command);
+
+        assertNotNull(orderId);
+        verify(orderRepository, times(1)).save(any());
     }
 }
 
 // 5.2 集成测试
-class ProductControllerTest extends IntegrationTestBase {
+class OrderControllerTest extends IntegrationTestBase {
+    @Autowired
+    private MockMvc mockMvc;
+
     @Test
-    void testCreateProductApi() {
-        // 测试API
+    void testCreateOrderApi() throws Exception {
+        String requestBody = "{\"customerId\":\"customer123\",\"totalAmount\":{\"amount\":\"100.00\",\"currency\":\"CNY\"}}";
+
+        mockMvc.perform(post("/api/orders")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success").value(true));
     }
 }
 ```
@@ -558,9 +676,10 @@ mvn verify -pl test
 ```
 start/src/main/java/org/smm/archetype/config/
 ├── OrderConfigure.java
-├── ProductConfigure.java
 └── ...
 ```
+
+**命名规范**：使用 `{Aggregate}Configure` 格式，如 `OrderConfigure`。
 
 **禁止**：在adapter/infrastructure模块创建配置类。
 
