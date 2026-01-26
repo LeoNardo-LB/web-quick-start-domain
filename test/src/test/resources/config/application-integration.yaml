@@ -2,24 +2,20 @@ spring:
   application:
     name: quickstart-integration-test
 
-  # H2内存数据库配置（MySQL兼容模式）
+  # Testcontainers MySQL数据库配置
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;FILE_LOCK=NO
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
-
-  # SQL初始化配置 - 加载H2兼容的schema文件（仅测试环境）
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:config/schema.sql
-      encoding: UTF-8
-
-  # H2控制台（可选，调试时使用）
-  h2:
-    console:
-      enabled: false
+    url: jdbc:tc:mysql:8.0:///testdb?TC_INITSCRIPT=file:MySQL-Scheme.sql&characterEncoding=utf-8&useInformationSchema=true
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: root
+    password: test
+    # HikariCP连接池配置
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 60000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
 
   # 禁用Kafka（测试环境不需要）
   kafka:

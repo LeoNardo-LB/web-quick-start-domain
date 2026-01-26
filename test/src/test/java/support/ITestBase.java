@@ -27,7 +27,7 @@ import java.sql.Connection;
  * <p>特点：
  * <ul>
  *   <li>✅ 启动完整的Spring上下文</li>
- *   <li>✅ 使用H2内存数据库</li>
+ *   <li>✅ 使用 Testcontainers + MySQL（完全隔离，与生产环境一致）</li>
  *   <li>✅ MyBatis-Flex自动建表</li>
  *   <li>✅ 支持DBUnit数据预加载</li>
  *   <li>✅ 事务回滚保证隔离性</li>
