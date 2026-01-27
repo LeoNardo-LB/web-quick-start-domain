@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smm.archetype.domain._shared.base.Entity;
+import org.smm.archetype.domain.bizshared.base.Entity;
 
 /**
  * 文件领域模型

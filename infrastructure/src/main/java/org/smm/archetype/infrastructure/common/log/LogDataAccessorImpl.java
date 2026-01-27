@@ -6,8 +6,8 @@ import org.smm.archetype.domain.common.log.LogAnno;
 import org.smm.archetype.domain.common.log.LogDataAccessor;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyHandler;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyType;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.LogDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.LogMapper;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.LogDO;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.LogMapper;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.smm.archetype.infrastructure._shared.generated.repository.entity.table.LogDOTableDef.LOG_DO;
+import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.table.LogDOTableDef.LOG_DO;
 
 /**
  * 日志数据访问器实现

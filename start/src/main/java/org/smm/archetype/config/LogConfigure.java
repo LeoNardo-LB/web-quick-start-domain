@@ -3,7 +3,7 @@ package org.smm.archetype.config;
 import org.smm.archetype.domain.common.log.LogDataAccessor;
 import org.smm.archetype.domain.common.log.handler.persistence.PersistenceHandler;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyHandler;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.LogMapper;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.LogMapper;
 import org.smm.archetype.infrastructure.common.log.DbPersistenceHandler;
 import org.smm.archetype.infrastructure.common.log.FilePersistenceHandler;
 import org.smm.archetype.infrastructure.common.log.JdkStringifyHandler;

@@ -2,13 +2,13 @@ package cases.unittest.org.smm.archetype.domain._example.order.model;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.smm.archetype.domain._example.order.model.OrderAggr;
-import org.smm.archetype.domain._example.order.model.OrderItem;
-import org.smm.archetype.domain._example.order.model.OrderStatus;
-import org.smm.archetype.domain._example.order.model.PaymentMethod;
-import org.smm.archetype.domain._example.order.model.valueobject.Address;
-import org.smm.archetype.domain._example.order.model.valueobject.ContactInfo;
-import org.smm.archetype.domain._example.order.model.valueobject.Money;
+import org.smm.archetype.domain.example.model.OrderAggr;
+import org.smm.archetype.domain.example.model.OrderItem;
+import org.smm.archetype.domain.example.model.OrderStatus;
+import org.smm.archetype.domain.example.model.PaymentMethod;
+import org.smm.archetype.domain.example.model.valueobject.Address;
+import org.smm.archetype.domain.example.model.valueobject.ContactInfo;
+import org.smm.archetype.domain.example.model.valueobject.Money;
 import support.UnitTestBase;
 
 import java.math.BigDecimal;

@@ -4,7 +4,7 @@ import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.smm.archetype.domain.common.file.FileBusiness;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileBusinessDO;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.FileBusinessDO;
 
 /**
  * 业务文件领域对象转换器（MapStruct实现）

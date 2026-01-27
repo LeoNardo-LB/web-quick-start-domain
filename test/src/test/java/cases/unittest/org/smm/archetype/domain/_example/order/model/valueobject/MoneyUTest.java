@@ -2,7 +2,7 @@ package cases.unittest.org.smm.archetype.domain._example.order.model.valueobject
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.smm.archetype.domain._example.order.model.valueobject.Money;
+import org.smm.archetype.domain.example.model.valueobject.Money;
 import support.UnitTestBase;
 
 import java.math.BigDecimal;

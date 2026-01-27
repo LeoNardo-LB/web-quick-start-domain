@@ -6,16 +6,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.common.file.FileRepository;
 import org.smm.archetype.domain.common.file.FileBusiness;
 import org.smm.archetype.domain.common.file.FileMetadata;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileBusinessDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileMetadataDO;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.FileBusinessMapper;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.FileMetadataMapper;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.FileBusinessDO;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.FileMetadataDO;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.FileBusinessMapper;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.FileMetadataMapper;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.smm.archetype.infrastructure._shared.generated.repository.entity.table.FileBusinessDOTableDef.FILE_BUSINESS_DO;
-import static org.smm.archetype.infrastructure._shared.generated.repository.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
+import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.table.FileBusinessDOTableDef.FILE_BUSINESS_DO;
+import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
 
 /**
  * 通用文件仓储实现

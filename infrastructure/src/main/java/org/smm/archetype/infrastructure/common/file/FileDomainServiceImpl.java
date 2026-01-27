@@ -2,7 +2,7 @@ package org.smm.archetype.infrastructure.common.file;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain._shared.client.OssClient;
+import org.smm.archetype.domain.bizshared.client.OssClient;
 import org.smm.archetype.domain.common.file.FileRepository;
 import org.smm.archetype.domain.common.file.FileDomainService;
 import org.smm.archetype.domain.common.file.FileBusiness;

@@ -1,6 +1,6 @@
 package org.smm.archetype.domain.common.log;
 
-import org.smm.archetype.domain._shared.base.DataAccessor;
+import org.smm.archetype.domain.bizshared.base.DataAccessor;
 
 import java.time.Instant;
 import java.util.List;

@@ -2,7 +2,6 @@ package org.smm.archetype.test;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 
 /**
  * 测试启动类
@@ -11,10 +10,7 @@ import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
  *
  * <p>注意：springEventPublisher Bean由EventConfigure提供，无需在此重复定义
  */
-@SpringBootApplication(
-        scanBasePackages = "org.smm.archetype",
-        exclude = {KafkaAutoConfiguration.class}
-)
+@SpringBootApplication(scanBasePackages = "org.smm.archetype")
 @MapperScan("org.smm.archetype.infrastructure.**.mapper")
 public class TestBootstrap {
 

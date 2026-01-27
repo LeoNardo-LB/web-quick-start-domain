@@ -1,6 +1,6 @@
 package org.smm.archetype.config;
 
-import org.smm.archetype.adapter.access.web.config.ContextFillFilter;
+import org.smm.archetype.adapter.web.config.ContextFillFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

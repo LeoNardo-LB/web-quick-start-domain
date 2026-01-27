@@ -1,0 +1,42 @@
+package org.smm.archetype.app._example.dto;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * 地址DTO
+ * @author Leonardo
+ * @since 2026/1/11
+ */
+@Getter
+@Builder(setterPrefix = "set")
+public class AddressDTO {
+
+    /**
+     * 省份
+     */
+    private String province;
+
+    /**
+     * 城市
+     */
+    private String city;
+
+    /**
+     * 区/县
+     */
+    private String district;
+
+    /**
+     * 详细地址
+     */
+    private String detailAddress;
+
+    /**
+     * 邮编
+     */
+    private String postalCode;
+
+}

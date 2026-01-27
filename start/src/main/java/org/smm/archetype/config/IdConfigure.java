@@ -1,7 +1,7 @@
 package org.smm.archetype.config;
 
-import org.smm.archetype.domain._shared.client.IdClient;
-import org.smm.archetype.infrastructure._shared.client.id.impl.SnowflakeIdClient;
+import org.smm.archetype.domain.bizshared.client.IdClient;
+import org.smm.archetype.infrastructure.bizshared.client.id.impl.SnowflakeIdClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

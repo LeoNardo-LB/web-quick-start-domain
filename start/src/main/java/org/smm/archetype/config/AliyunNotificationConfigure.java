@@ -4,8 +4,8 @@ import org.smm.archetype.config.condition.AliyunEmailEnabledCondition;
 import org.smm.archetype.config.condition.AliyunSmsEnabledCondition;
 import org.smm.archetype.config.properties.EmailProperties;
 import org.smm.archetype.config.properties.SmsProperties;
-import org.smm.archetype.infrastructure.common.notification.AliyunEmailServiceImpl;
-import org.smm.archetype.infrastructure.common.notification.AliyunSmsServiceImpl;
+import org.smm.archetype.infrastructure.bizshared.client.email.AliyunEmailClientImpl;
+import org.smm.archetype.infrastructure.bizshared.client.sms.AliyunSmsClientImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -46,9 +46,9 @@ public class AliyunNotificationConfigure {
      */
     @Bean
     @Conditional(AliyunSmsEnabledCondition.class)
-    public AliyunSmsServiceImpl aliyunSmsService(SmsProperties smsProperties) {
+    public AliyunSmsClientImpl aliyunSmsService(SmsProperties smsProperties) {
         SmsProperties.Aliyun aliyun = smsProperties.getAliyun();
-        return new AliyunSmsServiceImpl(
+        return new AliyunSmsClientImpl(
                 aliyun.getAccessKeyId(),
                 aliyun.getAccessKeySecret(),
                 aliyun.getRegionId(),
@@ -70,9 +70,9 @@ public class AliyunNotificationConfigure {
      */
     @Bean
     @Conditional(AliyunEmailEnabledCondition.class)
-    public AliyunEmailServiceImpl aliyunEmailService(EmailProperties emailProperties) {
+    public AliyunEmailClientImpl aliyunEmailService(EmailProperties emailProperties) {
         EmailProperties.Aliyun aliyun = emailProperties.getAliyun();
-        return new AliyunEmailServiceImpl(
+        return new AliyunEmailClientImpl(
                 aliyun.getAccessKeyId(),
                 aliyun.getAccessKeySecret(),
                 aliyun.getRegionId(),

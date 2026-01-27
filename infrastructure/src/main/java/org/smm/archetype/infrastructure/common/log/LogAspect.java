@@ -12,7 +12,7 @@ import org.smm.archetype.domain.common.log.Log.LogBuilder;
 import org.smm.archetype.domain.common.log.LogAnno;
 import org.smm.archetype.domain.common.log.handler.persistence.PersistenceHandler;
 import org.smm.archetype.domain.common.log.handler.persistence.PersistenceType;
-import org.smm.archetype.infrastructure._shared.context.executable.ContextRunnable;
+import org.smm.archetype.infrastructure.bizshared.context.executable.ContextRunnable;
 import org.springframework.core.annotation.Order;
 
 import java.time.Instant;

@@ -3,8 +3,8 @@ package cases.unittest.org.smm.archetype.domain._shared.util;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.smm.archetype.domain._shared.util.EnumUtil;
-import org.smm.archetype.domain._shared.util.EnumUtil.EnumWrapper;
+import org.smm.archetype.domain.bizshared.util.EnumUtil;
+import org.smm.archetype.domain.bizshared.util.EnumUtil.EnumWrapper;
 import org.smm.archetype.domain.common.search.enums.SortOrder;
 import support.UnitTestBase;
 

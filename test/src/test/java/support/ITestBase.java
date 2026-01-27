@@ -8,8 +8,6 @@ import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
@@ -34,8 +32,6 @@ import java.sql.Connection;
  * </ul>
  */
 @SpringBootTest(classes = org.smm.archetype.test.TestBootstrap.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("integration")
 @TestPropertySource(locations = "classpath:config/application-integration.yaml")
 @Transactional // 每个测试方法后自动回滚事务

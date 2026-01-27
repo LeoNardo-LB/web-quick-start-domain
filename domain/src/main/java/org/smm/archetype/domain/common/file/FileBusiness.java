@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.smm.archetype.domain._shared.base.Entity;
+import org.smm.archetype.domain.bizshared.base.Entity;
 
 /**
  * 业务关联信息

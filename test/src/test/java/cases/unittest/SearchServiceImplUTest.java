@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.smm.archetype.domain._shared.client.SearchClient;
+import org.smm.archetype.domain.bizshared.client.SearchClient;
 import org.smm.archetype.domain.common.search.enums.FilterOperator;
 import org.smm.archetype.domain.common.search.enums.SortOrder;
 import org.smm.archetype.domain.common.search.query.SearchFilter;

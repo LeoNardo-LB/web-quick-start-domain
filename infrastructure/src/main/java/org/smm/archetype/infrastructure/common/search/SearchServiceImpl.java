@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain._shared.client.SearchClient;
+import org.smm.archetype.domain.bizshared.client.SearchClient;
 import org.smm.archetype.domain.common.search.SearchService;
 import org.smm.archetype.domain.common.search.query.AiSearchQuery;
 import org.smm.archetype.domain.common.search.query.HybridSearchQuery;

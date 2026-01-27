@@ -4,7 +4,7 @@ import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.smm.archetype.domain.common.file.FileMetadata;
-import org.smm.archetype.infrastructure._shared.generated.repository.entity.FileMetadataDO;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.FileMetadataDO;
 
 /**
  * 文件元数据领域对象转换器（MapStruct实现）

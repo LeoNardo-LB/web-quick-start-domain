@@ -1,11 +1,11 @@
 package org.smm.archetype.config;
 
-import org.smm.archetype.adapter.access.listener.SpringEventListener;
-import org.smm.archetype.app._shared.event.EventHandler;
-import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.RetryStrategy;
-import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
-import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
+import org.smm.archetype.adapter.listener.SpringEventListener;
+import org.smm.archetype.adapter.schedule.handler.EventHandler;
+import org.smm.archetype.domain.bizshared.base.DomainEvent;
+import org.smm.archetype.adapter.schedule.RetryStrategy;
+import org.smm.archetype.infrastructure.bizshared.event.repository.EventConsumeRepository;
+import org.smm.archetype.infrastructure.bizshared.event.repository.EventPublishRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

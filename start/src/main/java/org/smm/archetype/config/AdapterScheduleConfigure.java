@@ -1,13 +1,13 @@
 package org.smm.archetype.config;
 
-import org.smm.archetype.adapter.access.listener.EventListener;
-import org.smm.archetype.adapter.access.schedule.EventRetrySchedulerImpl;
-import org.smm.archetype.app._shared.event.EventFailureHandler;
+import org.smm.archetype.adapter.listener.EventListener;
+import org.smm.archetype.adapter.schedule.EventRetrySchedulerImpl;
+import org.smm.archetype.adapter.schedule.handler.FailureHandler;
 import org.smm.archetype.config.properties.EventProperties;
 import org.smm.archetype.config.properties.RetryDelayProperties;
-import org.smm.archetype.infrastructure._shared.event.EventConsumeRecordConverter;
-import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
-import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
+import org.smm.archetype.infrastructure.bizshared.event.EventConsumeRecordConverter;
+import org.smm.archetype.infrastructure.bizshared.event.repository.EventConsumeRepository;
+import org.smm.archetype.infrastructure.bizshared.event.repository.EventPublishRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +45,7 @@ public class AdapterScheduleConfigure {
     public EventRetrySchedulerImpl eventRetryScheduler(
             final EventConsumeRepository eventConsumeRepository,
             final List<EventListener> eventListeners,
-            final List<EventFailureHandler> failureHandlers,
+            final List<FailureHandler> failureHandlers,
             @Qualifier("virtualThreadExecutor") final ExecutorService virtualThreadExecutor,
             final EventConsumeRecordConverter recordConverter,
             final EventPublishRepository eventPublishRepository,

@@ -2,7 +2,7 @@ package org.smm.archetype.test;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.smm.archetype.domain._shared.client.SearchClient;
+import org.smm.archetype.domain.bizshared.client.SearchClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.smm.archetype.domain.common.search.SearchService;

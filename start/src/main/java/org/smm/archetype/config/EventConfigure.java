@@ -3,23 +3,18 @@ package org.smm.archetype.config;
 import lombok.RequiredArgsConstructor;
 import org.smm.archetype.config.properties.EventProperties;
 import org.smm.archetype.config.properties.RetryDelayProperties;
-import org.smm.archetype.domain._shared.base.DomainEvent;
-import org.smm.archetype.domain._shared.event.EventPublisher;
-import org.smm.archetype.infrastructure._shared.event.EventConsumeRepository;
-import org.smm.archetype.infrastructure._shared.event.EventPublishRepository;
-import org.smm.archetype.infrastructure._shared.event.TransactionEventPublishingAspect;
-import org.smm.archetype.infrastructure._shared.event.publisher.AsyncEventPublisher;
-import org.smm.archetype.infrastructure._shared.event.publisher.KafkaEventPublisher;
-import org.smm.archetype.infrastructure._shared.event.publisher.SpringEventPublisher;
-import org.smm.archetype.infrastructure._shared.event.publisher.TransactionalEventPublisher;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventConsumeMapper;
-import org.smm.archetype.infrastructure._shared.generated.repository.mapper.EventPublishMapper;
+import org.smm.archetype.infrastructure.bizshared.event.repository.EventConsumeRepository;
+import org.smm.archetype.infrastructure.bizshared.event.repository.EventPublishRepository;
+import org.smm.archetype.infrastructure.bizshared.event.publisher.KafkaEventPublisher;
+import org.smm.archetype.infrastructure.bizshared.event.publisher.SpringEventPublisher;
+import org.smm.archetype.infrastructure.bizshared.event.publisher.TransactionalEventPublisher;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.EventConsumeMapper;
+import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.EventPublishMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -43,9 +38,6 @@ import java.util.concurrent.Executor;
  *   <li><b>本地场景</b>：当KafkaTemplate Bean不存在时（即未添加Kafka依赖），
  *       springEventPublisher会被创建，作为默认的本地事件发布器。</li>
  * </ul>
- *
- * <p>异步事件发布器（asyncEventPublisher）和事务性事件发布器（transactionalEventPublisher）
- * 仅在KafkaTemplate存在时创建，因为它们主要用于Kafka事件的异步和事务发布场景。
  *
  * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式）
  * 对于跨配置类的Bean依赖，使用构造器注入（遵循文档第2.6节规范）
@@ -105,25 +97,6 @@ public class EventConfigure implements AsyncConfigurer {
     }
 
     /**
-     * 异步事件发布器
-     *
-     * <p>包装具体的事件发布器，提供异步发布能力。
-     *
-     * <p>条件：KafkaTemplate Bean存在时创建，支持异步Kafka事件发布。
-     *
-     * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式，避免循环依赖）
-     *
-     * @param kafkaEventPublisher  Kafka事件发布器
-     * @return 异步事件发布器
-     */
-    @Bean
-    @ConditionalOnBean(KafkaTemplate.class)
-    public AsyncEventPublisher asyncEventPublisher(
-            final KafkaEventPublisher kafkaEventPublisher) {
-        return new AsyncEventPublisher(kafkaEventPublisher);
-    }
-
-    /**
      * 事务性事件发布器
      *
      * <p>确保事件在事务提交后才发布。
@@ -140,19 +113,6 @@ public class EventConfigure implements AsyncConfigurer {
     public TransactionalEventPublisher transactionalEventPublisher(
             final KafkaEventPublisher kafkaEventPublisher) {
         return new TransactionalEventPublisher(kafkaEventPublisher);
-    }
-
-    /**
-     * 事务事件发布切面
-     *
-     * <p>拦截@Transactional注解的方法，在事务提交后发布事件。
-     * @param applicationEventPublisher Application事件发布器
-     * @return 事务事件发布切面
-     */
-    @Bean
-    public TransactionEventPublishingAspect transactionEventPublishingAspect(
-            final org.springframework.context.ApplicationEventPublisher applicationEventPublisher) {
-        return new TransactionEventPublishingAspect(applicationEventPublisher);
     }
 
     /**

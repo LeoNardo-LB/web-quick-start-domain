@@ -3,7 +3,7 @@ package org.smm.archetype.domain.common.log;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.smm.archetype.domain._shared.base.Entity;
+import org.smm.archetype.domain.bizshared.base.Entity;
 
 import java.time.Instant;
 

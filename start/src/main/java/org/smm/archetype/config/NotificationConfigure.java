@@ -1,9 +1,9 @@
 package org.smm.archetype.config;
 
-import org.smm.archetype.domain.common.notification.EmailService;
-import org.smm.archetype.domain.common.notification.SmsService;
-import org.smm.archetype.infrastructure.common.notification.EmailServiceImpl;
-import org.smm.archetype.infrastructure.common.notification.SmsServiceImpl;
+import org.smm.archetype.domain.bizshared.client.EmailClient;
+import org.smm.archetype.domain.bizshared.client.SmsClient;
+import org.smm.archetype.infrastructure.bizshared.client.email.EmailClientImpl;
+import org.smm.archetype.infrastructure.bizshared.client.sms.SmsClientImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +16,8 @@ import org.springframework.context.annotation.Import;
  *
  * <p>当前实现：
  * <ul>
- *   <li>EmailServiceImpl - 邮件服务（模拟实现）</li>
- *   <li>SmsServiceImpl - 短信服务（模拟实现）</li>
+ *   <li>EmailClientImpl - 邮件服务（模拟实现）</li>
+ *   <li>SmsClientImpl - 短信服务（模拟实现）</li>
  * </ul>
  *
  * <p>生产环境接入方式：
@@ -30,7 +30,7 @@ import org.springframework.context.annotation.Import;
  *
  * <p>设计原则：
  * <ul>
- *   <li>Bean方法返回接口类型（EmailService/SmsService）而非具体实现</li>
+ *   <li>Bean方法返回接口类型（EmailClient/SmsClient）而非具体实现</li>
  *   <li>使用@ConditionalOnMissingBean允许用户替换实现</li>
  *   <li>配置类位于 start/src/main/java/org/smm/archetype/config/</li>
  * </ul>
@@ -45,27 +45,27 @@ public class NotificationConfigure {
     /**
      * 短信服务Bean（模拟实现）
      * <p>职责：发送短信通知
-     * <p>默认实现：SmsServiceImpl（模拟实现，仅打印日志）
+     * <p>默认实现：SmsClientImpl（模拟实现，仅打印日志）
      * <p>生产环境：用户可以通过@ConditionalOnMissingBean替换为真实实现
      * @return SmsService接口类型
      */
     @Bean
-    @ConditionalOnMissingBean(SmsService.class)
-    public SmsService smsService() {
-        return new SmsServiceImpl();
+    @ConditionalOnMissingBean(SmsClient.class)
+    public SmsClient smsService() {
+        return new SmsClientImpl();
     }
 
     /**
      * 邮件服务Bean（模拟实现）
      * <p>职责：发送邮件通知
-     * <p>默认实现：EmailServiceImpl（模拟实现，仅打印日志）
+     * <p>默认实现：EmailClientImpl（模拟实现，仅打印日志）
      * <p>生产环境：用户可以通过@ConditionalOnMissingBean替换为真实实现
      * @return EmailService接口类型
      */
     @Bean
-    @ConditionalOnMissingBean(EmailService.class)
-    public EmailService emailService() {
-        return new EmailServiceImpl();
+    @ConditionalOnMissingBean(EmailClient.class)
+    public EmailClient emailService() {
+        return new EmailClientImpl();
     }
 
 }
