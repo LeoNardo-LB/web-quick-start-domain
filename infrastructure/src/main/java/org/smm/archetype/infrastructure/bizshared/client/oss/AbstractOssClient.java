@@ -125,7 +125,6 @@ public abstract class AbstractOssClient implements OssClient {
             FileMetadataDO metadata = metadataMapper.selectOneByQuery(
                     com.mybatisflex.core.query.QueryWrapper.create()
                             .select()
-                            .from(FILE_METADATA_DO)
                             .where(FILE_METADATA_DO.PATH.eq(filePath))
             );
 
