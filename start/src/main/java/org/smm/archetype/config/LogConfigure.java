@@ -2,6 +2,7 @@ package org.smm.archetype.config;
 
 import org.smm.archetype.domain.common.log.LogDataAccessor;
 import org.smm.archetype.domain.common.log.handler.persistence.PersistenceHandler;
+import org.smm.archetype.domain.common.log.handler.persistence.PersistenceType;
 import org.smm.archetype.domain.common.log.handler.stringify.StringifyHandler;
 import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.LogMapper;
 import org.smm.archetype.infrastructure.common.log.DbPersistenceHandler;
@@ -15,8 +16,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * Infrastructure层日志相关配置
@@ -94,11 +97,17 @@ public class LogConfigure {
      *
      * <p>拦截需要记录日志的方法，自动收集和持久化日志信息。
      * @param persistenceHandlers 所有持久化处理器
+     * @param logExecutor 日志持久化线程池
      * @return 日志切面
      */
     @Bean
-    public LogAspect logAspect(List<PersistenceHandler> persistenceHandlers) {
-        return new LogAspect(persistenceHandlers);
+    public LogAspect logAspect(List<PersistenceHandler> persistenceHandlers, ExecutorService logExecutor) {
+        Map<PersistenceType, PersistenceHandler> persistenceHandlerMap = persistenceHandlers.stream()
+                .collect(Collectors.toMap(
+                    PersistenceHandler::getPersistenceType,
+                    handler -> handler
+                ));
+        return new LogAspect(persistenceHandlerMap, logExecutor);
     }
 
     /**
