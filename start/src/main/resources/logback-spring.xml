@@ -2,7 +2,13 @@
 <configuration scan="true" scanPeriod="30 seconds">
     <!-- 引入Spring Boot默认配置 -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!-- CONSOLE Appender with traceId/spanId pattern -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} | %thread | %X{traceId:--} | %X{spanId:--} | %-5level | %logger{36} | %msg%n</pattern>
+        </encoder>
+    </appender>
 
     <!-- 多环境配置（通过Spring Profile区分） -->
     <springProperty scope="context" name="LOG_PATH" source="logging.file.path" defaultValue="${user.dir}/../_logs"/>
@@ -18,7 +24,7 @@
             <totalSizeCap>5GB</totalSizeCap> <!-- 总日志上限 -->
         </rollingPolicy>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} | %thread | %X{traceId:--} | %X{spanId:--} | %-5level | %logger{36} | %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -34,7 +40,7 @@
         <file>${LOG_PATH}/current.log</file>
         <append>false</append> <!-- 每次启动时覆盖文件 -->
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} | %thread | %X{traceId:--} | %X{spanId:--} | %-5level | %logger{36} | %msg%n</pattern>
         </encoder>
     </appender>
 
