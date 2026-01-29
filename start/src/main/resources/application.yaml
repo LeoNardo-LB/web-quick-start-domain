@@ -296,6 +296,11 @@ middleware:
       # 回信地址（可选）
       reply-to-address: ${ALIYUN_EMAIL_REPLYTO:}
 
+  # 可观测性配置
+  observability:
+    metrics:
+      timer-percentiles: 0.5,0.95,0.99
+
 
 server:
   port: 9102
@@ -311,3 +316,19 @@ springdoc:
 
 logging:
   config: classpath:logback-spring.xml
+
+# Actuator管理端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,httptrace
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      environment: ${spring.profiles.active:default}
+  tracing:
+    enabled: true
