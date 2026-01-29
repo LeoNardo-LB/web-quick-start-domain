@@ -1,27 +1,21 @@
 package org.smm.archetype.infrastructure.common.log;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.smm.archetype.domain.common.log.Log;
-import org.smm.archetype.domain.common.log.Log.LogBuilder;
-import org.smm.archetype.domain.common.log.LogAnno;
-import org.smm.archetype.domain.common.log.handler.persistence.PersistenceHandler;
-import org.smm.archetype.domain.common.log.handler.persistence.PersistenceType;
-import org.smm.archetype.infrastructure.bizshared.context.executable.ContextRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.smm.archetype.infrastructure.common.log.Log.LogBuilder;
 import org.springframework.core.annotation.Order;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 /**
  * 业务日志切面类
@@ -29,18 +23,12 @@ import java.util.stream.Collectors;
  * 通过AOP技术拦截标记了@Log注解的方法，在方法执行前后记录相关信息。
  * 支持异步持久化日志，避免影响业务方法的执行性能。
  */
-@Slf4j
 @Aspect
 @Order
 @RequiredArgsConstructor
 public class LogAspect {
 
-    /**
-     * 持久化处理器映射表
-     * <p>
-     * 存储不同持久化类型的处理器实例，用于根据日志配置的持久化类型执行相应的持久化操作。
-     */
-    private Map<PersistenceType, PersistenceHandler> persistenceHandlerMap;
+    private static final Map<Class<?>, Logger> LOGGER_MAP = new ConcurrentHashMap<>();
 
     /**
      * 异步执行服务
@@ -50,20 +38,11 @@ public class LogAspect {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     /**
-     * 构造函数
-     * <p>
-     * @param handlers 持久化处理器列表
-     */
-    public LogAspect(List<PersistenceHandler> handlers) {
-        this.persistenceHandlerMap = handlers.stream().collect(Collectors.toMap(PersistenceHandler::getPersistenceType, s -> s));
-    }
-
-    /**
      * 业务日志切点
      * <p>
      * 定义切入点，拦截标记了@Log注解的方法。
      */
-    @Pointcut("@annotation(org.smm.archetype.domain.common.log.LogAnno)")
+    @Pointcut("@annotation(org.smm.archetype.infrastructure.common.log.LogAnno)")
     public void logCut() {
     }
 
@@ -81,6 +60,7 @@ public class LogAspect {
         // 获取注解信息
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         LogAnno logAnno = signature.getMethod().getAnnotation(LogAnno.class);
+        Class<?> declaringType = signature.getDeclaringType();
 
         // 构建日志信息
         LogBuilder<?, ?> builder = Log.builder();
@@ -101,16 +81,14 @@ public class LogAspect {
         } finally {
             // 持久化
             builder.setEndTime(Instant.now());
-            executorService.execute(new ContextRunnable() {
-                @Override
-                protected void doRun() {
-                    PersistenceType[] persistence = logAnno.persistence();
-                    for (PersistenceType persistenceType : persistence) {
-                        Optional.ofNullable(persistenceHandlerMap.get(persistenceType))
-                                .ifPresent(handler -> handler.persist(builder.build()));
-                    }
-                }
-            });
+            Log log = builder.build();
+            Logger logger = LOGGER_MAP.computeIfAbsent(declaringType, k -> LoggerFactory.getLogger(declaringType));
+            // TODO 日志的信息
+            if (log.getError() == null) {
+                // logger.info();
+            } else {
+                // logger.error();
+            }
         }
     }
 

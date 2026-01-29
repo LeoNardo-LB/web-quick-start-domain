@@ -1,12 +1,12 @@
-package org.smm.archetype.domain.common.log;
+package org.smm.archetype.infrastructure.common.log;
 
-import org.smm.archetype.domain.common.log.handler.persistence.PersistenceType;
-import org.smm.archetype.domain.common.log.handler.stringify.StringifyType;
+import org.apache.logging.log4j.Level;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
 
 /**
  * 业务日志注解
@@ -23,19 +23,5 @@ public @interface LogAnno {
      * 标识当前业务操作的名称，用于日志记录和分类。
      */
     String value() default "";
-
-    /**
-     * 持久化类型
-     *
-     * 指定日志的持久化方式，支持多种持久化类型组合。
-     */
-    PersistenceType[] persistence() default PersistenceType.FILE;
-
-    /**
-     * 默认持久化类型下转为字符串的形式
-     *
-     * 指定在默认持久化方式下，将对象转换为字符串的策略。
-     */
-    StringifyType stringify() default StringifyType.JDK;
 
 }

@@ -57,6 +57,7 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected Map<String, Object> doGet(String index, String id) {
         Map<String, Object> result = operations.get(id, Map.class, IndexCoordinates.of(index));
         return result != null ? new HashMap<>(result) : null;
@@ -79,7 +80,8 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
         Query searchQuery = Query.findAll();
         searchQuery.setPageable(org.springframework.data.domain.PageRequest.of(from / size, size));
 
-        SearchHits<Map> searchHits = operations.search(searchQuery, Map.class, IndexCoordinates.of(index));
+        @SuppressWarnings("unchecked")
+        SearchHits<Map<String, Object>> searchHits = (SearchHits<Map<String, Object>>) (SearchHits<?>) operations.search(searchQuery, Map.class, IndexCoordinates.of(index));
 
         Map<String, Object> result = new HashMap<>();
         result.put("took", searchHits.getSearchHits().stream().findFirst().map(SearchHit::getScore).orElse(0.0f));
@@ -119,6 +121,7 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void doCreateIndex(String index, String mapping) {
         IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
         indexOps.create();
@@ -183,14 +186,12 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
         return results;
     }
 
-    private Map<String, Object> convertSearchHit(SearchHit<Map> hit) {
+    private Map<String, Object> convertSearchHit(SearchHit<Map<String, Object>> hit) {
         Map<String, Object> result = new HashMap<>();
         result.put("_id", hit.getId());
         result.put("_score", hit.getScore());
         result.put("_index", hit.getIndex());
-        if (hit.getContent() != null) {
-            result.put("_source", hit.getContent());
-        }
+        result.put("_source", hit.getContent());
         return result;
     }
 }

@@ -1,4 +1,4 @@
-package org.smm.archetype.domain.common.log;
+package org.smm.archetype.infrastructure.common.log;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
