@@ -2,18 +2,11 @@
 <configuration scan="true" scanPeriod="30 seconds">
     <!-- 引入Spring Boot默认配置 -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
     <!-- 多环境配置（通过Spring Profile区分） -->
     <springProperty scope="context" name="LOG_PATH" source="logging.file.path" defaultValue="${user.dir}/../_logs"/>
     <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root" defaultValue="INFO"/>
-
-    <!-- CONSOLE Appender with JSON encoder -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <includeContext>true</includeContext>
-            <includeMdc>true</includeMdc>
-        </encoder>
-    </appender>
 
     <!-- 文件滚动策略（按日期和大小分割） -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -24,9 +17,8 @@
             <maxHistory>30</maxHistory>      <!-- 保留30天 -->
             <totalSizeCap>5GB</totalSizeCap> <!-- 总日志上限 -->
         </rollingPolicy>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <includeContext>true</includeContext>
-            <includeMdc>true</includeMdc>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -41,9 +33,8 @@
     <appender name="CURRENT" class="ch.qos.logback.core.FileAppender">
         <file>${LOG_PATH}/current.log</file>
         <append>false</append> <!-- 每次启动时覆盖文件 -->
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <includeContext>true</includeContext>
-            <includeMdc>true</includeMdc>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
