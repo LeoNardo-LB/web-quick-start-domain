@@ -105,14 +105,15 @@ public class EventConfigure implements AsyncConfigurer {
      *
      * <p>对于同一配置类中的Bean依赖，使用@Bean方法参数注入（Spring推荐方式，避免循环依赖）
      *
-     * @param kafkaEventPublisher  Kafka事件发布器
+     * @param eventPublisher  事件发布器
      * @return 事务性事件发布器
      */
     @Bean
     @ConditionalOnBean(KafkaTemplate.class)
     public TransactionalEventPublisher transactionalEventPublisher(
-            final KafkaEventPublisher kafkaEventPublisher) {
-        return new TransactionalEventPublisher(kafkaEventPublisher);
+            final Object eventPublisher) {
+        return new TransactionalEventPublisher(
+                org.smm.archetype.infrastructure.bizshared.event.publisher.AbstractEventPublisher.class.cast(eventPublisher));
     }
 
     /**

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,14 +43,14 @@ public class LogAspect {
     @PostConstruct
     public void init() {
         this.executionTimer = Timer.builder("log_aspect_timer_seconds")
-            .description("LogAspect method execution time in seconds")
-            .register(meterRegistry);
+                                      .description("LogAspect method execution time in seconds")
+                                      .register(meterRegistry);
         this.executionCounter = Counter.builder("log_aspect_counter_total")
-            .description("Total number of method executions intercepted by LogAspect")
-            .register(meterRegistry);
+                                        .description("Total number of method executions intercepted by LogAspect")
+                                        .register(meterRegistry);
         this.errorCounter = Counter.builder("log_aspect_errors_total")
-            .description("Total number of errors in methods intercepted by LogAspect")
-            .register(meterRegistry);
+                                    .description("Total number of errors in methods intercepted by LogAspect")
+                                    .register(meterRegistry);
     }
 
     /**
@@ -110,14 +111,14 @@ public class LogAspect {
 
             // 标准文本格式日志输出（traceId由logback pattern自动获取）
             String logMessage = String.format(
-                "[方法执行] 类: %s, 方法: %s, 业务: %s, 入参: %s, 出参: %s, 耗时: %dms, 线程: %s",
-                className,
-                methodName,
-                myLog != null ? myLog.value() : "",
-                log.getArgs(),
-                log.getError() == null ? log.getResult() : "ERROR",
-                log.getEndTime().toEpochMilli() - log.getStartTime().toEpochMilli(),
-                log.getThreadName()
+                    "[方法执行] 类: %s, 方法: %s, 业务: %s, 入参: %s, 出参: %s, 耗时: %dms, 线程: %s",
+                    className,
+                    methodName,
+                    myLog != null ? myLog.value() : "",
+                    Arrays.toString(log.getArgs()),
+                    log.getError() == null ? log.getResult() : "ERROR",
+                    log.getEndTime().toEpochMilli() - log.getStartTime().toEpochMilli(),
+                    log.getThreadName()
             );
 
             if (log.getError() == null) {

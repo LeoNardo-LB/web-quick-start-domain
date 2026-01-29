@@ -30,7 +30,6 @@ domain/
 - Repository: interfaces only, implementations in infrastructure/
 - Aggregates: protect invariants via public methods
 - Events: recorded via `recordEvent()` in AggregateRoot
-- `@Data` FORBIDDEN - use `@Getter`, `@Setter`, `@Builder`
 
 ## ANTI-PATTERNS
 - ❌ External libs in domain layer (Spring, MyBatis, etc.)

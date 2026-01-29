@@ -37,6 +37,8 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <caffeine.version>3.1.8</caffeine.version>
         <aliyun.dm.version>1.3.0</aliyun.dm.version>
+        <!-- Logback JSON encoder -->
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <!-- 测试框架版本 - 兼容 JDK 25 -->
         <mockito.version>5.14.2</mockito.version>
         <assertj.version>3.27.3</assertj.version>
@@ -277,7 +279,7 @@
                 <optional>true</optional>
             </dependency>
 
-            <!-- JSON序列化 -->
+             <!-- JSON序列化 -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
@@ -287,6 +289,12 @@
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>2.19.4</version>
+            </dependency>
+            <!-- Logback JSON encoder -->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback-encoder.version}</version>
             </dependency>
 
             <!-- Spring Boot Web相关（由Spring Boot parent 4.0.2管理版本） -->
