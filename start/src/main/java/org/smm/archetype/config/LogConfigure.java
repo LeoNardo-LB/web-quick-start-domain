@@ -97,38 +97,11 @@ public class LogConfigure {
      *
      * <p>拦截需要记录日志的方法，自动收集和持久化日志信息。
      * @param persistenceHandlers 所有持久化处理器
-     * @param logExecutor 日志持久化线程池
      * @return 日志切面
      */
     @Bean
-    public LogAspect logAspect(List<PersistenceHandler> persistenceHandlers, ExecutorService logExecutor) {
-        Map<PersistenceType, PersistenceHandler> persistenceHandlerMap = persistenceHandlers.stream()
-                .collect(Collectors.toMap(
-                    PersistenceHandler::getPersistenceType,
-                    handler -> handler
-                ));
-        return new LogAspect(persistenceHandlerMap, logExecutor);
-    }
-
-    /**
-     * 日志持久化线程池
-     *
-     * <p>专门用于异步持久化日志的线程池，避免阻塞业务线程。
-     * @return 日志持久化执行器
-     */
-    @Bean(name = "logExecutor", destroyMethod = "shutdown")
-    public ExecutorService logExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(8);
-        executor.setQueueCapacity(500);
-        executor.setThreadNamePrefix("log-persist-");
-        executor.setKeepAliveSeconds(60);
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.setAllowCoreThreadTimeOut(true);
-        executor.initialize();
-        return executor.getThreadPoolExecutor();
+    public LogAspect logAspect(List<PersistenceHandler> persistenceHandlers) {
+        return new LogAspect(persistenceHandlers);
     }
 
 }
