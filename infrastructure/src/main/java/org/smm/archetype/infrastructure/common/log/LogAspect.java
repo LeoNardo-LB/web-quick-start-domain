@@ -42,7 +42,7 @@ public class LogAspect {
      * <p>
      * 定义切入点，拦截标记了@Log注解的方法。
      */
-    @Pointcut("@annotation(org.smm.archetype.infrastructure.common.log.LogAnno)")
+    @Pointcut("@annotation(org.smm.archetype.infrastructure.common.log.MyLog)")
     public void logCut() {
     }
 
@@ -59,14 +59,14 @@ public class LogAspect {
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         // 获取注解信息
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        LogAnno logAnno = signature.getMethod().getAnnotation(LogAnno.class);
+        MyLog myLog = signature.getMethod().getAnnotation(MyLog.class);
         Class<?> declaringType = signature.getDeclaringType();
 
         // 构建日志信息
         LogBuilder<?, ?> builder = Log.builder();
         builder.setArgs(joinPoint.getArgs());
         builder.setSignature(signature);
-        builder.setLogAnno(logAnno);
+        builder.setMyLog(myLog);
         builder.setThreadName(Thread.currentThread().getName());
         try {
             // 执行目标方法

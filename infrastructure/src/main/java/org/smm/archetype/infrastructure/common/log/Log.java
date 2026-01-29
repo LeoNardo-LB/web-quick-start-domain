@@ -21,7 +21,7 @@ public class Log extends Entity {
      * 日志注解信息
      * 包含方法上标记的@Log注解的配置信息。
      */
-    private LogAnno logAnno;
+    private MyLog myLog;
 
     /**
      * 方法签名信息

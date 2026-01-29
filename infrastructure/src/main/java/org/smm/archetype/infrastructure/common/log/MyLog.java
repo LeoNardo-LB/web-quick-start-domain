@@ -1,7 +1,5 @@
 package org.smm.archetype.infrastructure.common.log;
 
-import org.apache.logging.log4j.Level;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -16,7 +14,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface LogAnno {
+public @interface MyLog {
 
     /**
      * 业务名称
