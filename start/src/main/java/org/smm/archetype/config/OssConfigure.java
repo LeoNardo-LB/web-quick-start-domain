@@ -38,11 +38,11 @@ public class OssConfigure {
     /**
      * 本地组件：本地对象存储服务（默认实现，兜底方案）
      *
-     * <p>存储路径：用户文件夹/.project/${spring.application.name}/oss
+    存储路径：用户文件夹/.project/${spring.application.name}/oss
      *
-     * <p>使用 NIO FileChannel.transferTo 实现零拷贝，提高性能。
+    使用 NIO FileChannel.transferTo 实现零拷贝，提高性能。
      *
-     * <p>条件：当不存在 RustFsOssClientImpl Bean 时才创建
+    条件：当不存在 RustFsOssClientImpl Bean 时才创建
      * @param metadataMapper 文件元数据 Mapper
      * @return 本地对象存储服务实现
      */
@@ -68,9 +68,9 @@ public class OssConfigure {
     /**
      * 外部中间件：RustFS 对象存储服务
      *
-     * <p>基于 AWS S3 SDK v2 实现，RustFS 100% 兼容 S3 协议。
+    基于 AWS S3 SDK v2 实现，RustFS 100% 兼容 S3 协议。
      *
-     * <p>条件：当 Spring Boot 自动配置创建了 RustFsOssClientImpl Bean 时才创建
+    条件：当 Spring Boot 自动配置创建了 RustFsOssClientImpl Bean 时才创建
      *
      * @param metadataMapper 文件元数据 Mapper
      * @return RustFS 对象存储服务实现
@@ -103,7 +103,7 @@ public class OssConfigure {
     /**
      * 通用文件仓储
      *
-     * <p>负责FileBusiness和FileMeta的持久化操作
+    负责FileBusiness和FileMeta的持久化操作
      * @param businessMapper        业务文件Mapper
      * @param metadataMapper        文件元数据Mapper
      * @param fileBusinessConverter 业务文件转换器
@@ -122,7 +122,7 @@ public class OssConfigure {
     /**
      * 通用文件服务
      *
-     * <p>整合OssClient、FileRepository，提供完整的文件管理功能
+    整合OssClient、FileRepository，提供完整的文件管理功能
      * @param ossClient            对象存储服务
      * @param fileRepository 通用文件仓储
      * @return 通用文件服务实现

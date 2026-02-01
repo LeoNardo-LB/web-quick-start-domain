@@ -16,7 +16,7 @@ public class LogConfigure {
     /**
      * 日志切面
      *
-     * <p>拦截需要记录日志的方法，自动收集和持久化日志信息。
+    拦截需要记录日志的方法，自动收集和持久化日志信息。
      * @param meterRegistry Micrometer指标注册中心
      * @return 日志切面
      */

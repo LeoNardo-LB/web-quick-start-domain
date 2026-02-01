@@ -23,7 +23,7 @@ public class ScheduleConfigure {
     /**
      * 事件重试调度器
      *
-     * <p>定时扫描 RETRYING 状态的事件，交给 EventDispatcher 进行重试处理。
+    定时扫描 RETRYING 状态的事件，交给 EventDispatcher 进行重试处理。
      *
      * @param eventRepository       事件仓储
      * @param eventDispatcher       事件分发器

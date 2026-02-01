@@ -21,7 +21,7 @@ public class AppConfigure {
     /**
      * 配置事务管理器
      *
-     * <p>用于声明式事务管理（@Transactional注解）。
+    用于声明式事务管理（@Transactional注解）。
      * @param dataSource 数据源
      * @return 事务管理器
      */
@@ -33,7 +33,7 @@ public class AppConfigure {
     /**
      * 配置事务模板（编程式事务）
      *
-     * <p>用于编程式事务管理，在不使用@Transactional注解的场景下使用。
+    用于编程式事务管理，在不使用@Transactional注解的场景下使用。
      * @param transactionManager 事务管理器
      * @return 事务模板
      */

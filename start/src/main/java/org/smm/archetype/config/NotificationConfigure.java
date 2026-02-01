@@ -22,7 +22,7 @@ public class NotificationConfigure {
     /**
      * 阿里云短信服务Bean
      *
-     * <p>条件：
+    条件：
      * <ul>
      *   <li>middleware.sms.type=aliyun</li>
      *   <li>配置了有效的 access-key-id 和 access-key-secret</li>
@@ -45,7 +45,7 @@ public class NotificationConfigure {
     /**
      * 阿里云邮件服务Bean
      *
-     * <p>条件：
+    条件：
      * <ul>
      *   <li>middleware.email.type=aliyun</li>
      *   <li>配置了有效的 access-key-id 和 access-key-secret</li>

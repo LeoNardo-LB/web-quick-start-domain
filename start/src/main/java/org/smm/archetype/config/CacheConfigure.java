@@ -27,9 +27,9 @@ public class CacheConfigure {
     /**
      * 本地组件：Caffeine缓存服务（默认实现）
      *
-     * <p>作为兜底方案，当RedisTemplate不存在时才创建此Bean。
+    作为兜底方案，当RedisTemplate不存在时才创建此Bean。
      *
-     * <p>使用@ConditionalOnMissingBean确保Redis优先级更高（@Primary）。
+    使用@ConditionalOnMissingBean确保Redis优先级更高（@Primary）。
      * @return Caffeine缓存服务实现
      */
     @Bean
@@ -44,9 +44,9 @@ public class CacheConfigure {
     /**
      * 外部中间件：Redis缓存服务
      *
-     * <p>条件：当RedisTemplate Bean存在时才创建此Bean。
+    条件：当RedisTemplate Bean存在时才创建此Bean。
      *
-     * <p>使用@Primary标记为优先Bean，自动覆盖Caffeine缓存。
+    使用@Primary标记为优先Bean，自动覆盖Caffeine缓存。
      * @param redisTemplate Redis模板（由Spring Data Redis自动配置）
      * @return Redis缓存服务实现
      */

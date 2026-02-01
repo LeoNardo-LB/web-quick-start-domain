@@ -29,7 +29,7 @@ public class OrderConfigure {
 
     /**
      * 订单应用服务Bean
-     * <p>职责：用例编排、事务管理、DTO转换
+    职责：用例编排、事务管理、DTO转换
      * @param orderRepository    订单仓储
      * @param orderDomainService 订单领域服务
      * @param domainEventPublisher     事件发布器
@@ -47,7 +47,7 @@ public class OrderConfigure {
 
     /**
      * 订单聚合根仓储Bean
-     * <p>如果用户未提供自定义实现，使用默认的OrderAggrRepositoryImpl
+    如果用户未提供自定义实现，使用默认的OrderAggrRepositoryImpl
      * @return OrderAggrRepository
      */
     @Bean
@@ -60,7 +60,7 @@ public class OrderConfigure {
 
     /**
      * 订单领域服务Bean
-     * <p>职责：封装跨聚合根的业务规则（库存验证、金额计算等）
+    职责：封装跨聚合根的业务规则（库存验证、金额计算等）
      * @param inventoryService 库存服务
      * @return OrderDomainService
      */
@@ -74,8 +74,8 @@ public class OrderConfigure {
 
     /**
      * 库存服务Bean
-     * <p>职责：验证库存、锁定库存、释放库存
-     * <p>默认实现：MockInventoryServiceAdapter（模拟实现）
+    职责：验证库存、锁定库存、释放库存
+    默认实现：MockInventoryServiceAdapter（模拟实现）
      * @return InventoryService
      */
     @Bean
@@ -85,8 +85,8 @@ public class OrderConfigure {
 
     /**
      * 支付网关Bean（Stripe实现）
-     * <p>职责：处理支付请求、查询支付状态
-     * <p>通过配置文件控制是否启用（payment.stripe.enabled）
+    职责：处理支付请求、查询支付状态
+    通过配置文件控制是否启用（payment.stripe.enabled）
      * @return Stripe支付网关实现
      */
     @Bean
@@ -97,9 +97,9 @@ public class OrderConfigure {
 
     /**
      * 支付网关Bean（默认实现）
-     * <p>职责：处理支付请求、查询支付状态
-     * <p>支持多种支付方式：Stripe、支付宝、微信支付等
-     * <p>默认情况下返回null，用户可以通过配置启用特定的支付适配器
+    职责：处理支付请求、查询支付状态
+    支持多种支付方式：Stripe、支付宝、微信支付等
+    默认情况下返回null，用户可以通过配置启用特定的支付适配器
      * @return PaymentGateway（可能为null）
      */
     @Bean
@@ -114,7 +114,7 @@ public class OrderConfigure {
 
     /**
      * 订单创建事件处理器Bean
-     * <p>职责：处理订单创建事件（如发送通知、记录日志）
+    职责：处理订单创建事件（如发送通知、记录日志）
      * @param inventoryService 库存服务
      * @return EventDispatcher
      */
@@ -125,7 +125,7 @@ public class OrderConfigure {
 
     /**
      * 订单支付事件处理器Bean
-     * <p>职责：处理订单支付事件（如更新库存、发货）
+    职责：处理订单支付事件（如更新库存、发货）
      * @return EventDispatcher
      */
     @Bean
@@ -135,7 +135,7 @@ public class OrderConfigure {
 
     /**
      * 订单取消事件处理器Bean
-     * <p>职责：处理订单取消事件（如释放库存、退款）
+    职责：处理订单取消事件（如释放库存、退款）
      * @return EventDispatcher
      */
     @Bean

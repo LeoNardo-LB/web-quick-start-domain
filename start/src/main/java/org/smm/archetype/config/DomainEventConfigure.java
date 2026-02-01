@@ -62,7 +62,7 @@ public class DomainEventConfigure implements AsyncConfigurer {
     /**
      * 事件分发器
      *
-     * <p>统一控制事件消费的完整生命周期。
+    统一控制事件消费的完整生命周期。
      * @param eventRepository 事件仓储
      * @param eventHandlers   事件处理器列表（可选）
      * @param retryStrategy   重试策略

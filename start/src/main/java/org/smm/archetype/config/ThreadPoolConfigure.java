@@ -165,7 +165,7 @@ public class ThreadPoolConfigure implements AsyncConfigurer {
     /**
      * 虚拟线程池（ExecutorService类型）
      *
-     * <p>用于需要ExecutorService类型的场景，如EventRetrySchedulerImpl。
+    用于需要ExecutorService类型的场景，如EventRetrySchedulerImpl。
      * @return ExecutorService
      */
     @Bean(name = "virtualThreadExecutor")

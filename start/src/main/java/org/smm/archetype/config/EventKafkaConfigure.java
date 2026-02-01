@@ -27,7 +27,7 @@ public class EventKafkaConfigure {
     /**
      * Kafka监听器容器工厂
      *
-     * <p>配置JsonDeserializer，实现自动反序列化。
+    配置JsonDeserializer，实现自动反序列化。
      * @param kafkaProperties Kafka配置属性
      * @return Kafka监听器容器工厂
      */

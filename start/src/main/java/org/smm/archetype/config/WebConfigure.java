@@ -14,7 +14,7 @@ public class WebConfigure {
     /**
      * 上下文填充过滤器
      *
-     * <p>为每个请求填充上下文信息，如用户ID、TraceId等。
+    为每个请求填充上下文信息，如用户ID、TraceId等。
      * @return 过滤器注册Bean
      */
     @Bean
