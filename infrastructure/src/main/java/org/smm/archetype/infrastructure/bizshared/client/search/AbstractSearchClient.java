@@ -7,10 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ES技术客户端抽象基类
- *
- * <p>实现ES操作的通用流程模板，提供统一的异常处理和日志记录
- *
+ * ES搜索服务抽象基类，提供通用操作流程模板。
  * @author Leonardo
  * @since 2026-01-14
  */

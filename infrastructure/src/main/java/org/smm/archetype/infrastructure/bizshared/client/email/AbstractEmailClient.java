@@ -9,17 +9,7 @@ import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
 import java.util.List;
 
 /**
- * 邮件服务抽象基类
- *
- * <p>实现邮件发送的通用流程模板，定义扩展点供子类实现具体服务商接入。
- *
- * <p>核心功能：
- * <ul>
- *   <li>参数校验</li>
- *   <li>服务商选择</li>
- *   <li>批量发送流程编排</li>
- *   <li>异常处理与日志记录</li>
- * </ul>
+ * 邮件服务抽象基类，提供通用发送流程模板。
  * @author Leonardo
  * @since 2026/01/09
  */
@@ -27,15 +17,7 @@ import java.util.List;
 public abstract class AbstractEmailClient implements EmailClient {
 
     /**
-     * 发送邮件（模板方法）
-     *
-     * <p>定义发送邮件的通用流程：
-     * <ol>
-     *   <li>校验请求参数</li>
-     *   <li>选择默认服务商</li>
-     *   <li>调用具体发送逻辑</li>
-     *   <li>记录日志</li>
-     * </ol>
+     * 发送邮件（使用默认服务商）。
      * @param request 邮件请求
      * @return 发送结果
      * @throws IllegalArgumentException 当 request 为 null 时抛出
@@ -46,15 +28,8 @@ public abstract class AbstractEmailClient implements EmailClient {
     }
 
     /**
-     * 发送邮件（指定服务商，模板方法）
-     *
-     * <p>定义发送邮件的通用流程：
-     * <ol>
-     *   <li>校验请求参数</li>
-     *   <li>调用具体发送逻辑</li>
-     *   <li>记录日志</li>
-     * </ol>
-     * @param request  邮件请求
+     * 发送邮件（指定服务商）。
+     * @param request 邮件请求
      * @param provider 服务商
      * @return 发送结果
      * @throws IllegalArgumentException 当 request 或 provider 为 null 时抛出

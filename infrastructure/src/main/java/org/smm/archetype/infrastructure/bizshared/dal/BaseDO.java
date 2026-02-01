@@ -10,8 +10,7 @@ import org.smm.archetype.domain.bizshared.base.Identifier;
 import java.time.Instant;
 
 /**
- * 数据对象（context object）基类
- * 自定进行设置操作，无需手动干预，只有get方法
+ * 数据对象基类，自动进行设置操作。
  * @author Leonardo
  * @since 2025/12/29
  */

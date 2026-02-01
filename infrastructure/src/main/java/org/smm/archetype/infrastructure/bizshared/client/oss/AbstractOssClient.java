@@ -14,15 +14,7 @@ import java.util.List;
 import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
 
 /**
- * 对象存储服务抽象基类
- *
- * <p>实现模板方法模式，提供通用的文件操作流程：
- * <ul>
- *   <li>参数验证</li>
- *   <li>调用扩展点（由子类实现）</li>
- *   <li>持久化元数据到数据库</li>
- *   <li>日志记录</li>
- * </ul>
+ * 对象存储服务抽象基类，提供通用文件操作流程。
  * @author Leonardo
  * @since 2026/1/10
  */

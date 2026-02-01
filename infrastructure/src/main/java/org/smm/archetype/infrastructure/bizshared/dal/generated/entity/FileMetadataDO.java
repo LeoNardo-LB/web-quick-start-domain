@@ -13,12 +13,11 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 
-/**
- * 文件元数据表 实体类。
- *
- * @author Administrator
- * @since 2026-01-31
- */
+    /**
+     * 文件元数据表DO实体。
+     * @author Administrator
+     * @since 2026/01/31
+     */
 @Data
 @Builder
 @NoArgsConstructor

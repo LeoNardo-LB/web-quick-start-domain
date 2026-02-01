@@ -12,7 +12,9 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 /**
- * MybatisFlex 代码生成器，默认在当前目录下生成 repository 包，包含 Mapper与DO对象
+ * MyBatisFlex代码生成器，在当前目录生成Mapper和DO对象。
+ * @author Leonardo
+ * @since 2026/01/10
  */
 public class MybatisFlexGenerator {
 

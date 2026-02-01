@@ -13,9 +13,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * 通用文件服务实现
- *
- * <p>整合OssClient、FileRepository，提供完整的文件管理功能
+ * 文件服务实现，整合OSS和仓储，提供完整文件管理。
  * @author Leonardo
  * @since 2026/01/10
  */

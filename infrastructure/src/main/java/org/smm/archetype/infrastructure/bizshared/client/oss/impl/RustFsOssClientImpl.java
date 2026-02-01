@@ -30,18 +30,9 @@ import java.util.List;
 import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
 
 /**
- * RustFS 对象存储服务实现
- *
- * <p>基于 AWS S3 SDK v2 实现，RustFS 100% 兼容 S3 协议。
- *
- * <p>关键配置：
- * <ul>
- *   <li>forcePathStyle: true - RustFS 必须启用 Path-Style 访问</li>
- *   <li>endpointOverride: <a href="http://localhost:9000">RustFS 服务地址</a></li>
- *   <li>region: US_EAST_1 - 任意值，RustFS 不校验</li>
- * </ul>
+ * RustFS OSS实现，基于AWS S3 SDK。
  * @author Leonardo
- * @since 2026-01-10
+ * @since 2026/01/10
  */
 @Slf4j
 public class RustFsOssClientImpl extends AbstractOssClient {
@@ -50,12 +41,7 @@ public class RustFsOssClientImpl extends AbstractOssClient {
     private final String bucket;
 
     /**
-     * 构造 RustFS 对象存储服务
-     * @param endpoint       RustFS服务器地址
-     * @param accessKey      Access Key
-     * @param secretKey      Secret Key
-     * @param bucket         Bucket名称
-     * @param metadataMapper 文件元数据 Mapper
+     * 上传文件到RustFS，返回S3 key。
      */
     public RustFsOssClientImpl(
             String endpoint,
@@ -80,7 +66,7 @@ public class RustFsOssClientImpl extends AbstractOssClient {
     }
 
     /**
-     * 确保 bucket 存在，不存在则创建
+     * 确保bucket存在，不存在则创建。
      */
     private void ensureBucketExists() {
         try {
@@ -129,7 +115,6 @@ public class RustFsOssClientImpl extends AbstractOssClient {
         return new ByteArrayInputStream(bytes);
     }
 
-    @Override
     protected void doDelete(String filePath) {
         // filePath 就是 S3 key
         DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()

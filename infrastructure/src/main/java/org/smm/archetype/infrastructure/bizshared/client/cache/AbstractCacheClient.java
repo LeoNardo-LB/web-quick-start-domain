@@ -8,11 +8,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 抽象缓存服务
- *
- * <p>定义缓存服务的通用流程模板，提供统一的异常处理和日志记录。
- *
- * <p>具体实现类需要实现所有 doXxx 抽象方法，提供具体的缓存操作。
+ * 抽象缓存服务，提供通用流程模板和异常处理。
  * @author Leonardo
  * @since 2026-01-10
  */

@@ -20,10 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 业务日志切面类
- *
- * 通过AOP技术拦截标记了@Log注解的方法，在方法执行前后记录相关信息。
- * 支持异步持久化日志，避免影响业务方法的执行性能。
+ * 业务日志切面，拦截@Log注解方法，记录执行信息。
  */
 @Aspect
 @Order

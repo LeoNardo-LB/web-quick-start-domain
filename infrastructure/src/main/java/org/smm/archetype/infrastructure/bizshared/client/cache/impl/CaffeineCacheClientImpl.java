@@ -13,30 +13,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Caffeine 本地缓存服务实现
- *
- * <p>Caffeine 是基于 Java 8 的高性能本地缓存库，提供了：
- * <ul>
- *   <li>自动加载</li>
- *   <li>基于大小的驱逐</li>
- *   <li>基于时间的过期（支持每个 Key 独立过期时间）</li>
- *   <li>自动刷新</li>
- * </ul>
- *
- * <p>通过 {@link CacheValueWrapper} 封装缓存值，支持：
- * <ul>
- *   <li>存入时间追踪</li>
- *   <li>自定义过期时间</li>
- *   <li>访问时间记录</li>
- *   <li>动态过期时间设置</li>
- * </ul>
- *
- * <p>适用于：
- * <ul>
- *   <li>单机应用</li>
- *   <li>开发测试环境</li>
- *   <li>Redis的降级方案</li>
- * </ul>
+ * Caffeine本地缓存实现，支持自定义过期和访问追踪。
  * @author Leonardo
  * @since 2026-01-10
  */
@@ -48,7 +25,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
     private final Duration defaultExpireAfterWrite;
 
     /**
-     * 构造函数，使用配置初始化Caffeine缓存
+     * 初始化Caffeine缓存实例。
      * @param initialCapacity 初始容量
      * @param maximumSize 最大容量
      * @param expireAfterWrite 写入后过期时间

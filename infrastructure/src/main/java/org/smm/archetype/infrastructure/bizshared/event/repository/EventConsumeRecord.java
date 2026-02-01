@@ -11,26 +11,7 @@ import org.smm.archetype.domain.bizshared.event.Type;
 import java.time.Instant;
 
 /**
- * 事件消费记录值对象
- *
- * <p>封装事件消费过程中的状态信息，用于跨层传递。
- *
- * <p>职责：
- * <ul>
- *   <li>封装消费状态信息</li>
- *   <li>提供类型安全的访问</li>
- *   <li>避免跨层直接依赖DO对象</li>
- *   <li>提供业务方法判断消费状态</li>
- * </ul>
- *
- * <p>设计说明：
- * <ul>
- *   <li>继承ValueObject，基于值的相等性</li>
- *   <li>所有字段final，确保不可变性</li>
- *   <li>使用Builder模式，便于创建对象</li>
- * </ul>
- *
- * <p>注意：from()转换方法应在Infrastructure层或App层实现，以避免Domain层依赖Infrastructure层。
+ * 事件消费记录实体。
  * @author Leonardo
  * @since 2026/01/10
  */

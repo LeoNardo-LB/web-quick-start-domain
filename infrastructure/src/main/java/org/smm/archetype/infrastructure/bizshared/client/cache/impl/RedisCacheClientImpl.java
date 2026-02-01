@@ -10,16 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * Redis 缓存服务实现
- *
- * <p>基于 Fastjson2 序列化，充分利用 WriteClassName 特性实现零拷贝类型转换。
- *
- * <p>适用于：
- * <ul>
- *   <li>分布式应用</li>
- *   <li>生产环境</li>
- *   <li>需要缓存共享的场景</li>
- * </ul>
+ * Redis缓存实现，基于Fastjson2序列化，适用于分布式场景。
  * @author Leonardo
  * @since 2026-01-10
  */

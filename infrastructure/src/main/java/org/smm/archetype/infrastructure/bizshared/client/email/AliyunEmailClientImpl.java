@@ -10,10 +10,7 @@ import org.smm.archetype.domain.bizshared.client.dto.EmailResult;
 import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
 
 /**
- * 阿里云邮件服务实现
- *
- * <p>基于阿里云邮件推送（DirectMail）发送邮件。
- *
+ * 阿里云邮件实现，基于DirectMail推送。
  * <p><a href="https://help.aliyun.com/zh/direct-mail/">官方文档</a>
  * @author Leonardo
  * @since 2026/01/10

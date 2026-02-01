@@ -8,54 +8,15 @@ import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
 import java.util.UUID;
 
 /**
- * 邮件服务实现（模拟实现）
- *
- * <p>脚手架项目的模拟实现，用于演示和测试。
+ * 邮件服务实现（模拟），用于演示和测试。
  *
  * <p>生产环境接入方式：
  * <ul>
- *   <li>添加邮件服务SDK依赖（如Spring Mail、阿里云邮件推送等）</li>
+ *   <li>添加邮件服务SDK依赖</li>
  *   <li>注入真实的邮件服务客户端</li>
  *   <li>实现doSendEmail方法调用真实API</li>
  *   <li>配置服务商账号信息</li>
  * </ul>
- *
- * <p>示例接入（实现类）：
- * <pre>{@code
- * public class CustomEmailServiceImpl extends AbstractEmailClient {
- *
- *     private final JavaMailSender mailSender;
- *
- *     public CustomEmailServiceImpl(JavaMailSender mailSender) {
- *         this.mailSender = mailSender;
- *     }
- *
- *     @Override
- *     protected EmailResult doSendEmail(EmailRequest request, ServiceProvider provider) {
- *         MimeMessage message = mailSender.createMimeMessage();
- *         MimeMessageHelper helper = new MimeMessageHelper(message, true);
- *         helper.setTo(request.getTo().toArray(new String[0]));
- *         helper.setSubject(request.getSubject());
- *         helper.setText(request.getHtmlBody(), true);
- *         mailSender.send(message);
- *
- *         return EmailResult.success(UUID.randomUUID().toString());
- *     }
- * }
- * }</pre>
- *
- * <p>示例接入（配置类注册）：
- * <pre>{@code
- * @Configuration
- * public class NotificationConfigure {
- *
- *     @Bean
- *     @ConditionalOnProperty(prefix = "notification.email", name = "enabled", havingValue = "true")
- *     public EmailClient emailService(JavaMailSender mailSender) {
- *         return new CustomEmailServiceImpl(mailSender);
- *     }
- * }
- * }</pre>
  * @author Leonardo
  * @since 2026/01/10
  */

@@ -7,10 +7,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * 业务日志注解
- *
- * 用于标记需要记录业务日志的方法，支持配置持久化方式和字符串化方式。
- * 通过AOP切面拦截带有此注解的方法，在方法执行前后记录相关信息。
+ * 业务日志注解，标记需记录的方法，支持配置持久化和字符串化。
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

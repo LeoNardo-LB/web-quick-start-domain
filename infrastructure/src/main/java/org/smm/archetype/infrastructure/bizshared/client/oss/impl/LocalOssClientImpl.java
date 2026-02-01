@@ -23,27 +23,7 @@ import java.util.List;
 import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
 
 /**
- * 本地文件系统对象存储服务实现
- *
- * <p>作为默认兜底实现，使用本地文件系统存储文件。
- *
- * <h3>特性</h3>
- * <ul>
- *   <li>零拷贝上传/下载（使用 NIO FileChannel.transferTo）</li>
- *   <li>顺序存储（按日期分层：yyyy/MM）</li>
- *   <li>总是可用，不依赖外部服务</li>
- * </ul>
- *
- * <h3>存储路径</h3>
- * <pre>
- * 用户文件夹/.project/${spring.application.name}/oss/
- * ├── 2026/
- * │   ├── 01/
- * │   │   ├── file123-test1.txt
- * │   │   └── file456-test2.jpg
- * │   └── 02/
- * │       └── file789-test3.pdf
- * </pre>
+ * 本地文件系统OSS实现，支持零拷贝和日期分层存储。
  * @author Leonardo
  * @since 2026/1/10
  */
@@ -54,11 +34,10 @@ public class LocalOssClientImpl extends AbstractOssClient {
     private final boolean zeroCopy;
 
     /**
-     * 构造函数
-     * @param basePath       基础存储路径（可选，默认：用户文件夹/.project/${spring.application.name}/oss）
-     * @param zeroCopy       是否使用零拷贝（NIO transferTo/transferFrom）
-     * @param metadataMapper 文件元数据 Mapper
-     * @throws IOException 如果创建存储目录失败
+     * 初始化本地OSS客户端。
+     * @param basePath 基础存储路径（可选）
+     * @param zeroCopy 是否使用零拷贝
+     * @param metadataMapper 文件元数据Mapper
      */
     public LocalOssClientImpl(String basePath,
                               boolean zeroCopy,
