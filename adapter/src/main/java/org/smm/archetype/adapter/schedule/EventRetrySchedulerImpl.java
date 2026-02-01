@@ -47,9 +47,7 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
     }
 
     /**
-     * 定时调度方法
-     *
-     * <p>按配置的 cron 表达式执行，扫描待重试事件。
+     * 定时调度方法。
      */
     @Override
     @Scheduled(cron = "${middleware.domain-event.retry.cron}")

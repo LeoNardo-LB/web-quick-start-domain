@@ -18,9 +18,7 @@ public class SpringDomainEventListener {
     private final EventDispatcher eventDispatcher;
 
     /**
-     * 处理 Spring 事件
-     *
-     * <p>使用 @Async 异步处理，避免阻塞事件发布者。
+     * 处理Spring事件。
      * @param event 事件
      */
     @EventListener

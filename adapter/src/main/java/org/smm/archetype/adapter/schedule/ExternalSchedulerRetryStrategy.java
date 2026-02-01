@@ -8,22 +8,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 
 /**
- * 外部调度框架重试策略，适用于XXL-JOB、PowerJob等分布式任务调度框架。
- *
- *       interval-minutes: 5
- * </pre>
- *
- * <p>支持的框架：XXL-JOB、PowerJob、SchedulerX等
- * <p>配置项说明：
- * <ul>
- *   <li>strategy: 重试策略，固定值为 external-scheduler</li>
- *   <li>interval-minutes: 重试间隔（分钟），默认5分钟</li>
- * </ul>
- *
- * @author Leonardo
- * @since 2026-01-16
- * @see <a href="https://www.xuxueli.com/xxl-job/">XXL-JOB官方文档</a>
- * @see <a href="https://www.powerjob.tech/">PowerJob官方文档</a>
+ * 外部调度框架重试策略，适用于XXL-JOB、PowerJob等。
  */
 @Slf4j
 @Component
@@ -34,10 +19,8 @@ import java.time.Instant;
 )
 public class ExternalSchedulerRetryStrategy implements RetryStrategy {
 
-    /**
-     * 重试间隔（单位：分钟）
-     *
-     * <p>可通过配置文件覆盖，默认5分钟
+/**
+     * 重试间隔（分钟）。
      */
     @Value("${middleware.event.retry.interval-minutes:5}")
     private int retryIntervalMinutes;

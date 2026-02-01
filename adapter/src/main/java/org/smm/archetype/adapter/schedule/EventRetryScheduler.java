@@ -6,9 +6,7 @@ package org.smm.archetype.adapter.schedule;
 public interface EventRetryScheduler {
 
     /**
-     * 调度重试方法
-     *
-     * <p>定时扫描待处理事件并进行重试。
+     * 调度重试方法。
      */
     void scheduleRetry();
 

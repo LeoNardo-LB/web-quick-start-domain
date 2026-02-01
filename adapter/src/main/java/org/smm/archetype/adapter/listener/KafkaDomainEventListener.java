@@ -15,12 +15,9 @@ public class KafkaDomainEventListener {
 
     private final EventDispatcher eventDispatcher;
 
-    /**
-     * 处理 Kafka 消息
-     *
-     * <p>Spring Kafka 会自动根据 __TypeId__ header 反序列化为具体的 Event 类型。
-     *
-     * @param event 事件（已自动反序列化）
+/**
+     * 处理Kafka消息。
+     * @param event 事件
      */
     @KafkaListener(topics = "${middleware.domain-event.consumer.kafka.topic}")
     public void onEvent(Event<?> event) {
