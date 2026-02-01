@@ -111,7 +111,7 @@ public class EventDispatcher {
     /**
      * 检查幂等性
      *
-     * <p>基于 eid + action + executor_group + delete_time 进行幂等检查。
+    基于 eid + action + executor_group + delete_time 进行幂等检查。
      * @param eventId 事件ID
      * @return true-已处理（幂等），false-未处理
      */
@@ -182,7 +182,7 @@ public class EventDispatcher {
     /**
      * 执行事件分发
      *
-     * <p>遍历所有 EventHandler，找到能处理的 Handler 并调用。
+    遍历所有 EventHandler，找到能处理的 Handler 并调用。
      * @param event 领域事件
      * @throws Exception 处理异常
      */
@@ -227,7 +227,7 @@ public class EventDispatcher {
     /**
      * 处理失败
      *
-     * <p>根据当前重试次数判断是继续重试还是标记为最终失败。
+    根据当前重试次数判断是继续重试还是标记为最终失败。
      * @param event   领域事件
      * @param eventDO 消费记录
      * @param e       异常
