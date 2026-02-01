@@ -4,11 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 线程池配置属性
- *
- * <p>配置应用程序中各种线程池的参数。
- * @author Leonardo
- * @since 2026/1/10
+ * 线程池配置属性类。
  */
 @Data
 @ConfigurationProperties(prefix = "middleware.thread-pool")

@@ -27,10 +27,7 @@ import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 
 /**
- *
- *
- * @author Leonardo
- * @since 2025/12/13
+ * 线程池配置类，配置IO密集型、CPU密集型和虚拟线程池。
  */
 @Configuration
 @EnableConfigurationProperties(ThreadPoolProperties.class)

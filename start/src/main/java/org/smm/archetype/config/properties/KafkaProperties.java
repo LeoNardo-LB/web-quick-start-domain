@@ -7,11 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Kafka消费者配置属性
- *
- * <p>配置Kafka消息队列的消费者参数。
- * @author Leonardo
- * @since 2026/1/10
+ * Kafka消费者配置属性类。
  */
 @Data
 @ConfigurationProperties(prefix = "middleware.kafka.consumer")

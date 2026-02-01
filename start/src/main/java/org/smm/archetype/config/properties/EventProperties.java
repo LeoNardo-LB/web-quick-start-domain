@@ -7,11 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 事件配置属性
- *
- * <p>支持 Spring Events 本地事件和 Kafka 消息队列两种实现。
- * @author Leonardo
- * @since 2026/1/10
+ * 事件配置属性类，支持Spring Events和Kafka。
  */
 @Data
 @ConfigurationProperties(prefix = "middleware.domain-event")

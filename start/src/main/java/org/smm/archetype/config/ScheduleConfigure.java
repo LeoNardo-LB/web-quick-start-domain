@@ -13,12 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Adapter 层定时任务配置
- *
- * <p>负责创建定时任务的 Bean，如事件重试调度器等。
- *
- * @author Leonardo
- * @since 2026-01-10
+ * 定时任务配置类，创建事件重试调度器等定时任务Bean。
  */
 @Configuration
 @EnableScheduling

@@ -6,9 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
 
 /**
- * 缓存配置属性
- * @author Leonardo
- * @since 2026/1/10
+ * 缓存配置属性类。
  */
 @Data
 @ConfigurationProperties(prefix = "middleware.cache")

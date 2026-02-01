@@ -10,18 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 阿里云通知服务配置
- *
- * <p>通过@Bean方法显式注册阿里云通知服务Bean。
- *
- * <p>条件装配：
- * <ul>
- *   <li>短信服务：middleware.sms.type=aliyun 且配置了有效的访问密钥</li>
- *   <li>邮件服务：middleware.email.type=aliyun 且配置了有效的访问密钥</li>
- * </ul>
- *
- * @author Leonardo
- * @since 2026-01-10
+ * 阿里云通知服务配置类，注册短信和邮件服务Bean。
  */
 @Configuration
 @EnableConfigurationProperties({

@@ -16,21 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Kafka 事件相关配置
- *
- * <p>条件：KafkaTemplate Bean存在时生效（即Kafka依赖已添加）。
- *
- * <p>包含：
- * <ul>
- *   <li>Kafka 监听器容器工厂</li>
- *   <li>Kafka 事件发布器（标注@Primary，优先于Spring事件发布器）</li>
- *   <li>Kafka 事件监听器</li>
- * </ul>
- *
- * <p>使用@ConditionalOnBean(KafkaTemplate.class)检测Kafka依赖的存在性，
- * 替代原有的@ConditionalOnProperty配置方式，实现自动依赖检测。
- * @author Leonardo
- * @since 2026-01-16
+ * Kafka事件配置类，配置Kafka监听器容器工厂。
  */
 @Configuration
 @RequiredArgsConstructor

@@ -15,27 +15,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 
 /**
- * 搜索服务配置类（Search Service Configuration）
- *
- * <p>配置ES客户端的Bean创建，根据ElasticsearchOperations Bean的存在性自动选择实现：
- * <ul>
- *   <li>ElasticsearchOperations Bean存在 → 创建 {@link ElasticsearchClientImpl}，使用Spring Data ES</li>
- *   <li>ElasticsearchOperations Bean不存在 → 创建 {@link DisabledSearchClientImpl}，禁用ES功能</li>
- * </ul>
- *
- * <p>条件装配规则：
- * <ul>
- *   <li>{@code esClient()}: {@code @ConditionalOnBean(ElasticsearchOperations.class)}</li>
- *   <li>{@code disabledEsClient()}: {@code @ConditionalOnMissingBean(ElasticsearchOperations.class)}</li>
- * </ul>
- *
- * <p>配置方式：
- * <ul>
- *   <li>启用ES：配置 {@code spring.elasticsearch.*} (Spring Boot标准配置)</li>
- *   <li>禁用ES：不配置ES依赖或移除 {@code spring.elasticsearch.*} 配置</li>
- * </ul>
- * @author Leonardo
- * @since 2026-01-24
+ * 搜索服务配置类，自动检测Elasticsearch并配置搜索客户端。
  */
 @Slf4j
 @Configuration

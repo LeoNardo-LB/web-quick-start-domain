@@ -12,25 +12,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
- * Infrastructure层缓存服务配置
- *
- * <p>Bean装配策略（自动依赖检测）：
- * <ul>
- *   <li>外部中间件优先：RedisTemplate存在时，使用@Primary标记的RedisCacheClientImpl</li>
- *   <li>本地兜底方案：RedisTemplate不存在时，使用CaffeineCacheClientImpl作为默认实现</li>
- *   <li>使用@ConditionalOnBean和@ConditionalOnMissingBean进行依赖自动检测</li>
- *   <li>SpringBoot自动配置RedisTemplate，无需手动创建</li>
- * </ul>
- *
- * <p>设计原则：
- * <ul>
- *   <li>启动时确定：所有中间件在应用启动时通过Bean装配确定</li>
- *   <li>无运行时切换：不支持运行时动态切换中间件</li>
- *   <li>本地兜底：即使没有外部中间件，应用也能正常运行</li>
- *   <li>去配置化：移除@ConditionalOnProperty类型选择，依赖自动检测</li>
- * </ul>
- * @author Leonardo
- * @since 2026-01-10
+ * 缓存服务配置类，自动检测Redis并配置缓存客户端。
  */
 @Configuration
 @EnableConfigurationProperties(CacheProperties.class)

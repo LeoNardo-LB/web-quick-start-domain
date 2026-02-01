@@ -6,12 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Adapter层Web相关配置
- *
- * <p>负责创建Web层相关的Bean，如Filter、Aspect等。
- * <p>注意：MapStruct Converter会自动生成为Spring Bean，无需手动注册。
- * @author Leonardo
- * @since 2026-01-10
+ * Web层配置类，创建Filter和Web相关Bean。
  */
 @Configuration
 public class WebConfigure {

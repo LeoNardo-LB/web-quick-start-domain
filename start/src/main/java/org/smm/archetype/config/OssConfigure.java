@@ -20,30 +20,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 /**
- * 对象存储服务配置类
- *
- * <p>遵循项目的中间件接入规范：
- * <ul>
- *   <li>本地组件作为默认实现（兜底方案）</li>
- *   <li>外部中间件通过 @ConditionalOnBean + @Primary 自动覆盖本地组件</li>
- *   <li>所有中间件在应用启动时通过 Bean 装配确定，无运行时切换</li>
- * </ul>
- *
- * <h3>Bean 装配策略</h3>
- * <pre>
- * 1. RustFsOssClientImpl（RustFS 对象存储）
- *    - 当 Spring Boot 自动配置创建了 RustFsOssClientImpl Bean 时才创建
- *    - 使用 @ConditionalOnBean(RustFsOssClientImpl.class) 检测依赖
- *    - 使用 @Primary 标记为优先 Bean，自动覆盖本地存储
- *    - 基于 AWS S3 SDK v2 实现（RustFS 100% 兼容 S3 协议）
- *
- * 2. LocalOssClientImpl（本地文件系统）
- *    - 当不存在 RustFsOssClientImpl Bean 时才创建
- *    - 使用 @ConditionalOnMissingBean(RustFsOssClientImpl.class) 作为兜底方案
- *    - 存储路径：用户文件夹/.project/${spring.application.name}/oss
- * </pre>
- * @author Leonardo
- * @since 2026/1/10
+ * 对象存储服务配置类，支持本地存储和RustFS对象存储。
  */
 @Slf4j
 @Configuration

@@ -6,11 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
 
 /**
- * 对象存储配置属性
- *
- * <p>支持本地文件系统和 RustFS 对象存储两种实现。
- * @author Leonardo
- * @since 2026/1/10
+ * 对象存储配置属性类，支持本地文件系统和RustFS。
  */
 @Data
 @ConfigurationProperties(prefix = "middleware.object-storage")

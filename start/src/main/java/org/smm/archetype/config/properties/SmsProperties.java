@@ -4,11 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 短信服务配置属性
- *
- * <p>支持多种短信服务提供商（阿里云、腾讯云等）
- * @author Leonardo
- * @since 2026-01-11
+ * 短信服务配置属性类。
  */
 @Data
 @ConfigurationProperties(prefix = "middleware.sms")

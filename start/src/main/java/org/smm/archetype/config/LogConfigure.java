@@ -8,11 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
- * Infrastructure层日志相关配置
- *
- * <p>负责创建日志切面、持久化、序列化等相关的Bean。
- * @author Leonardo
- * @since 2026-01-10
+ * 日志配置类，创建日志切面和相关Bean。
  */
 @Configuration
 public class LogConfigure {
