@@ -67,7 +67,6 @@ public class OssConfigure {
      *
      * <p>条件：当不存在 RustFsOssClientImpl Bean 时才创建
      * @param metadataMapper 文件元数据 Mapper
-     * @param idClient       ID 生成服务
      * @return 本地对象存储服务实现
      */
     @Bean
@@ -97,7 +96,6 @@ public class OssConfigure {
      * <p>条件：当 Spring Boot 自动配置创建了 RustFsOssClientImpl Bean 时才创建
      *
      * @param metadataMapper 文件元数据 Mapper
-     * @param idClient       ID 生成服务
      * @return RustFS 对象存储服务实现
      */
     @Bean

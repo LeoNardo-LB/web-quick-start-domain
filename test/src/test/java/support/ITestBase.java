@@ -10,7 +10,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.sql.DataSource;
 import java.time.Duration;
 
 /**
@@ -35,9 +34,6 @@ public abstract class ITestBase {
     protected int port;
 
     protected WebTestClient webTestClient;
-
-    @Autowired
-    protected DataSource dataSource;
 
     @Autowired
     protected WebApplicationContext webApplicationContext;

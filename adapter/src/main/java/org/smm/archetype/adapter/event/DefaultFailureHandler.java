@@ -229,7 +229,6 @@ public class DefaultFailureHandler implements FailureHandler {
      * @return 告警邮箱地址
      */
     private String getAlertEmail() {
-        // TODO: 从配置文件读取
         // 可以通过 @Value 注入配置
         return DEFAULT_ALERT_EMAIL;
     }
