@@ -36,9 +36,9 @@ import java.util.List;
  *   <li><b>本地场景</b>：当 KafkaTemplate Bean 不存在时，
  *       springEventPublisher 会被创建，作为默认的本地事件发布器。</li>
  * </ul>
- * @author Leonardo
+
  * @see KafkaEventConfigure
- * @since 2026-01-10
+
  */
 @Configuration
 @EnableAsync
