@@ -15,8 +15,6 @@ import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.ta
 
 /**
  * 对象存储服务抽象基类，提供通用文件操作流程。
- * @author Leonardo
- * @since 2026/1/10
  */
 @Slf4j
 @RequiredArgsConstructor

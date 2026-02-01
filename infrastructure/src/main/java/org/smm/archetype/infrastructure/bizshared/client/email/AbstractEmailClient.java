@@ -10,8 +10,6 @@ import java.util.List;
 
 /**
  * 邮件服务抽象基类，提供通用发送流程模板。
- * @author Leonardo
- * @since 2026/01/09
  */
 @Slf4j
 public abstract class AbstractEmailClient implements EmailClient {

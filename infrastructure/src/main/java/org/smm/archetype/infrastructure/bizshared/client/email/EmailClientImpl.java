@@ -9,16 +9,6 @@ import java.util.UUID;
 
 /**
  * 邮件服务实现（模拟），用于演示和测试。
- *
- * <p>生产环境接入方式：
- * <ul>
- *   <li>添加邮件服务SDK依赖</li>
- *   <li>注入真实的邮件服务客户端</li>
- *   <li>实现doSendEmail方法调用真实API</li>
- *   <li>配置服务商账号信息</li>
- * </ul>
- * @author Leonardo
- * @since 2026/01/10
  */
 @Slf4j
 public class EmailClientImpl extends AbstractEmailClient {

@@ -11,9 +11,6 @@ import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
 
 /**
  * 阿里云邮件实现，基于DirectMail推送。
- * <p><a href="https://help.aliyun.com/zh/direct-mail/">官方文档</a>
- * @author Leonardo
- * @since 2026/01/10
  */
 @Slf4j
 public class AliyunEmailClientImpl extends AbstractEmailClient {
