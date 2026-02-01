@@ -7,17 +7,7 @@ import org.smm.archetype.domain.bizshared.event.Type;
 import org.smm.archetype.domain.example.model.event.OrderCancelledEventDTO;
 
 /**
- * 订单取消事件处理器
- *
- * <p>职责：
- * <ul>
- *   <li>监听订单取消事件</li>
- *   <li>释放库存（已在应用层处理）</li>
- *   <li>发送取消通知（Mock调用）</li>
- * </ul>
- *
- * @author Leonardo
- * @since 2026/1/11
+ * 订单取消事件处理器，监听订单取消事件并释放库存。
  */
 @Slf4j
 public class OrderCancelledEventHandler implements EventHandler<OrderCancelledEventDTO> {

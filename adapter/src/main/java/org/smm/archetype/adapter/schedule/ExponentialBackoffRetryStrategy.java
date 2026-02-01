@@ -7,14 +7,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 
 /**
- * 指数退避重试策略（默认实现）
- *
- * <p>重试延迟时间：1分钟 → 5分钟 → 15分钟 → 30分钟 → 60分钟
- *
- * <p>适用于大多数场景的默认重试策略。
- *
- * @author Leonardo
- * @since 2026-01-16
+ * 指数退避重试策略，默认重试延迟：1分钟→5分钟→15分钟→30分钟→60分钟。
  */
 @Slf4j
 @Component

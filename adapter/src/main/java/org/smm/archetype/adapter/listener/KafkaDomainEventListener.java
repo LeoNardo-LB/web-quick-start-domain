@@ -7,20 +7,7 @@ import org.smm.archetype.domain.bizshared.event.Event;
 import org.springframework.kafka.annotation.KafkaListener;
 
 /**
- * Kafka 事件监听器
- *
- * <p>监听 Kafka 消息队列中的事件，并委托给 EventDispatcher 处理。
- *
- * <p>职责：
- * <ul>
- *   <li>作为 Kafka 消息的入口</li>
- *   <li>将事件委托给 EventDispatcher 进行统一处理</li>
- * </ul>
- *
- * <p>事件的完整生命周期（幂等检查、状态流转、重试等）由 EventDispatcher 统一控制。
- *
- * @author Leonardo
- * @since 2026/01/10
+ * Kafka事件监听器，监听Kafka消息队列并委托给EventDispatcher处理。
  */
 @Slf4j
 @RequiredArgsConstructor

@@ -13,16 +13,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 默认事件失败处理器
- *
- * <p>实现：
- * <ul>
- *   <li>记录告警日志</li>
- *   <li>发送邮件通知</li>
- *   <li>可扩展发送钉钉/企微通知</li>
- * </ul>
- * @author Leonardo
- * @since 2026/01/09
+ * 默认事件失败处理器，记录告警日志并发送邮件通知。
  */
 @Slf4j
 @RequiredArgsConstructor

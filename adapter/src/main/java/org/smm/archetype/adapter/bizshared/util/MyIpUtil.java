@@ -5,9 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * IP地址工具类
- * 提供获取客户端真实IP地址的功能，处理使用反向代理（如Nginx）时的IP获取问题。
- * 支持从多个HTTP头中获取IP地址，并按优先级处理，确保获取到真实的客户端IP。
+ * IP地址工具类，提供获取客户端真实IP地址的功能。
  */
 @Slf4j
 public class MyIpUtil {

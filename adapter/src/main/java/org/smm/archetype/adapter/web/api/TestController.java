@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 测试控制器
- *
- * 提供用于测试和演示的RESTful API接口，包括基础的hello接口和异常处理测试接口。
+ * 测试控制器，提供用于测试和演示的RESTful API接口。
  */
 @Slf4j
 @RestController

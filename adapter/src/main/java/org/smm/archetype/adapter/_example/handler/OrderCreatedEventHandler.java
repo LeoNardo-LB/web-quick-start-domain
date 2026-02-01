@@ -9,16 +9,7 @@ import org.smm.archetype.domain.example.model.event.OrderCreatedEventDTO;
 import org.smm.archetype.domain.example.service.InventoryService;
 
 /**
- * 订单创建事件处理器
- *
- * <p>职责：
- * <ul>
- *   <li>监听订单创建事件</li>
- *   <li>锁定库存（真实调用）</li>
- * </ul>
- *
- * @author Leonardo
- * @since 2026/1/11
+ * 订单创建事件处理器，监听订单创建事件并锁定库存。
  */
 @Slf4j
 @RequiredArgsConstructor

@@ -13,23 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 /**
- * 事件重试调度器实现
- *
- * <p>定时扫描 event 表中 RETRYING 状态的消费记录，
- * 将事件交给 EventDispatcher 进行重试处理。
- *
- * <p>职责边界：
- * <ul>
- *   <li>扫描数据库中待重试的事件</li>
- *   <li>通过 Type 枚举反序列化事件数据</li>
- *   <li>将事件委托给 EventDispatcher 处理</li>
- * </ul>
- *
- * <p>注意：事件消费的完整生命周期由 EventDispatcher 统一控制，
- * 本类仅负责"捞取"和"委托"。
- *
- * @author Leonardo
- * @since 2026/01/09
+ * 事件重试调度器实现，定时扫描并重试RETRYING状态的事件。
  */
 @Slf4j
 public class EventRetrySchedulerImpl implements EventRetryScheduler {

@@ -12,10 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- *
- *
- * @author Leonardo
- * @since 2025/12/30
+ * 上下文填充过滤器，设置请求上下文信息。
  */
 @Slf4j
 public class ContextFillFilter extends OncePerRequestFilter {

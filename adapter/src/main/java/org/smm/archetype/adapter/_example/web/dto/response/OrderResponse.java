@@ -11,9 +11,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * 订单响应
- * @author Leonardo
- * @since 2026/1/11
+ * 订单响应对象，用于Web层返回订单数据。
  */
 @Getter
 @Builder(setterPrefix = "set")

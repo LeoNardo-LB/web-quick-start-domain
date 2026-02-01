@@ -14,30 +14,8 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * 事件分发器
+ * 事件分发器，统一控制事件消费的完整生命周期。
  *
- * <p>统一控制事件消费的完整生命周期，包括：
- * <ul>
- *   <li>幂等性检查（基于 eid + action + executor_group + delete_time）</li>
- *   <li>消费记录的创建与状态流转</li>
- *   <li>事件处理器的调度</li>
- *   <li>成功/失败/最终失败的处理</li>
- * </ul>
- *
- * <p>调用方：
- * <ul>
- *   <li>Listener（首次消费）：dispatch(event, false)</li>
- *   <li>Scheduler（重试消费）：dispatch(event, true)</li>
- * </ul>
- *
- * <p>状态流转：
- * <pre>
- * 首次消费：
- *   → 创建记录(RETRYING) → 处理成功(SUCCESS) / 处理失败(RETRYING)
- *
- * 重试消费：
- *   → 获取已有记录 → 处理成功(SUCCESS) / 处理失败(RETRYING/FAILED)
- * </pre>
  * @author Leonardo
  * @since 2026/1/31
  */

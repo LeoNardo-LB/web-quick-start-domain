@@ -7,16 +7,7 @@ import org.smm.archetype.domain.bizshared.event.Type;
 import org.smm.archetype.domain.example.model.event.OrderPaidEventDTO;
 
 /**
- * 订单支付事件处理器
- *
- * <p>职责：
- * <ul>
- *   <li>监听订单支付事件</li>
- *   <li>发送支付通知（Mock调用）</li>
- * </ul>
- *
- * @author Leonardo
- * @since 2026/1/11
+ * 订单支付事件处理器，监听订单支付事件并发送通知。
  */
 @Slf4j
 public class OrderPaidEventHandler implements EventHandler<OrderPaidEventDTO> {
