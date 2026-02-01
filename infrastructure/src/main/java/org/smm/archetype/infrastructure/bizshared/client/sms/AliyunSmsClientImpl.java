@@ -13,9 +13,9 @@ import org.smm.archetype.domain.bizshared.client.dto.SmsResult;
 /**
  * 阿里云短信服务实现
  *
- * <p>基于阿里云短信服务（SMS）发送短信。
+基于阿里云短信服务（SMS）发送短信。
  *
- * <p><a href="https://help.aliyun.com/zh/sms/">官方文档</a>
+<a href="https://help.aliyun.com/zh/sms/">官方文档</a>
 
 
  */

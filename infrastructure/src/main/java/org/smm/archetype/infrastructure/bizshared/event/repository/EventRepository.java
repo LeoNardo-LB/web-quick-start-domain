@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * 事件仓储
  *
- * <p>封装 EventMapper，提供事件发布和消费的持久化操作。
+封装 EventMapper，提供事件发布和消费的持久化操作。
 
 
  */
@@ -118,7 +118,7 @@ public class EventRepository {
     /**
      * 根据幂等键查询消费记录
      *
-     * <p>幂等键组成：eid + action + executor_group + delete_time
+    幂等键组成：eid + action + executor_group + delete_time
      * @param eventId       事件ID
      * @param action        动作类型（CONSUME）
      * @param executorGroup 执行者组
@@ -138,7 +138,7 @@ public class EventRepository {
     /**
      * 查询待重试事件（RETRYING 状态且到达重试时间）
      *
-     * <p>返回 EventConsumeRecord 而非 EventDO，避免上层直接依赖 Infrastructure 层实体。
+    返回 EventConsumeRecord 而非 EventDO，避免上层直接依赖 Infrastructure 层实体。
      * @param limit 限制数量
      * @return 消费记录列表
      */
@@ -161,7 +161,7 @@ public class EventRepository {
     /**
      * 将 EventDO 转换为 EventConsumeRecord
      *
-     * <p>用于避免上层直接依赖 Infrastructure 层实体。
+    用于避免上层直接依赖 Infrastructure 层实体。
      * @param eventDO 事件 DO
      * @return 事件消费记录
      */

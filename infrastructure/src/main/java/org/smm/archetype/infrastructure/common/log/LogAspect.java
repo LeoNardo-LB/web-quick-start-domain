@@ -62,7 +62,7 @@ public class LogAspect {
 
     /**
      * 业务日志切点
-     * <p>
+    
      * 定义切入点，拦截标记了@Log注解的方法。
      */
     @Pointcut("@annotation(org.smm.archetype.infrastructure.common.log.MyLog)")
@@ -71,7 +71,7 @@ public class LogAspect {
 
     /**
      * 环绕通知处理方法
-     * <p>
+    
      * 拦截标记了@Log注解的方法，在方法执行前后收集相关信息并记录日志和指标。
      * 记录方法的入参、出参、执行时间、线程信息等，并在出现异常时记录异常信息。
      * 同时采集执行时间和调用次数等指标。

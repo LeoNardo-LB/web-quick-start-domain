@@ -7,16 +7,16 @@ import org.smm.archetype.infrastructure.bizshared.event.repository.EventConsumeR
 /**
  * 事件消费记录转换器（MapStruct实现）
  *
- * <p>负责在EventDO（Infrastructure层）和EventConsumeRecord（Domain层）之间转换。
+负责在EventDO（Infrastructure层）和EventConsumeRecord（Domain层）之间转换。
  *
- * <p>为什么需要转换器：
+为什么需要转换器：
  * <ul>
  *   <li>Domain层不应该依赖Infrastructure层的DO对象</li>
  *   <li>App层需要使用Domain层的值对象</li>
  *   <li>转换逻辑集中在一个地方，便于维护</li>
  * </ul>
  *
- * <p>通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
+通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
 
 
  */
@@ -26,7 +26,7 @@ public interface EventRecordConverter {
     /**
      * 从EventDO转换为EventConsumeRecord
      *
-     * <p>转换规则：
+    转换规则：
      * <ul>
      *   <li>字符串枚举值转换为对应的枚举类型</li>
      *   <li>保留所有业务字段</li>

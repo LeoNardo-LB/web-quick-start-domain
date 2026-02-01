@@ -170,16 +170,16 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
     /**
      * Caffeine 自定义过期策略（私有内部类）
      *
-     * <p>基于 {@link CacheValueWrapper} 的过期时间实现每个 Entry 的独立过期控制。
+    基于 {@link CacheValueWrapper} 的过期时间实现每个 Entry 的独立过期控制。
      *
-     * <p>线程安全性：
+    线程安全性：
      * <ul>
      *   <li>Caffeine 内部使用同步锁，同一时刻只有一个线程能操作特定 key</li>
      *   <li>此类的所有方法都在 Caffeine 的同步保护下调用</li>
      *   <li>Wrapper 的 volatile 字段保证了多线程间的可见性</li>
      * </ul>
      *
-     * <p>设置为私有内部类的原因：
+    设置为私有内部类的原因：
      * <ul>
      *   <li>防止外部引用，保持高内聚</li>
      *   <li>仅服务于 CaffeineCacheClientImpl</li>
@@ -193,7 +193,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 缓存条目创建时调用，返回过期时间
          *
-         * <p>此方法在 Caffeine 的同步保护下调用，保证线程安全。
+        此方法在 Caffeine 的同步保护下调用，保证线程安全。
          * @param key         缓存键
          * @param wrapper     缓存值包装器
          * @param currentTime Caffeine 内部当前时间（纳秒）
@@ -209,7 +209,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 缓存条目更新时调用，返回新的过期时间
          *
-         * <p>此方法在 Caffeine 的同步保护下调用，保证线程安全。
+        此方法在 Caffeine 的同步保护下调用，保证线程安全。
          * 当通过 put(key, value) 更新缓存时，会重新计算过期时间。
          * @param key         缓存键
          * @param wrapper     新的缓存值包装器
@@ -228,9 +228,9 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * Entry 读取时调用，返回过期时间
          *
-         * <p>此方法在 Caffeine 的同步保护下调用，保证线程安全。
+        此方法在 Caffeine 的同步保护下调用，保证线程安全。
          *
-         * <p>注意：我们在此更新访问时间，但保持原过期时间不变（返回 currentDuration）。
+        注意：我们在此更新访问时间，但保持原过期时间不变（返回 currentDuration）。
          * 这样实现了基于访问时间追踪，但不延长过期时间的效果。
          * @param key             缓存键
          * @param wrapper         缓存值包装器
@@ -255,7 +255,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
     /**
      * 缓存值包装器（线程安全）
      *
-     * <p>封装原始值并添加时间属性，支持：
+    封装原始值并添加时间属性，支持：
      * <ul>
      *   <li>存入时间追踪</li>
      *   <li>自定义过期时间</li>
@@ -263,7 +263,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
      *   <li>Caffeine Expiry 接口集成</li>
      * </ul>
      *
-     * <p>线程安全性说明：
+    线程安全性说明：
      * <ul>
      *   <li>✓ 不可变字段（value, createTime）使用 final 保证初始化安全</li>
      *   <li>✓ 可变字段（expireTime, accessTime）使用 volatile 保证可见性</li>
@@ -271,17 +271,17 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
      *   <li>✓ 适用于高并发读多写少场景</li>
      * </ul>
      *
-     * <p>⚠️ 重要：不要在外部持有此对象的引用！
-     * <p>此类的线程安全依赖于 Caffeine 的内部同步机制（类似 ConcurrentHashMap 的分段锁）。
+    ⚠️ 重要：不要在外部持有此对象的引用！
+    此类的线程安全依赖于 Caffeine 的内部同步机制（类似 ConcurrentHashMap 的分段锁）。
      * 如果在缓存外部持有此对象并调用其方法，可能导致并发问题。
      *
-     * <p>正确用法：
+    正确用法：
      * <pre>{@code
      * // 通过 CacheClient 访问，Wrapper 由 Caffeine 管理
      * String value = cacheClient.get("key");
      * }</pre>
      *
-     * <p>错误用法：
+    错误用法：
      * <pre>{@code
      * // ✗ 禁止在外部持有 Wrapper 引用
      * CacheValueWrapper wrapper = ...;  // 不要这样做
@@ -307,14 +307,14 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 过期时间戳（毫秒，volatile 保证可见性）
          *
-         * <p>使用 volatile 的原因：
+        使用 volatile 的原因：
          * <ul>
          *   <li>保证多线程间的可见性（happens-before 关系）</li>
          *   <li>防止指令重排序</li>
          *   <li>避免读取到过期时间的陈旧值</li>
          * </ul>
          *
-         * <p>虽然此字段可能被 {@link #updateExpireTime(long)} 更新，
+        虽然此字段可能被 {@link #updateExpireTime(long)} 更新，
          * 但更新操作仅在 Caffeine 的同步保护下进行（如 doExpire 方法）。
          */
         private volatile long expireTime;
@@ -322,7 +322,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 最后访问时间戳（毫秒，volatile 保证可见性）
          *
-         * <p>使用 volatile 的原因：
+        使用 volatile 的原因：
          * <ul>
          *   <li>保证多线程间的可见性</li>
          *   <li>虽然 {@link #updateAccessTime()} 在 Caffeine 同步保护下调用，
@@ -334,7 +334,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 创建永久有效的 Wrapper
          *
-         * <p>expireTime 设置为 0 表示永不过期。
+        expireTime 设置为 0 表示永不过期。
          * @param value 原始值
          * @return Wrapper 实例
          */
@@ -358,7 +358,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 是否已过期
          *
-         * <p>此方法读取 volatile 字段，保证获取最新的过期时间。
+        此方法读取 volatile 字段，保证获取最新的过期时间。
          * @return true 如果已过期，false 如果未过期或永不过期
          */
         public boolean isExpired() {
@@ -371,7 +371,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 获取剩余有效时间（毫秒）
          *
-         * <p>此方法读取 volatile 字段，保证获取最新的过期时间。
+        此方法读取 volatile 字段，保证获取最新的过期时间。
          * @return 剩余毫秒数，-1 表示永不过期，0 表示已过期
          */
         public long getRemainingTimeMillis() {
@@ -385,7 +385,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 获取过期时间的纳秒数（用于 Caffeine Expiry）
          *
-         * <p>此方法读取 volatile 字段并转换为纳秒，供 Caffeine 的 Expiry 接口使用。
+        此方法读取 volatile 字段并转换为纳秒，供 Caffeine 的 Expiry 接口使用。
          * @return 过期时间的纳秒数，Long.MAX_VALUE 表示永不过期
          */
         public long getExpireTimeNanos() {
@@ -399,10 +399,10 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 更新访问时间
          *
-         * <p>⚠️ 此方法应在 Caffeine 的同步保护下调用（如 expireAfterRead）。
+        ⚠️ 此方法应在 Caffeine 的同步保护下调用（如 expireAfterRead）。
          * 如果在外部调用，可能导致并发问题。
          *
-         * <p>volatile 写操作保证了 happens-before 关系，确保其他线程能立即看到更新。
+        volatile 写操作保证了 happens-before 关系，确保其他线程能立即看到更新。
          */
         public void updateAccessTime() {
             this.accessTime = System.currentTimeMillis();
@@ -411,10 +411,10 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         /**
          * 更新过期时间
          *
-         * <p>⚠️ 此方法应在 Caffeine 的同步保护下调用（如 doExpire）。
+        ⚠️ 此方法应在 Caffeine 的同步保护下调用（如 doExpire）。
          * 如果在外部调用，可能导致并发问题。
          *
-         * <p>volatile 写操作保证了 happens-before 关系，确保其他线程能立即看到更新。
+        volatile 写操作保证了 happens-before 关系，确保其他线程能立即看到更新。
          * @param expireTime 新的过期时间戳（毫秒）
          */
         public void updateExpireTime(long expireTime) {

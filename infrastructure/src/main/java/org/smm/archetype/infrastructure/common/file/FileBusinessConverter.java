@@ -9,9 +9,9 @@ import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.FileBusin
 /**
  * 业务文件领域对象转换器（MapStruct实现）
  *
- * <p>负责FileBusiness与FileBusinessDO之间的转换
+负责FileBusiness与FileBusinessDO之间的转换
  *
- * <p>通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
+通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
 
 
  */

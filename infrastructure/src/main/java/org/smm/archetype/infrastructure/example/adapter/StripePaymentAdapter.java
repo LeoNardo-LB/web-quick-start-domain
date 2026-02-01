@@ -10,14 +10,14 @@ import java.util.UUID;
 /**
  * Stripe支付网关适配器
  *
- * <p>职责：
+职责：
  * <ul>
  *   <li>实现PaymentGateway端口接口</li>
  *   <li>调用Stripe API进行支付</li>
  *   <li>处理Stripe响应和异常</li>
  * </ul>
  *
- * <p>说明：
+说明：
  * <ul>
  *   <li>这是一个Mock实现，仅用于演示</li>
  *   <li>实际生产环境需要集成Stripe SDK</li>

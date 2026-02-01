@@ -20,7 +20,7 @@ import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.ta
 /**
  * 通用文件仓储实现
  *
- * <p>负责FileBusiness和FileMeta的持久化操作
+负责FileBusiness和FileMeta的持久化操作
 
 
  */

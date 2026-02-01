@@ -12,14 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 模拟库存服务适配器
  *
- * <p>职责：
+职责：
  * <ul>
  *   <li>实现InventoryService端口接口</li>
  *   <li>提供Mock的库存验证和锁定功能</li>
  *   <li>用于演示和测试</li>
  * </ul>
  *
- * <p>说明：
+说明：
  * <ul>
  *   <li>这是一个Mock实现，仅用于演示</li>
  *   <li>实际生产环境需要调用真实的库存服务</li>

@@ -21,9 +21,9 @@ import java.util.List;
 /**
  * 抽象事件发布器
  *
- * <p>提供事件发布的通用流程模板，处理事件持久化和状态管理。
+提供事件发布的通用流程模板，处理事件持久化和状态管理。
  *
- * <p>发布流程：
+发布流程：
  * <ol>
  *   <li>持久化事件到数据库（状态为 CREATED）</li>
  *   <li>调用 doPublish 方法进行实际发布</li>
@@ -153,7 +153,7 @@ public abstract class DomainEventCollectPublisher implements DomainEventPublishe
     /**
      * 执行实际的事件发布逻辑
      *
-     * <p>由子类实现具体的发布方式（Kafka、Spring事件等）。
+    由子类实现具体的发布方式（Kafka、Spring事件等）。
      * @param event 事件
      * @throws Exception 发布异常
      */

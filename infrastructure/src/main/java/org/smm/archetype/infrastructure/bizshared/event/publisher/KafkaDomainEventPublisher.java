@@ -9,9 +9,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 /**
  * Kafka 事件发布器
  *
- * <p>将事件发布到 Kafka 消息队列，支持异步处理。
+将事件发布到 Kafka 消息队列，支持异步处理。
  *
- * <p>工作流程：
+工作流程：
  * <ol>
  *   <li>继承 DomainEventCollectPublisher，事件持久化到数据库（状态为 CREATED）</li>
  *   <li>使用 IO 线程池异步发送到 Kafka 主题</li>
@@ -19,7 +19,7 @@ import org.springframework.kafka.core.KafkaTemplate;
  *   <li>发送失败则保持 CREATED 状态，由定时任务重试</li>
  * </ol>
  *
- * <p>适用于：
+适用于：
  * <ul>
  *   <li>分布式应用</li>
  *   <li>生产环境</li>

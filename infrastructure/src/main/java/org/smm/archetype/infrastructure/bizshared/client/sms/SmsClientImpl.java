@@ -10,9 +10,9 @@ import java.util.UUID;
 /**
  * 短信服务实现（模拟实现）
  *
- * <p>脚手架项目的模拟实现，用于演示和测试。
+脚手架项目的模拟实现，用于演示和测试。
  *
- * <p>生产环境接入方式：
+生产环境接入方式：
  * <ul>
  *   <li>添加短信服务SDK依赖（如阿里云短信、腾讯云短信等）</li>
  *   <li>注入真实的短信服务客户端</li>
@@ -20,7 +20,7 @@ import java.util.UUID;
  *   <li>配置服务商账号信息</li>
  * </ul>
  *
- * <p>示例接入（实现类）：
+示例接入（实现类）：
  * <pre>{@code
  * public class AliyunSmsClientImpl extends AbstractSmsClient {
  *
@@ -44,7 +44,7 @@ import java.util.UUID;
  * }
  * }</pre>
  *
- * <p>示例接入（配置类注册）：
+示例接入（配置类注册）：
  * <pre>{@code
  * @Configuration
  * public class NotificationConfigure {
@@ -70,9 +70,9 @@ public class SmsClientImpl extends AbstractSmsClient {
     /**
      * 执行实际的短信发送逻辑（模拟实现）
      *
-     * <p>TODO: 生产环境需要接入真实的短信服务商
+    TODO: 生产环境需要接入真实的短信服务商
      *
-     * <p>推荐服务商：
+    推荐服务商：
      * <ul>
      *   <li><a href="https://www.aliyun.com/product/sms">阿里云短信</a></li>
      *   <li>腾讯云短信：https://cloud.tencent.com/product/sms</li>

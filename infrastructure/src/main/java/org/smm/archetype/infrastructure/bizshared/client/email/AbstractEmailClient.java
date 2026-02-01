@@ -72,7 +72,7 @@ public abstract class AbstractEmailClient implements EmailClient {
     /**
      * 批量发送邮件（模板方法）
      *
-     * <p>调用单发方法实现批量发送。
+    调用单发方法实现批量发送。
      * @param requests 邮件请求列表
      * @return 发送结果列表
      * @throws IllegalArgumentException 当 requests 为 null 时抛出
@@ -94,7 +94,7 @@ public abstract class AbstractEmailClient implements EmailClient {
     /**
      * 执行实际的邮件发送逻辑（由子类实现）
      *
-     * <p>扩展点：子类实现具体服务商的邮件发送逻辑，如：
+    扩展点：子类实现具体服务商的邮件发送逻辑，如：
      * <ul>
      *   <li>阿里云邮件服务</li>
      *   <li>腾讯云邮件服务</li>

@@ -9,9 +9,9 @@ import java.util.Map;
 /**
  * ES客户端禁用实现（Disabled Implementation）
  *
- * <p>当搜索功能禁用时（middleware.search.enabled=false），使用此实现。
+当搜索功能禁用时（middleware.search.enabled=false），使用此实现。
  *
- * <p>行为特性：
+行为特性：
  * <ul>
  *   <li>所有操作抛出 {@link IllegalStateException}</li>
  *   <li>异常消息明确提示 "Elasticsearch is disabled"</li>

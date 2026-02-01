@@ -8,9 +8,9 @@ import org.springframework.context.ApplicationEventPublisher;
 /**
  * Spring 事件发布器
  *
- * <p>使用 Spring 的 ApplicationEventPublisher 发布事件。
+使用 Spring 的 ApplicationEventPublisher 发布事件。
  *
- * <p>工作流程：
+工作流程：
  * <ol>
  *   <li>继承 DomainEventCollectPublisher，事件持久化到数据库（状态为 CREATED）</li>
  *   <li>使用 ApplicationEventPublisher 异步发布 Spring 事件</li>
@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationEventPublisher;
  *   <li>发布失败则保持 CREATED 状态，由定时任务重试</li>
  * </ol>
  *
- * <p>适用于：
+适用于：
  * <ul>
  *   <li>单机应用</li>
  *   <li>开发测试环境</li>

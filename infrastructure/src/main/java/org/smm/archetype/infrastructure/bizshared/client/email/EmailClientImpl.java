@@ -21,9 +21,9 @@ public class EmailClientImpl extends AbstractEmailClient {
     /**
      * 执行实际的邮件发送逻辑（模拟实现）
      *
-     * <p>TODO: 生产环境需要接入真实的邮件服务商
+    TODO: 生产环境需要接入真实的邮件服务商
      *
-     * <p>推荐服务商：
+    推荐服务商：
      * <ul>
      *   <li><a href="https://www.aliyun.com/product/directmail">阿里云邮件推送</a></li>
      *   <li><a href="https://cloud.tencent.com/product/ses">腾讯云邮件服务</a></li>
