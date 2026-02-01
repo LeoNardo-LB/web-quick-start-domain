@@ -6,29 +6,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
- * 纯单元测试基类 - 不启动任何Spring上下文
- *
- * 特点：
- * ✅ 0毫秒启动时间
- * ✅ 完全隔离，无外部依赖
- * ✅ 可Mock任意对象
- * ❌ 不能测试Spring集成
- *
- * 使用示例：
- * <pre>
- * class OrderServiceTest extends UnitTestBase {
- *     &#64;Mock
- *     private OrderRepository orderRepository;
- *
- *     &#64;InjectMocks
- *     private OrderService orderService;
- *
- *     &#64;Test
- *     void testSomeMethod() {
- *         // 测试逻辑
- *     }
- * }
- * </pre>
+ * 纯单元测试基类，不启动Spring上下文，支持Mockito模拟。
  */
 @ExtendWith(MockitoExtension.class)
 public abstract class UnitTestBase {

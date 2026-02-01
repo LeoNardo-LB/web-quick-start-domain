@@ -12,12 +12,7 @@ import org.springframework.test.context.TestPropertySource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 应用启动测试
- *
- * <p>验证Spring容器能够成功启动并装配所有Bean
- *
- * @author Leonardo
- * @since 2026-01-14
+ * 应用启动测试，验证Spring容器成功启动并装配所有Bean。
  */
 @DisplayName("应用启动测试")
 @SpringBootTest(classes = TestBootstrap.class)
