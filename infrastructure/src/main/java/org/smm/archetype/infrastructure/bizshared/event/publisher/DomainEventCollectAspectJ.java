@@ -14,8 +14,8 @@ import java.util.ArrayList;
 /**
  * 领域事件收集切面
  * 默认的事务顺序是最低优先级，即在事务提交之后执行
- * @author Leonardo
- * @since 2026/1/31
+
+
  */
 @Aspect
 @RequiredArgsConstructor

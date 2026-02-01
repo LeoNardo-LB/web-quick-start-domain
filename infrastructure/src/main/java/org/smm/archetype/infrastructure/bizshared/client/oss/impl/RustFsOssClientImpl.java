@@ -31,8 +31,8 @@ import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.ta
 
 /**
  * RustFS OSS实现，基于AWS S3 SDK。
- * @author Leonardo
- * @since 2026/01/10
+
+
  */
 @Slf4j
 public class RustFsOssClientImpl extends AbstractOssClient {

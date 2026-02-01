@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *   <li>实际生产环境需要调用真实的库存服务</li>
  *   <li>使用内存Map存储库存数据</li>
  * </ul>
- * @author Leonardo
- * @since 2026/1/11
+
+
  */
 @Getter
 @Slf4j

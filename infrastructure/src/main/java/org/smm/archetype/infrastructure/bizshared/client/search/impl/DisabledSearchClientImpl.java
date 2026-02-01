@@ -18,8 +18,8 @@ import java.util.Map;
  *   <li>记录ERROR级别日志</li>
  * </ul>
  *
- * @author Leonardo
- * @since 2026-01-15
+
+
  */
 @Slf4j
 public class DisabledSearchClientImpl extends AbstractSearchClient {

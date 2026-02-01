@@ -17,8 +17,8 @@ import org.smm.archetype.infrastructure.bizshared.event.repository.EventConsumeR
  * </ul>
  *
  * <p>通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
- * @author Leonardo
- * @since 2026/01/10
+
+
  */
 @Mapper(componentModel = "spring")
 public interface EventRecordConverter {

@@ -15,8 +15,8 @@ import java.time.Instant;
 
 /**
  * 事件发布表DO实体。
- * @author Administrator
- * @since 2026/01/31
+
+
  */
 @Data
 @Builder

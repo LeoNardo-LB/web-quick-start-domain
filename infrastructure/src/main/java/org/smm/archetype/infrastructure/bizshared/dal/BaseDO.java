@@ -11,8 +11,8 @@ import java.time.Instant;
 
 /**
  * 数据对象基类，自动进行设置操作。
- * @author Leonardo
- * @since 2025/12/29
+
+
  */
 @Getter
 @Setter

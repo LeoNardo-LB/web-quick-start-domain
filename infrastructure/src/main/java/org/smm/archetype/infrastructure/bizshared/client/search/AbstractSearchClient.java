@@ -8,8 +8,8 @@ import java.util.Map;
 
 /**
  * ES搜索服务抽象基类，提供通用操作流程模板。
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 @Slf4j
 public abstract class AbstractSearchClient implements SearchClient {

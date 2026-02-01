@@ -24,8 +24,8 @@ import static org.smm.archetype.infrastructure.bizshared.dal.generated.entity.ta
 
 /**
  * 本地文件系统OSS实现，支持零拷贝和日期分层存储。
- * @author Leonardo
- * @since 2026/1/10
+
+
  */
 @Slf4j
 public class LocalOssClientImpl extends AbstractOssClient {

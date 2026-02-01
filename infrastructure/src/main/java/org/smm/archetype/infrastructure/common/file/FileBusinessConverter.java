@@ -12,8 +12,8 @@ import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.FileBusin
  * <p>负责FileBusiness与FileBusinessDO之间的转换
  *
  * <p>通过@Mapper(componentModel = "spring")自动生成@Component，支持Spring依赖注入
- * @author Leonardo
- * @since 2026/01/10
+
+
  */
 @Mapper(componentModel = "spring")
 public interface FileBusinessConverter {

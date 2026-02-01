@@ -29,8 +29,8 @@ import java.util.List;
  *   <li>调用 doPublish 方法进行实际发布</li>
  *   <li>根据发布结果更新状态（PUBLISHED 或保持 CREATED）</li>
  * </ol>
- * @author Leonardo
- * @since 2026/01/09
+
+
  */
 @Slf4j
 public abstract class DomainEventCollectPublisher implements DomainEventPublisher {

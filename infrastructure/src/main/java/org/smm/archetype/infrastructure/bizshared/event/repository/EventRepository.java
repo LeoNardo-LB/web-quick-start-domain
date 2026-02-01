@@ -17,8 +17,8 @@ import java.util.List;
  * 事件仓储
  *
  * <p>封装 EventMapper，提供事件发布和消费的持久化操作。
- * @author Leonardo
- * @since 2026/01/09
+
+
  */
 @Slf4j
 @RequiredArgsConstructor

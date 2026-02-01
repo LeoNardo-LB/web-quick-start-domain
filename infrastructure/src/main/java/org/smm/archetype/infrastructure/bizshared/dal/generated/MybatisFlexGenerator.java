@@ -13,8 +13,8 @@ import java.time.Instant;
 
 /**
  * MyBatisFlex代码生成器，在当前目录生成Mapper和DO对象。
- * @author Leonardo
- * @since 2026/01/10
+
+
  */
 public class MybatisFlexGenerator {
 

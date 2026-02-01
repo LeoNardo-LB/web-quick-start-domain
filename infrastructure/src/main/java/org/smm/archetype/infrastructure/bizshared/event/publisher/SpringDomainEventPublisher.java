@@ -24,8 +24,8 @@ import org.springframework.context.ApplicationEventPublisher;
  *   <li>开发测试环境</li>
  *   <li>Kafka 的降级方案</li>
  * </ul>
- * @author Leonardo
- * @since 2026-01-10
+
+
  */
 @Slf4j
 public class SpringDomainEventPublisher extends DomainEventCollectPublisher {

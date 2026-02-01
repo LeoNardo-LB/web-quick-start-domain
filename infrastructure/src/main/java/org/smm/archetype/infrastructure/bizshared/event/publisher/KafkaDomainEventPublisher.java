@@ -25,8 +25,8 @@ import org.springframework.kafka.core.KafkaTemplate;
  *   <li>生产环境</li>
  *   <li>需要事件解耦的场景</li>
  * </ul>
- * @author Leonardo
- * @since 2026-01-10
+
+
  */
 @Slf4j
 public class KafkaDomainEventPublisher extends DomainEventCollectPublisher {

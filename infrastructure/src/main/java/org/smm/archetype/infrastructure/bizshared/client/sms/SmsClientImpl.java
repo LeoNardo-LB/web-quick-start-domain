@@ -56,8 +56,8 @@ import java.util.UUID;
  *     }
  * }
  * }</pre>
- * @author Leonardo
- * @since 2026/01/10
+
+
  */
 @Slf4j
 public class SmsClientImpl extends AbstractSmsClient {

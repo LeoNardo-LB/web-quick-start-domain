@@ -185,8 +185,8 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
      *   <li>仅服务于 CaffeineCacheClientImpl</li>
      *   <li>避免被其他类误用</li>
      * </ul>
-     * @author Leonardo
-     * @since 2026-01-10
+    
+    
      */
     private static class CaffeineExpiry implements Expiry<String, CacheValueWrapper> {
 
@@ -287,8 +287,8 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
      * CacheValueWrapper wrapper = ...;  // 不要这样做
      * wrapper.updateAccessTime();       // 可能导致并发问题
      * }</pre>
-     * @author Leonardo
-     * @since 2026-01-10
+    
+    
      */
     @Getter
     @AllArgsConstructor

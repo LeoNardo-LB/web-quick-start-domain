@@ -16,8 +16,8 @@ import org.smm.archetype.domain.bizshared.client.dto.SmsResult;
  * <p>基于阿里云短信服务（SMS）发送短信。
  *
  * <p><a href="https://help.aliyun.com/zh/sms/">官方文档</a>
- * @author Leonardo
- * @since 2026/01/10
+
+
  */
 @Slf4j
 public class AliyunSmsClientImpl extends AbstractSmsClient {

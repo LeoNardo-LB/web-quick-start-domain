@@ -24,8 +24,8 @@ import java.util.UUID;
  *   <li>通过配置文件控制是否启用（payment.stripe.enabled）</li>
  *   <li>通过OrderConfigure配置类注册为Bean（遵循规范：不使用@Component注解）</li>
  * </ul>
- * @author Leonardo
- * @since 2026/1/11
+
+
  */
 @Slf4j
 public class StripePaymentAdapter implements PaymentGateway {

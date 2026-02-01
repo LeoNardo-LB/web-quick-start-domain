@@ -12,8 +12,8 @@ import java.time.Instant;
 
 /**
  * 事件消费记录实体。
- * @author Leonardo
- * @since 2026/01/10
+
+
  */
 @Getter
 @SuperBuilder(setterPrefix = "set")

@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 
 /**
  * 搜索服务实现，组合ES客户端提供业务搜索。
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 @Slf4j
 @RequiredArgsConstructor
