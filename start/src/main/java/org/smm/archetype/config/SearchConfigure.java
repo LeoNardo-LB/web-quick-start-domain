@@ -3,17 +3,15 @@ package org.smm.archetype.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.config.properties.SearchProperties;
 import org.smm.archetype.domain.bizshared.client.SearchClient;
 import org.smm.archetype.domain.common.search.SearchService;
 import org.smm.archetype.infrastructure.bizshared.client.search.impl.DisabledSearchClientImpl;
 import org.smm.archetype.infrastructure.bizshared.client.search.impl.ElasticsearchClientImpl;
 import org.smm.archetype.infrastructure.common.search.SearchServiceImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 
 /**
@@ -41,11 +39,8 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
  */
 @Slf4j
 @Configuration
-@EnableConfigurationProperties(SearchProperties.class)
 @RequiredArgsConstructor
 public class SearchConfigure {
-
-    private final SearchProperties searchProperties;
 
     @Bean
     public ObjectMapper objectMapper() {
@@ -53,14 +48,14 @@ public class SearchConfigure {
     }
 
     @Bean
-    @ConditionalOnBean(ElasticsearchOperations.class)
+    @Primary
+    @ConditionalOnBooleanProperty("spring.elasticsearch")
     public SearchClient esClient(ElasticsearchOperations operations) {
         log.info("Elasticsearch client initialized with ElasticsearchOperations");
         return new ElasticsearchClientImpl(operations);
     }
 
     @Bean
-    @ConditionalOnMissingBean(ElasticsearchOperations.class)
     public SearchClient disabledEsClient() {
         log.info("Elasticsearch is disabled (ElasticsearchOperations bean not found)");
         return new DisabledSearchClientImpl();

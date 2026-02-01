@@ -1,84 +1,84 @@
-spring:
-  application:
-    name: quickstart-integration-test
-
-  # Testcontainers MySQL数据库配置
-  datasource:
-    url: jdbc:tc:mysql:8.0:///testdb?TC_INITSCRIPT=file:MySQL-Scheme.sql&characterEncoding=utf-8&useInformationSchema=true
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    username: root
-    password: test
-    # HikariCP连接池配置
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 60000
-      max-lifetime: 1800000
-      connection-timeout: 30000
-      connection-test-query: SELECT 1
-
-  # 禁用Kafka（测试环境不需要）
-  kafka:
-    listener:
-      auto-startup: false
-
-  # Redis配置（测试环境使用嵌入式或忽略）
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      database: 99
-      timeout: 3000ms
-
-# 中间件配置
-middleware:
-  # 使用本地缓存
-  cache:
-    type: local
-
-  # 使用Spring事件发布器（测试环境推荐）
-  event:
-    publisher:
-      type: spring
-      spring:
-        async: false  # 测试环境使用同步事件，便于验证
-        thread-pool-core-size: 1
-        thread-pool-max-size: 1
-        thread-pool-queue-capacity: 10
-
-  # 对象存储使用本地文件系统
-  object-storage:
-    type: local
-
-  # 搜索服务配置（测试环境使用禁用实现）
-  search:
-    enabled: false  # false: 使用禁用实现，抛出异常（测试环境不需要ES）
-
-  # 短信服务配置（测试环境禁用）
-  sms:
-    type: aliyun
-    aliyun:
-      access-key-id: your-access-key-id
-      access-key-secret: your-access-key-secret
-
-  # 邮件服务配置（测试环境禁用）
-  email:
-    type: aliyun
-    aliyun:
-      access-key-id: your-access-key-id
-      access-key-secret: your-access-key-secret
-
-# ID生成器配置
-id:
-  snowflake:
-    datacenter-id: 0
-    worker-id: 0
-
-# 日志配置
-logging:
-  level:
-    root: INFO
-    org.smm.archetype: DEBUG
-    org.springframework.test: INFO
-    com.mybatisflex: DEBUG
-    com.zaxxer.hikari: INFO
+# spring:
+#   application:
+#     name: quickstart-integration-test
+#
+#   # Testcontainers MySQL数据库配置
+#   datasource:
+#     url: jdbc:tc:mysql:8.0:///testdb?TC_INITSCRIPT=file:MySQL-Scheme.sql&characterEncoding=utf-8&useInformationSchema=true
+#     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+#     username: root
+#     password: test
+#     # HikariCP连接池配置
+#     hikari:
+#       maximum-pool-size: 10
+#       minimum-idle: 5
+#       idle-timeout: 60000
+#       max-lifetime: 1800000
+#       connection-timeout: 30000
+#       connection-test-query: SELECT 1
+#
+#   # 禁用Kafka（测试环境不需要）
+#   kafka:
+#     listener:
+#       auto-startup: false
+#
+#   # Redis配置（测试环境使用嵌入式或忽略）
+#   data:
+#     redis:
+#       host: localhost
+#       port: 6379
+#       database: 99
+#       timeout: 3000ms
+#
+# # 中间件配置
+# middleware:
+#   # 使用本地缓存
+#   cache:
+#     type: local
+#
+#   # 使用Spring事件发布器（测试环境推荐）
+#   event:
+#     publisher:
+#       type: spring
+#       spring:
+#         async: false  # 测试环境使用同步事件，便于验证
+#         thread-pool-core-size: 1
+#         thread-pool-max-size: 1
+#         thread-pool-queue-capacity: 10
+#
+#   # 对象存储使用本地文件系统
+#   object-storage:
+#     type: local
+#
+#   # 搜索服务配置（测试环境使用禁用实现）
+#   search:
+#     enabled: false  # false: 使用禁用实现，抛出异常（测试环境不需要ES）
+#
+#   # 短信服务配置（测试环境禁用）
+#   sms:
+#     type: aliyun
+#     aliyun:
+#       access-key-id: your-access-key-id
+#       access-key-secret: your-access-key-secret
+#
+#   # 邮件服务配置（测试环境禁用）
+#   email:
+#     type: aliyun
+#     aliyun:
+#       access-key-id: your-access-key-id
+#       access-key-secret: your-access-key-secret
+#
+# # ID生成器配置
+# id:
+#   snowflake:
+#     datacenter-id: 0
+#     worker-id: 0
+#
+# # 日志配置
+# logging:
+#   level:
+#     root: INFO
+#     org.smm.archetype: DEBUG
+#     org.springframework.test: INFO
+#     com.mybatisflex: DEBUG
+#     com.zaxxer.hikari: INFO

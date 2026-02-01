@@ -5,8 +5,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.smm.archetype.infrastructure.bizshared.context.ContextHolder;
-import org.smm.archetype.infrastructure.bizshared.context.impl.AccessContext;
+import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.infrastructure.bizshared.util.context.MyContext;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -17,19 +17,20 @@ import java.io.IOException;
  * @author Leonardo
  * @since 2025/12/30
  */
+@Slf4j
 public class ContextFillFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain filterChain)
-            throws ServletException, IOException {
-        AccessContext accessContext = AccessContext.builder().setUserId("ADMIN").build();
-        try {
-            ContextHolder.createContext(accessContext);
-            filterChain.doFilter(request, response);
-        } finally {
-            ContextHolder.clear();
-        }
-
+    protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response,
+                                    @Nonnull FilterChain filterChain) {
+        MyContext.runWithUserId("ADMIN", () -> {
+            try {
+                filterChain.doFilter(request, response);
+            } catch (IOException | ServletException e) {
+                log.error("Error occurred while processing request", e);
+                throw new RuntimeException(e);
+            }
+        });
     }
 
 }

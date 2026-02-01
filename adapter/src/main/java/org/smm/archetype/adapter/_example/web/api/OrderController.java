@@ -15,11 +15,8 @@ import org.smm.archetype.app._example.dto.OrderDTO;
 import org.smm.archetype.app._example.query.GetOrderByIdQuery;
 import org.smm.archetype.app._example.query.GetOrdersByCustomerQuery;
 import org.smm.archetype.app._example.query.OrderListQuery;
-import org.smm.archetype.app._example.query.OrderListQuery.OrderListQueryBuilder;
 import org.smm.archetype.app.bizshared.result.BaseResult;
-import org.smm.archetype.app.bizshared.result.BaseResult.BaseResultBuilder;
 import org.smm.archetype.app.bizshared.result.PageResult;
-import org.smm.archetype.app.bizshared.result.PageResult.PageResultBuilder;
 import org.smm.archetype.domain.example.model.valueobject.Address;
 import org.smm.archetype.domain.example.model.valueobject.ContactInfo;
 import org.smm.archetype.domain.example.model.valueobject.OrderItemInfo;
@@ -65,27 +62,30 @@ public class OrderController {
         try {
             // 转换请求为命令
             List<OrderItemInfo> items = request.getItems().stream()
-                                                .map(item -> OrderItemInfo.builder()
-                                                                     .productId(item.getProductId())
-                                                                     .productName(item.getProductName())
-                                                                     .skuCode(item.getSkuCode())
-                                                                     .unitPrice(item.getUnitPrice())
-                                                                     .quantity(item.getQuantity())
-                                                                     .build())
+                                                .map(item -> {
+                                                    OrderItemInfo itemInfo = OrderItemInfo.builder()
+                                                                                     .setProductId(item.getProductId())
+                                                                                     .setProductName(item.getProductName())
+                                                                                     .setSkuCode(item.getSkuCode())
+                                                                                     .setUnitPrice(item.getUnitPrice())
+                                                                                     .setQuantity(item.getQuantity())
+                                                                                     .build();
+                                                    return itemInfo;
+                                                })
                                                 .toList();
 
-            Address address = Address.builder()
-                                      .province(request.getShippingAddress().getProvince())
-                                      .city(request.getShippingAddress().getCity())
-                                      .district(request.getShippingAddress().getDistrict())
-                                      .detailAddress(request.getShippingAddress().getDetailAddress())
-                                      .postalCode(request.getShippingAddress().getPostalCode())
+            Address address = Address.ABuilder()
+                                      .setProvince(request.getShippingAddress().getProvince())
+                                      .setCity(request.getShippingAddress().getCity())
+                                      .setDistrict(request.getShippingAddress().getDistrict())
+                                      .setDetailAddress(request.getShippingAddress().getDetailAddress())
+                                      .setPostalCode(request.getShippingAddress().getPostalCode())
                                       .build();
 
             ContactInfo contactInfo = ContactInfo.builder()
-                                              .contactName(request.getContactInfo().getContactName())
-                                              .contactPhone(request.getContactInfo().getContactPhone())
-                                              .contactEmail(request.getContactInfo().getContactEmail())
+                                              .setContactName(request.getContactInfo().getContactName())
+                                              .setContactPhone(request.getContactInfo().getContactPhone())
+                                              .setContactEmail(request.getContactInfo().getContactEmail())
                                               .build();
 
             CreateOrderCommand command = new CreateOrderCommand(
@@ -273,11 +273,11 @@ public class OrderController {
 
         try {
             // 构建查询对象
-            OrderListQueryBuilder<?, ?> builder = OrderListQuery.orderListQueryBuilder();
-            builder.setCustomerId(customerId);
-            builder.setPageNumber(pageNumber);
-            builder.setPageSize(pageSize);
-            OrderListQuery query = builder.build();
+            OrderListQuery query = OrderListQuery.OLQBuilder()
+                                           .setCustomerId(customerId)
+                                           .setPageNumber(pageNumber)
+                                           .setPageSize(pageSize)
+                                           .build();
 
             // 调用应用服务
             PageResult<List<OrderDTO>> page = orderApplicationService.getOrderList(query);
@@ -288,7 +288,7 @@ public class OrderController {
                                                     .toList();
 
             // 构建分页结果
-            return PageResult.<List<OrderResponse>>pageResultBuilder()
+            return PageResult.<List<OrderResponse>>PRBuilder()
                            .setPageNumber(page.getPageNumber())
                            .setPageSize(page.getPageSize())
                            .setData(responses)
@@ -297,13 +297,12 @@ public class OrderController {
 
         } catch (Exception e) {
             log.error("分页查询订单列表失败: {}", e.getMessage(), e);
-            PageResultBuilder<List<OrderResponse>, ?, ?> builder = PageResult.<List<OrderResponse>>pageResultBuilder();
-            builder.setCode(500);
-            builder.setData(null);
-            builder.setMessage("分页查询订单列表失败: " + e.getMessage());
-            builder.setTime(Instant.now());
-            return builder.build();
-
+            return PageResult.<List<OrderResponse>>PRBuilder()
+                           .setCode(500)
+                           .setData(null)
+                           .setMessage("分页查询订单列表失败: " + e.getMessage())
+                           .setTime(Instant.now())
+                           .build();
         }
     }
 

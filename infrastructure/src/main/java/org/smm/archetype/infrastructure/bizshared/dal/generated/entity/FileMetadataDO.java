@@ -3,11 +3,9 @@ package org.smm.archetype.infrastructure.bizshared.dal.generated.entity;
 import com.mybatisflex.annotation.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.smm.archetype.infrastructure.bizshared.dal.BaseDO;
 import org.smm.archetype.infrastructure.bizshared.dal.BaseDOFillListener;
 
@@ -19,15 +17,13 @@ import java.time.Instant;
  * 文件元数据表 实体类。
  *
  * @author Administrator
- * @since 2026-01-10
+ * @since 2026-01-31
  */
-@Getter
-@Setter
-@Builder(setterPrefix = "set")
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 @Table(value = "file_metadata", onInsert = BaseDOFillListener.class, onUpdate = BaseDOFillListener.class)
 public class FileMetadataDO extends BaseDO implements Serializable {
 
@@ -63,5 +59,15 @@ public class FileMetadataDO extends BaseDO implements Serializable {
      * 文件存储路径
      */
     private String path;
+
+    /**
+     * 删除标记：0=未删除，非0=删除时间戳
+     */
+    private Long deleteTime;
+
+    /**
+     * 删除人ID
+     */
+    private String deleteUser;
 
 }

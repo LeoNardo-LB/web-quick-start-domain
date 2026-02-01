@@ -1,23 +1,17 @@
 package support;
 
-import com.github.springtestdbunit.annotation.DbUnitConfiguration;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.sql.DataSource;
-import java.io.InputStream;
-import java.sql.Connection;
+import java.time.Duration;
 
 /**
  * 集成测试基类 - 启动完整Spring上下文
@@ -27,65 +21,37 @@ import java.sql.Connection;
  *   <li>✅ 启动完整的Spring上下文</li>
  *   <li>✅ 使用 Testcontainers + MySQL（完全隔离，与生产环境一致）</li>
  *   <li>✅ MyBatis-Flex自动建表</li>
- *   <li>✅ 支持DBUnit数据预加载</li>
  *   <li>✅ 事务回滚保证隔离性</li>
+ *   <li>✅ 提供WebTestClient用于Web测试</li>
  * </ul>
  */
 @SpringBootTest(classes = org.smm.archetype.test.TestBootstrap.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
 @TestPropertySource(locations = "classpath:config/application-integration.yaml")
 @Transactional // 每个测试方法后自动回滚事务
-@DbUnitConfiguration(databaseConnection = "dataSource")
 public abstract class ITestBase {
 
-    @Autowired
-    protected MockMvc mockMvc;
+    @LocalServerPort
+    protected int port;
+
+    protected WebTestClient webTestClient;
 
     @Autowired
     protected DataSource dataSource;
 
-    /**
-     * 子类重写：指定数据集文件
-     */
-    protected String getDataSetFile() {
-        return null;
-    }
+    @Autowired
+    protected WebApplicationContext webApplicationContext;
 
     /**
-     * 在每个测试方法前加载测试数据
+     * 初始化 WebTestClient
      */
     @BeforeEach
-    void setUpTestData() throws Exception {
-        if (shouldLoadTestData()) {
-            loadDataSet(getDataSetFile());
-        }
-    }
-
-    protected boolean shouldLoadTestData() {
-        return getDataSetFile() != null;
-    }
-
-    /**
-     * 加载DBUnit数据集
-     */
-    protected void loadDataSet(String dataSetFile) throws Exception {
-        try (Connection connection = dataSource.getConnection()) {
-            IDatabaseConnection dbConnection = new DatabaseConnection(connection);
-            IDataSet dataSet = loadDataSetFromFile(dataSetFile);
-            // 使用CLEAN_INSERT：先清空表，再插入数据
-            DatabaseOperation.CLEAN_INSERT.execute(dbConnection, dataSet);
-        }
-    }
-
-    /**
-     * 从文件加载数据集
-     */
-    protected IDataSet loadDataSetFromFile(String fileName) throws Exception {
-        try (InputStream inputStream = new ClassPathResource("datasets/integration/" + fileName).getInputStream()) {
-            return new FlatXmlDataSetBuilder()
-                           .setColumnSensing(true)
-                           .build(inputStream);
-        }
+    void initWebTestClient() {
+        this.webTestClient = WebTestClient
+                                     .bindToServer()
+                                     .baseUrl("http://localhost:" + port)
+                                     .responseTimeout(Duration.ofSeconds(30))
+                                     .build();
     }
 
 }

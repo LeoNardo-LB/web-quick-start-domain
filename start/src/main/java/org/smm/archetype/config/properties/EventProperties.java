@@ -1,10 +1,10 @@
 package org.smm.archetype.config.properties;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 事件配置属性
@@ -13,108 +13,35 @@ import java.time.Duration;
  * @author Leonardo
  * @since 2026/1/10
  */
-@Getter
-@Setter
-@ConfigurationProperties(prefix = "middleware.event")
+@Data
+@ConfigurationProperties(prefix = "middleware.domain-event")
 public class EventProperties {
-
-    /**
-     * 事件发布器配置
-     */
-    private Publisher publisher = new Publisher();
 
     /**
      * 事件重试配置
      */
     private Retry retry = new Retry();
 
-    /**
-     * 事件发布器配置
-     */
-    @Getter
-    @Setter
-    public static class Publisher {
+    private Consumer consumer;
 
-        /**
-         * 发布器类型：spring | kafka
-         */
-        private String type = "spring";
+    @Data
+    public static class Consumer {
 
-        /**
-         * Kafka 配置
-         */
-        private Kafka kafka = new Kafka();
+        private Kafka kafka;
 
-        /**
-         * Spring Events 配置
-         */
-        private Spring spring = new Spring();
+        @Data
+        public static class Kafka {
 
-    }
+            private String topic;
 
-    /**
-     * Kafka 配置
-     */
-    @Getter
-    @Setter
-    public static class Kafka {
-
-        /**
-         * 主题前缀
-         */
-        private String topicPrefix = "domain-events-";
-
-        /**
-         * 是否启用发布确认
-         */
-        private Boolean enableAcks = true;
-
-        /**
-         * 超时时间
-         */
-        private Duration timeout = Duration.ofSeconds(5);
-
-        /**
-         * 重试次数
-         */
-        private Integer retries = 3;
-
-    }
-
-    /**
-     * Spring Events 配置
-     */
-    @Getter
-    @Setter
-    public static class Spring {
-
-        /**
-         * 是否异步处理
-         */
-        private Boolean async = true;
-
-        /**
-         * 线程池核心大小
-         */
-        private Integer threadPoolCoreSize = 5;
-
-        /**
-         * 线程池最大大小
-         */
-        private Integer threadPoolMaxSize = 10;
-
-        /**
-         * 队列容量
-         */
-        private Integer threadPoolQueueCapacity = 100;
+        }
 
     }
 
     /**
      * 事件重试配置
      */
-    @Getter
-    @Setter
+    @Data
     public static class Retry {
 
         /**
@@ -131,6 +58,28 @@ public class EventProperties {
          * 高优先级事件占比
          */
         private Double highPriorityRatio = 0.8;
+
+        /**
+         * 重试延迟时间列表（分钟）
+         *
+         * <p>索引对应重试次数：
+         * <ul>
+         *   <li>索引0：第1次重试延迟</li>
+         *   <li>索引1：第2次重试延迟</li>
+         *   <li>索引2：第3次重试延迟</li>
+         *   <li>...</li>
+         * </ul>
+         *
+         * <p>如果重试次数超过列表长度，使用最后一个值。
+         * <p>默认：[1, 5, 15, 30, 60]，即1分钟、5分钟、15分钟、30分钟、60分钟
+         */
+        private List<Integer> delays = new ArrayList<>(List.of(1, 5, 15, 30, 60));
+
+        /**
+         * 最大重试次数
+         * <p>默认：5
+         */
+        private Integer maxRetryTimes = 5;
 
     }
 

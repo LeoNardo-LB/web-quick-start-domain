@@ -1,5 +1,6 @@
 package org.smm.archetype.infrastructure.common.log;
 
+import com.alibaba.fastjson2.JSON;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -15,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,6 +29,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @Order
 @RequiredArgsConstructor
 public class LogAspect {
+
+    /**
+     * 日志序列化最大长度
+     */
+    private static final int MAX_LENGTH = 2048;
+
+    /**
+     * 截断后缀
+     */
+    private static final String TRUNCATED_SUFFIX = "...(truncated)";
 
     private static final Map<Class<?>, Logger> LOGGER_MAP = new ConcurrentHashMap<>();
 
@@ -109,16 +119,16 @@ public class LogAspect {
             Log log = builder.build();
             Logger logger = LOGGER_MAP.computeIfAbsent(declaringType, k -> LoggerFactory.getLogger(declaringType));
 
-            // 标准文本格式日志输出（traceId由logback pattern自动获取）
+            // 日志格式约定：类 | 方法 | 业务 | 耗时ms | 线程 | 入参 | 出参
             String logMessage = String.format(
-                    "[方法执行] 类: %s, 方法: %s, 业务: %s, 入参: %s, 出参: %s, 耗时: %dms, 线程: %s",
+                    "[方法执行] %s | %s | %s | %dms | %s | %s | %s",
                     className,
                     methodName,
-                    myLog != null ? myLog.value() : "",
-                    Arrays.toString(log.getArgs()),
-                    log.getError() == null ? log.getResult() : "ERROR",
+                    myLog != null ? myLog.value() : "-",
                     log.getEndTime().toEpochMilli() - log.getStartTime().toEpochMilli(),
-                    log.getThreadName()
+                    log.getThreadName(),
+                    toSafeJson(log.getArgs()),
+                    log.getError() == null ? toSafeJson(log.getResult()) : "ERROR"
             );
 
             if (log.getError() == null) {
@@ -126,6 +136,26 @@ public class LogAspect {
             } else {
                 logger.error(logMessage, log.getError());
             }
+        }
+    }
+
+    /**
+     * 安全序列化对象为JSON，限制长度
+     * @param obj 待序列化对象
+     * @return JSON字符串
+     */
+    private String toSafeJson(Object obj) {
+        if (obj == null) {
+            return "null";
+        }
+        try {
+            String json = JSON.toJSONString(obj);
+            if (json.length() > MAX_LENGTH) {
+                return json.substring(0, MAX_LENGTH - TRUNCATED_SUFFIX.length()) + TRUNCATED_SUFFIX;
+            }
+            return json;
+        } catch (Exception e) {
+            return obj.getClass().getSimpleName() + "@" + Integer.toHexString(obj.hashCode());
         }
     }
 

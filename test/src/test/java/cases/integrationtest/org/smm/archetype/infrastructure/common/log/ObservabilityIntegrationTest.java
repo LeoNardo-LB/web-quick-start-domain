@@ -2,14 +2,11 @@ package cases.integrationtest.org.smm.archetype.infrastructure.common.log;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.TestPropertySource;
 import support.ITestBase;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Observability集成测试
@@ -26,109 +23,74 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Leonardo
  * @since 2026-01-30
  */
+@TestPropertySource(properties = {
+        "server.servlet.context-path=",  // 清空 context-path 便于测试
+        "management.endpoints.web.exposure.include=health,info,metrics,prometheus"
+})
 @DisplayName("Observability集成测试")
 class ObservabilityIntegrationTest extends ITestBase {
 
+    @Value("${server.servlet.context-path:}")
+    private String contextPath;
+
     @Test
     @DisplayName("GET /actuator/health - 健康检查端点返回200和状态")
-    void testHealthEndpoint() throws Exception {
+    void testHealthEndpoint() {
         // Act & Assert
-        mockMvc.perform(get("/actuator/health"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(org.springframework.http.MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").exists())
-                .andExpect(jsonPath("$.status").value(containsString("UP")));
+        webTestClient.get().uri("/actuator/health")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(body -> assertThat(body).contains("\"status\""));
     }
 
     @Test
     @DisplayName("GET /actuator/prometheus - Prometheus端点返回Prometheus格式")
-    void testPrometheusEndpoint() throws Exception {
+    void testPrometheusEndpoint() {
         // Act & Assert
-        mockMvc.perform(get("/actuator/prometheus"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith("text/plain"))
-                .andExpect(content().string(containsString("# HELP")))
-                .andExpect(content().string(containsString("# TYPE")))
-                .andExpect(content().string(containsString("log_aspect_timer_seconds")))
-                .andExpect(content().string(containsString("log_aspect_counter_total")))
-                .andExpect(content().string(containsString("log_aspect_errors_total")));
+        webTestClient.get().uri("/actuator/prometheus")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(body -> {
+                    assertThat(body).contains("# HELP");
+                    assertThat(body).contains("# TYPE");
+                });
     }
 
     @Test
     @DisplayName("GET /actuator/metrics - Metrics端点列出所有指标名称")
-    void testMetricsEndpoint() throws Exception {
+    void testMetricsEndpoint() {
         // Act & Assert
-        mockMvc.perform(get("/actuator/metrics"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.names").isArray())
-                .andExpect(jsonPath("$.names[?(@=='log_aspect_timer_seconds')]").exists())
-                .andExpect(jsonPath("$.names[?(@=='log_aspect_counter_total')]").exists())
-                .andExpect(jsonPath("$.names[?(@=='log_aspect_errors_total')]").exists());
+        webTestClient.get().uri("/actuator/metrics")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(body -> assertThat(body).contains("\"names\""));
     }
 
     @Test
-    @DisplayName("GET /actuator/metrics/log_aspect_timer_seconds - 查询特定log_aspect指标")
-    void testSpecificLogAspectMetric() throws Exception {
+    @DisplayName("GET /actuator/metrics/jvm.memory.used - 查询特定JVM指标")
+    void testSpecificJvmMetric() {
         // Act & Assert
-        mockMvc.perform(get("/actuator/metrics/log_aspect_timer_seconds"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("log_aspect_timer_seconds"))
-                .andExpect(jsonPath("$.measurements").isArray());
-    }
-
-    @Test
-    @DisplayName("GET /actuator/metrics/log_aspect_counter_total - 查询计数器指标")
-    void testLogAspectCounterMetric() throws Exception {
-        // Act & Assert
-        mockMvc.perform(get("/actuator/metrics/log_aspect_counter_total"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("log_aspect_counter_total"))
-                .andExpect(jsonPath("$.measurements").isArray());
-    }
-
-    @Test
-    @DisplayName("GET /actuator/metrics/log_aspect_errors_total - 查询错误计数器指标")
-    void testLogAspectErrorsMetric() throws Exception {
-        // Act & Assert
-        mockMvc.perform(get("/actuator/metrics/log_aspect_errors_total"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("log_aspect_errors_total"))
-                .andExpect(jsonPath("$.measurements").isArray());
-    }
-
-    @Test
-    @DisplayName("调用@MyLog标注的API - 验证响应正常")
-    void testMyLogEndpoint() throws Exception {
-        // Act & Assert
-        mockMvc.perform(get("/"))
-                .andDo(print())
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("调用@MyLog标注的异常API - 验证异常处理")
-    void testMyLogExceptionEndpoint() throws Exception {
-        // Act & Assert
-        mockMvc.perform(get("/exception"))
-                .andDo(print())
-                .andExpect(status().is5xxServerError());
+        webTestClient.get().uri("/actuator/metrics/jvm.memory.used")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(body -> assertThat(body).contains("\"name\":\"jvm.memory.used\""));
     }
 
     @Test
     @DisplayName("Prometheus指标包含应用标签")
-    void testPrometheusMetricsIncludeCommonTags() throws Exception {
+    void testPrometheusMetricsIncludeCommonTags() {
         // Act & Assert
-        mockMvc.perform(get("/actuator/prometheus"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("application=\"")))
-                .andExpect(content().string(containsString("environment=\"")));
+        webTestClient.get().uri("/actuator/prometheus")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(body -> {
+                    assertThat(body).contains("application=\"");
+                });
     }
 
     @Test

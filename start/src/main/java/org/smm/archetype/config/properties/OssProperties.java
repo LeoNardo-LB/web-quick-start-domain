@@ -1,7 +1,6 @@
 package org.smm.archetype.config.properties;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
@@ -13,8 +12,7 @@ import java.time.Duration;
  * @author Leonardo
  * @since 2026/1/10
  */
-@Getter
-@Setter
+@Data
 @ConfigurationProperties(prefix = "middleware.object-storage")
 public class OssProperties {
 
@@ -37,8 +35,7 @@ public class OssProperties {
     /**
      * RustFS 配置
      */
-    @Getter
-    @Setter
+    @Data
     public static class RustFs {
 
         /**
@@ -76,8 +73,7 @@ public class OssProperties {
     /**
      * 本地存储配置
      */
-    @Getter
-    @Setter
+    @Data
     public static class Local {
 
         /**

@@ -2,9 +2,9 @@ package org.smm.archetype.infrastructure.example.persistence;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.bizshared.base.PageResult;
 import org.smm.archetype.domain.example.model.OrderAggr;
 import org.smm.archetype.domain.example.repository.OrderAggrRepository;
-import org.smm.archetype.domain.bizshared.base.BasePageResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +54,7 @@ public class OrderAggrRepositoryImpl implements OrderAggrRepository {
     }
 
     @Override
-    public BasePageResult<OrderAggr> findOrders(String customerId, Long pageNumber, Long pageSize) {
+    public PageResult<OrderAggr> findOrders(String customerId, Long pageNumber, Long pageSize) {
         return null;
     }
 

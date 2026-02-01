@@ -39,7 +39,7 @@ import java.time.Instant;
  *         this.paymentTime = Instant.now();
  *
  *         // 发布领域事件
- *         addDomainEvent(new OrderPaidEvent(this.orderId, this.totalAmount));
+ *         addDomainEvent(new OrderPaidEventDTO(this.orderId, this.totalAmount));
  *     }
  * }
  * }</pre>
@@ -49,13 +49,6 @@ import java.time.Instant;
 @Getter
 @SuperBuilder(setterPrefix = "set")
 public abstract class Entity implements Identifier {
-
-    /**
-     * 受保护的默认构造函数
-     * <p>供子类工厂方法使用
-     */
-    protected Entity() {
-    }
 
     /**
      * 唯一标识
@@ -110,22 +103,6 @@ public abstract class Entity implements Identifier {
         if (this.version != null) {
             this.version++;
         }
-    }
-
-    /**
-     * 检查是否为新创建的实体
-     * @return 如果ID为null返回true
-     */
-    public boolean isNew() {
-        return this.id == null;
-    }
-
-    /**
-     * 检查是否已持久化
-     * @return 如果ID不为null返回true
-     */
-    public boolean isPersisted() {
-        return this.id != null;
     }
 
 }

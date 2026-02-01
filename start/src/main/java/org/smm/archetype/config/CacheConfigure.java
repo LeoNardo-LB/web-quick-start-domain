@@ -4,8 +4,7 @@ import org.smm.archetype.config.properties.CacheProperties;
 import org.smm.archetype.domain.bizshared.client.CacheClient;
 import org.smm.archetype.infrastructure.bizshared.client.cache.impl.CaffeineCacheClientImpl;
 import org.smm.archetype.infrastructure.bizshared.client.cache.impl.RedisCacheClientImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,13 +51,11 @@ public class CacheConfigure {
      * @return Caffeine缓存服务实现
      */
     @Bean
-    @ConditionalOnMissingBean(RedisTemplate.class)
     public CacheClient caffeineCacheService() {
-        CacheProperties.Local local = properties.getLocal();
         return new CaffeineCacheClientImpl(
-                local.getInitialCapacity(),
-                local.getMaximumSize(),
-                local.getExpireAfterWrite()
+                properties.getInitialCapacity(),
+                properties.getMaximumSize(),
+                properties.getExpireAfterWrite()
         );
     }
 
@@ -73,8 +70,8 @@ public class CacheConfigure {
      */
     @Bean
     @Primary
-    @ConditionalOnBean(RedisTemplate.class)
-    public CacheClient redisCacheService(final RedisTemplate<String, Object> redisTemplate) {
+    @ConditionalOnBooleanProperty("spring.data.redis")
+    public CacheClient redisCacheService(RedisTemplate<String, Object> redisTemplate) {
         return new RedisCacheClientImpl(redisTemplate);
     }
 

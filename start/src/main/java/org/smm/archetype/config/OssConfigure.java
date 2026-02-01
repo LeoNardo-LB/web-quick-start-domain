@@ -2,20 +2,18 @@ package org.smm.archetype.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.config.properties.OssProperties;
-import org.smm.archetype.domain.bizshared.client.IdClient;
 import org.smm.archetype.domain.bizshared.client.OssClient;
-import org.smm.archetype.domain.common.file.FileRepository;
 import org.smm.archetype.domain.common.file.FileDomainService;
+import org.smm.archetype.domain.common.file.FileRepository;
 import org.smm.archetype.infrastructure.bizshared.client.oss.impl.LocalOssClientImpl;
 import org.smm.archetype.infrastructure.bizshared.client.oss.impl.RustFsOssClientImpl;
 import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.FileBusinessMapper;
 import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.FileMetadataMapper;
-import org.smm.archetype.infrastructure.common.file.FileRepositoryImpl;
-import org.smm.archetype.infrastructure.common.file.FileDomainServiceImpl;
 import org.smm.archetype.infrastructure.common.file.FileBusinessConverter;
+import org.smm.archetype.infrastructure.common.file.FileDomainServiceImpl;
 import org.smm.archetype.infrastructure.common.file.FileMetaConverter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.smm.archetype.infrastructure.common.file.FileRepositoryImpl;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -73,10 +71,7 @@ public class OssConfigure {
      * @return 本地对象存储服务实现
      */
     @Bean
-    @ConditionalOnMissingBean(RustFsOssClientImpl.class)
-    public OssClient localObjectStorageService(
-            FileMetadataMapper metadataMapper,
-            IdClient idClient) {
+    public OssClient localObjectStorageService(FileMetadataMapper metadataMapper) {
         try {
             OssProperties.Local local = properties.getLocal();
             log.info("Initializing Local Object Storage Service: basePath={}, zeroCopy={}",
@@ -84,8 +79,7 @@ public class OssConfigure {
             return new LocalOssClientImpl(
                     local.getBasePath(),
                     local.isZeroCopy(),
-                    metadataMapper,
-                    idClient
+                    metadataMapper
             );
         } catch (Exception e) {
             log.error("Failed to initialize Local Object Storage Service", e);
@@ -108,10 +102,8 @@ public class OssConfigure {
      */
     @Bean
     @Primary
-    @ConditionalOnBean(RustFsOssClientImpl.class)
-    public OssClient rustfsObjectStorageService(
-            FileMetadataMapper metadataMapper,
-            IdClient idClient) {
+    @ConditionalOnBooleanProperty("middleware.object-storage.rustfs")
+    public OssClient rustfsObjectStorageService(FileMetadataMapper metadataMapper) {
         try {
             OssProperties.RustFs rustfs = properties.getRustfs();
             log.info("Initializing RustFS Object Storage Service: endpoint={}, bucket={}",
@@ -123,8 +115,7 @@ public class OssConfigure {
                     rustfs.getAccessKey(),
                     rustfs.getSecretKey(),
                     rustfs.getBucket(),
-                    metadataMapper,
-                    idClient
+                    metadataMapper
             );
         } catch (Exception e) {
             log.error("Failed to initialize RustFS Object Storage Service", e);

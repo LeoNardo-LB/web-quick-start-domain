@@ -3,6 +3,8 @@ package org.smm.archetype.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -39,8 +41,8 @@ public class AppConfigure {
      * @return 事务管理器
      */
     @Bean
-    public org.springframework.transaction.PlatformTransactionManager transactionManager(DataSource dataSource) {
-        return new org.springframework.jdbc.datasource.DataSourceTransactionManager(dataSource);
+    public PlatformTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
     /**
@@ -51,7 +53,7 @@ public class AppConfigure {
      * @return 事务模板
      */
     @Bean
-    public TransactionTemplate transactionTemplate(org.springframework.transaction.PlatformTransactionManager transactionManager) {
+    public TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager) {
         return new TransactionTemplate(transactionManager);
     }
 

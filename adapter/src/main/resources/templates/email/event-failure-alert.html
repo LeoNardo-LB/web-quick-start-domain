@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #f44336;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .info {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .error {
+            background-color: #ffebee;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #f44336;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>⚠️ 事件处理失败告警</h2>
+    </div>
+    <div class="content">
+        <h3>事件信息</h3>
+        <div class="info">
+            <p><strong>事件ID：</strong>{{eventId}}</p>
+            <p><strong>事件类型：</strong>{{eventType}}</p>
+            <p><strong>聚合根ID：</strong>{{aggregateId}}</p>
+            <p><strong>发生时间：</strong>{{occurredOn}}</p>
+        </div>
+
+        <h3>消费信息</h3>
+        <div class="info">
+            <p><strong>消费者组：</strong>{{consumerGroup}}</p>
+            <p><strong>消费者名称：</strong>{{consumerName}}</p>
+            <p><strong>重试次数：</strong>{{retryTimes}}</p>
+            <p><strong>创建时间：</strong>{{createTime}}</p>
+        </div>
+
+        <h3>错误信息</h3>
+        <div class="error">
+            <p>{{errorMessage}}</p>
+        </div>
+
+        <p style="color: #666; margin-top: 20px;">
+            <strong>操作建议：</strong><br>
+            1. 检查事件处理逻辑是否存在异常<br>
+            2. 查看应用日志获取详细错误堆栈<br>
+            3. 确认外部依赖服务是否正常<br>
+            4. 必要时手动重试处理失败的事件
+        </p>
+    </div>
+    <div class="footer">
+        <p>此邮件由系统自动发送，请勿回复。</p>
+        <p>发送时间：{{sendTime}}</p>
+    </div>
+</div>
+</body>
+</html>

@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder(setterPrefix = "set", builderMethodName = "pageResultBuilder")
+@SuperBuilder(setterPrefix = "set", builderMethodName = "PRBuilder")
 public class PageResult<T extends List<?>> extends BaseResult<T> implements Serializable {
 
     /**

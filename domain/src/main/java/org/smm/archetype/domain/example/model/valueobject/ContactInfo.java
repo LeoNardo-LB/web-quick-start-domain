@@ -1,9 +1,9 @@
 package org.smm.archetype.domain.example.model.valueobject;
 
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import org.smm.archetype.domain.bizshared.base.ValueObject;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
  * @since 2026/1/11
  */
 @Getter
+@SuperBuilder(setterPrefix = "set")
 public class ContactInfo extends ValueObject {
 
     /**
@@ -46,41 +47,6 @@ public class ContactInfo extends ValueObject {
      */
     private final String contactEmail;
 
-    /**
-     * 私有构造函数
-     */
-    private ContactInfo(Builder builder) {
-        this.contactName = Objects.requireNonNull(builder.contactName, "联系人姓名不能为空");
-        this.contactPhone = Objects.requireNonNull(builder.contactPhone, "联系人电话不能为空");
-        this.contactEmail = builder.contactEmail;
-
-        // 验证电话格式
-        if (!PHONE_PATTERN.matcher(this.contactPhone).matches()) {
-            throw new IllegalArgumentException("电话号码格式不正确");
-        }
-
-        // 验证邮箱格式（如果提供）
-        if (this.contactEmail != null && !EMAIL_PATTERN.matcher(this.contactEmail).matches()) {
-            throw new IllegalArgumentException("邮箱格式不正确");
-        }
-    }
-
-    /**
-     * 创建构建器
-     * @return 构建器
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * 检查是否提供了邮箱
-     * @return 提供了返回true
-     */
-    public boolean hasEmail() {
-        return contactEmail != null && !contactEmail.isEmpty();
-    }
-
     @Override
     protected Object[] equalityFields() {
         return new Object[] {contactName, contactPhone, contactEmail};
@@ -89,40 +55,6 @@ public class ContactInfo extends ValueObject {
     @Override
     public String toString() {
         return String.format("%s (%s)", contactName, contactPhone);
-    }
-
-    /**
-     * 构建器
-     */
-    public static class Builder {
-
-        private String contactName;
-        private String contactPhone;
-        private String contactEmail;
-
-        public Builder contactName(String contactName) {
-            this.contactName = contactName;
-            return this;
-        }
-
-        public Builder contactPhone(String contactPhone) {
-            this.contactPhone = contactPhone;
-            return this;
-        }
-
-        public Builder contactEmail(String contactEmail) {
-            this.contactEmail = contactEmail;
-            return this;
-        }
-
-        /**
-         * 构建联系信息对象
-         * @return 联系信息值对象
-         */
-        public ContactInfo build() {
-            return new ContactInfo(this);
-        }
-
     }
 
 }

@@ -1,15 +1,15 @@
 package org.smm.archetype.exampleorder;
 
-import org.smm.archetype.adapter._example.listener.OrderCancelledEventHandler;
-import org.smm.archetype.adapter._example.listener.OrderCreatedEventHandler;
-import org.smm.archetype.adapter._example.listener.OrderPaidEventHandler;
+import org.smm.archetype.adapter._example.handler.OrderCancelledEventHandler;
+import org.smm.archetype.adapter._example.handler.OrderCreatedEventHandler;
+import org.smm.archetype.adapter._example.handler.OrderPaidEventHandler;
+import org.smm.archetype.adapter.event.EventHandler;
 import org.smm.archetype.app._example.OrderAppService;
-import org.smm.archetype.adapter.schedule.handler.EventHandler;
+import org.smm.archetype.domain.bizshared.event.DomainEventPublisher;
 import org.smm.archetype.domain.example.repository.OrderAggrRepository;
 import org.smm.archetype.domain.example.service.InventoryService;
 import org.smm.archetype.domain.example.service.OrderDomainService;
 import org.smm.archetype.domain.example.service.PaymentGateway;
-import org.smm.archetype.domain.bizshared.event.EventPublisher;
 import org.smm.archetype.infrastructure.example.adapter.MockInventoryServiceAdapter;
 import org.smm.archetype.infrastructure.example.adapter.StripePaymentAdapter;
 import org.smm.archetype.infrastructure.example.persistence.OrderAggrRepositoryImpl;
@@ -58,15 +58,15 @@ public class OrderConfigure {
      * <p>职责：用例编排、事务管理、DTO转换
      * @param orderRepository    订单仓储
      * @param orderDomainService 订单领域服务
-     * @param eventPublisher     事件发布器
+     * @param domainEventPublisher     事件发布器
      * @return OrderAppService
      */
     @Bean
     public OrderAppService orderAppService(
             OrderAggrRepository orderRepository,
             OrderDomainService orderDomainService,
-            @Qualifier("springEventPublisher") EventPublisher eventPublisher) {
-        return new OrderAppService(orderRepository, orderDomainService, eventPublisher);
+            @Qualifier("springEventPublisher") DomainEventPublisher domainEventPublisher) {
+        return new OrderAppService(orderRepository, orderDomainService, domainEventPublisher);
     }
 
     // ==================== 仓储实现 ====================
@@ -142,7 +142,7 @@ public class OrderConfigure {
      * 订单创建事件处理器Bean
      * <p>职责：处理订单创建事件（如发送通知、记录日志）
      * @param inventoryService 库存服务
-     * @return EventHandler
+     * @return EventDispatcher
      */
     @Bean
     public EventHandler<?> orderCreatedEventHandler(InventoryService inventoryService) {
@@ -152,7 +152,7 @@ public class OrderConfigure {
     /**
      * 订单支付事件处理器Bean
      * <p>职责：处理订单支付事件（如更新库存、发货）
-     * @return EventHandler
+     * @return EventDispatcher
      */
     @Bean
     public EventHandler<?> orderPaidEventHandler() {
@@ -162,7 +162,7 @@ public class OrderConfigure {
     /**
      * 订单取消事件处理器Bean
      * <p>职责：处理订单取消事件（如释放库存、退款）
-     * @return EventHandler
+     * @return EventDispatcher
      */
     @Bean
     public EventHandler<?> orderCancelledEventHandler() {

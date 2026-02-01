@@ -1,15 +1,17 @@
 package org.smm.archetype.domain.example.model;
 
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.example.model.event.OrderCancelledEvent;
-import org.smm.archetype.domain.example.model.event.OrderCreatedEvent;
-import org.smm.archetype.domain.example.model.event.OrderPaidEvent;
-import org.smm.archetype.domain.example.model.event.OrderShippedEvent;
+import org.smm.archetype.domain.bizshared.base.AggregateRoot;
+import org.smm.archetype.domain.example.model.event.OrderCancelledEventDTO;
+import org.smm.archetype.domain.example.model.event.OrderCreatedEventDTO;
+import org.smm.archetype.domain.example.model.event.OrderCreatedEventDTO.OrderCreatedEventDTOBuilder;
+import org.smm.archetype.domain.example.model.event.OrderPaidEventDTO;
+import org.smm.archetype.domain.example.model.event.OrderShippedEventDTO;
 import org.smm.archetype.domain.example.model.valueobject.Address;
 import org.smm.archetype.domain.example.model.valueobject.ContactInfo;
 import org.smm.archetype.domain.example.model.valueobject.Money;
-import org.smm.archetype.domain.bizshared.base.AggregateRoot;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Getter
+@SuperBuilder(setterPrefix = "set", builderMethodName = "OABuilder")
 public class OrderAggr extends AggregateRoot {
 
     private String               orderNo;
@@ -55,15 +58,6 @@ public class OrderAggr extends AggregateRoot {
     private Instant              completedTime;
     private Instant              cancelledTime;
     private String               cancelReason;
-
-    /**
-     * 受保护的默认构造函数
-     * <p>供ORM框架和工厂方法使用
-     */
-    protected OrderAggr() {
-        super();
-        this.items = new ArrayList<>();
-    }
 
     // ==================== 工厂方法 ====================
 
@@ -89,24 +83,24 @@ public class OrderAggr extends AggregateRoot {
             ContactInfo contactInfo,
             String remark
     ) {
-        OrderAggr order = new OrderAggr();
-        order.orderNo = orderNo;
-        order.customerId = customerId;
-        order.customerName = customerName;
-        order.items = items != null ? new ArrayList<>(items) : new ArrayList<>();
-        order.totalAmount = totalAmount;
-        order.currency = totalAmount.getCurrency();
-        order.shippingAddress = shippingAddress;
-        order.contactInfo = contactInfo;
-        order.remark = remark;
-        order.status = OrderStatus.CREATED;
+        OrderAggrBuilder<?, ?> builder = OrderAggr.OABuilder();
+        builder.orderNo = orderNo;
+        builder.customerId = customerId;
+        builder.customerName = customerName;
+        builder.items = items != null ? new ArrayList<>(items) : new ArrayList<>();
+        builder.totalAmount = totalAmount;
+        builder.currency = totalAmount.getCurrency();
+        builder.shippingAddress = shippingAddress;
+        builder.contactInfo = contactInfo;
+        builder.remark = remark;
+        builder.status = OrderStatus.CREATED;
+        OrderAggr orderAggr = builder.build();
 
-        order.markAsCreated();
-        order.publishCreatedEvent();
+        orderAggr.markAsCreated();
+        orderAggr.publishCreatedEvent();
 
-        log.info("订单创建成功: orderNo={}, customerId={}, totalAmount={}",
-                orderNo, customerId, totalAmount);
-        return order;
+        log.info("订单创建成功: orderNo={}, customerId={}, totalAmount={}", orderNo, customerId, totalAmount);
+        return orderAggr;
     }
 
     /**
@@ -281,70 +275,65 @@ public class OrderAggr extends AggregateRoot {
      */
     private void publishCreatedEvent() {
         // 转换 OrderItem 为 OrderItemInfo
-        ArrayList<OrderCreatedEvent.OrderItemInfo> orderItemInfos = new ArrayList<>();
+        ArrayList<OrderCreatedEventDTO.OrderItemInfo> orderItemInfos = new ArrayList<>();
         for (OrderItem item : this.items) {
-            orderItemInfos.add(new OrderCreatedEvent.OrderItemInfo(
+            orderItemInfos.add(new OrderCreatedEventDTO.OrderItemInfo(
                     item.getProductId(),
                     item.getSkuCode(),
                     item.getQuantity()
             ));
         }
 
-        OrderCreatedEvent event = new OrderCreatedEvent(
-                this.id,
-                this.orderNo,
-                this.customerId,
-                this.customerName,
-                this.totalAmount,
-                this.shippingAddress,
-                this.contactInfo,
-                orderItemInfos
-        );
-        addDomainEvent(event);
+        OrderCreatedEventDTOBuilder<?, ?> builder = OrderCreatedEventDTO.OCEBuilder();
+        builder.setOrderId(this.id);
+        builder.setOrderNo(this.orderNo);
+        builder.setCustomerId(this.customerId);
+        builder.setCustomerName(this.customerName);
+        builder.setTotalAmount(this.totalAmount);
+        builder.setShippingAddress(this.shippingAddress);
+        builder.setContactInfo(this.contactInfo);
+        builder.setOrderItems(orderItemInfos);
+        OrderCreatedEventDTO createdEventDTO = builder.build();
+        addEvent(createdEventDTO);
     }
 
     /**
      * 发布订单支付事件
      */
     private void publishPaidEvent() {
-        OrderPaidEvent event = new OrderPaidEvent(
-                this.id,
-                this.orderNo,
-                this.customerId,
-                this.totalAmount,
-                this.paymentMethod,
-                this.paymentTime,
-                null // transactionId 暂时为 null，由支付网关返回后更新
-        );
-        addDomainEvent(event);
+        OrderPaidEventDTO.OrderPaidEventDTOBuilder<?, ?> builder = OrderPaidEventDTO.OPEBuilder();
+        builder.setOrderId(this.id);
+        builder.setOrderNo(this.orderNo);
+        builder.setCustomerId(this.customerId);
+        builder.setPaymentAmount(this.totalAmount);
+        builder.setPaymentMethod(this.paymentMethod);
+        builder.setPaymentTime(this.paymentTime);
+        addEvent(builder.build());
     }
 
     /**
      * 发布订单发货事件
      */
     private void publishShippedEvent() {
-        OrderShippedEvent event = new OrderShippedEvent(
-                this.id,
-                this.orderNo,
-                this.customerId,
-                null, // trackingNumber 暂时为 null，可以后续添加物流单号字段
-                this.shippedTime != null ? this.shippedTime.toString() : Instant.now().toString()
-        );
-        addDomainEvent(event);
+        OrderShippedEventDTO.OrderShippedEventDTOBuilder<?, ?> builder = OrderShippedEventDTO.OSEBuilder();
+        builder.setOrderId(this.id);
+        builder.setOrderNo(this.orderNo);
+        builder.setCustomerId(this.customerId);
+        builder.setShippedTime(this.shippedTime != null ? this.shippedTime.toString() : Instant.now().toString());
+        addEvent(builder.build());
     }
 
     /**
      * 发布订单取消事件
      */
     private void publishCancelledEvent() {
-        OrderCancelledEvent event = new OrderCancelledEvent(
-                this.id,
-                this.orderNo,
-                this.customerId,
-                this.cancelReason,
-                this.cancelledTime
-        );
-        addDomainEvent(event);
+        OrderCancelledEventDTO.OrderCancelledEventDTOBuilder<?, ?> builder = OrderCancelledEventDTO.OCEBuilder();
+        builder.setOrderId(this.id);
+        builder.setOrderNo(this.orderNo);
+        builder.setCustomerId(this.customerId);
+        builder.setReason(this.cancelReason);
+        builder.setCancelledTime(this.cancelledTime);
+        addEvent(builder.build());
     }
 
     // ==================== 查询方法 ====================

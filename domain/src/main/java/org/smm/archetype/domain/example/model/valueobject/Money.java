@@ -23,7 +23,8 @@ import java.util.Objects;
 @Getter
 public class Money extends ValueObject {
 
-    private static final int          SCALE         = 2;
+    private static final int SCALE = 2;
+
     private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
 
     /**

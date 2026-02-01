@@ -1,9 +1,8 @@
 package org.smm.archetype.domain.example.model.valueobject;
 
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import org.smm.archetype.domain.bizshared.base.ValueObject;
-
-import java.util.Objects;
 
 /**
  * 订单项信息值对象
@@ -18,6 +17,7 @@ import java.util.Objects;
  * @since 2026/1/11
  */
 @Getter
+@SuperBuilder(setterPrefix = "set")
 public class OrderItemInfo extends ValueObject {
 
     /**
@@ -46,91 +46,11 @@ public class OrderItemInfo extends ValueObject {
     private final int quantity;
 
     /**
-     * 私有构造函数
-     */
-    private OrderItemInfo(Builder builder) {
-        this.productId = Objects.requireNonNull(builder.productId, "商品ID不能为空");
-        this.productName = Objects.requireNonNull(builder.productName, "商品名称不能为空");
-        this.skuCode = Objects.requireNonNull(builder.skuCode, "SKU编码不能为空");
-        this.unitPrice = Objects.requireNonNull(builder.unitPrice, "单价不能为空");
-        this.quantity = builder.quantity;
-
-        // 验证数量
-        if (this.quantity <= 0) {
-            throw new IllegalArgumentException("数量必须大于0");
-        }
-    }
-
-    /**
-     * 创建构建器
-     * @return 构建器
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
      * 计算小计金额
      * @return 小计金额
      */
     public Money calculateSubtotal() {
         return unitPrice.multiply(quantity);
-    }
-
-    @Override
-    protected Object[] equalityFields() {
-        return new Object[] {productId, skuCode, unitPrice, quantity};
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s x %d", productName, quantity);
-    }
-
-    /**
-     * 构建器
-     */
-    public static class Builder {
-
-        private String productId;
-        private String productName;
-        private String skuCode;
-        private Money  unitPrice;
-        private int    quantity = 1;
-
-        public Builder productId(String productId) {
-            this.productId = productId;
-            return this;
-        }
-
-        public Builder productName(String productName) {
-            this.productName = productName;
-            return this;
-        }
-
-        public Builder skuCode(String skuCode) {
-            this.skuCode = skuCode;
-            return this;
-        }
-
-        public Builder unitPrice(Money unitPrice) {
-            this.unitPrice = unitPrice;
-            return this;
-        }
-
-        public Builder quantity(int quantity) {
-            this.quantity = quantity;
-            return this;
-        }
-
-        /**
-         * 构建订单项信息对象
-         * @return 订单项信息值对象
-         */
-        public OrderItemInfo build() {
-            return new OrderItemInfo(this);
-        }
-
     }
 
 }

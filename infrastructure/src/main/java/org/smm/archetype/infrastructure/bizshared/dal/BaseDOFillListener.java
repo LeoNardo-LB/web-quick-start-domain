@@ -2,8 +2,7 @@ package org.smm.archetype.infrastructure.bizshared.dal;
 
 import com.mybatisflex.annotation.InsertListener;
 import com.mybatisflex.annotation.UpdateListener;
-import org.smm.archetype.infrastructure.bizshared.context.ContextHolder;
-import org.smm.archetype.infrastructure.bizshared.context.impl.AccessContext;
+import org.smm.archetype.infrastructure.bizshared.util.context.MyContext;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -21,7 +20,7 @@ public class BaseDOFillListener implements InsertListener, UpdateListener {
         if (entity instanceof BaseDO baseDO) {
             baseDO.setCreateTime(now);
             baseDO.setUpdateTime(now);
-            Optional.ofNullable(ContextHolder.get(AccessContext.class)).map(AccessContext::getData).ifPresent(userId -> {
+            Optional.ofNullable(MyContext.getUserId()).ifPresent(userId -> {
                 baseDO.setCreateUser(userId);
                 baseDO.setUpdateUser(userId);
             });
@@ -32,7 +31,7 @@ public class BaseDOFillListener implements InsertListener, UpdateListener {
     public void onUpdate(Object entity) {
         if (entity instanceof BaseDO baseDO) {
             baseDO.setUpdateTime(Instant.now());
-            Optional.ofNullable(ContextHolder.get(AccessContext.class)).map(AccessContext::getData).ifPresent(baseDO::setUpdateUser);
+            Optional.ofNullable(MyContext.getUserId()).ifPresent(baseDO::setUpdateUser);
         }
     }
 

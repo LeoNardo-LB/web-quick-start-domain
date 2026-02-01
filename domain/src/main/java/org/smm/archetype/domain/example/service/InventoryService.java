@@ -1,6 +1,6 @@
 package org.smm.archetype.domain.example.service;
 
-import org.smm.archetype.domain.example.model.event.OrderCreatedEvent;
+import org.smm.archetype.domain.example.model.event.OrderCreatedEventDTO;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public interface InventoryService {
      * @param event 订单创建事件
      * @return 库存项列表
      */
-    default List<InventoryItem> extractInventoryItems(OrderCreatedEvent event) {
+    default List<InventoryItem> extractInventoryItems(OrderCreatedEventDTO event) {
         return event.getOrderItems().stream()
                        .map(item -> new InventoryItem(
                                item.productId(),

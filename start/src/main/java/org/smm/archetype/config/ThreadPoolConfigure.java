@@ -49,12 +49,12 @@ public class ThreadPoolConfigure implements AsyncConfigurer {
     /**
      * 虚拟线程池
      */
-    public static final String               VIRTUAL_TASK_EXECUTOR = "virtualTaskExecutor";
+    public static final String VIRTUAL_TASK_EXECUTOR = "virtualTaskExecutor";
+
     /**
      * 守护线程池
      */
-    public static final String               DAEMON_TASK_EXECUTOR  = "lowPriorityTaskExecutor";
-    private final       ThreadPoolProperties threadPoolProperties;
+    public static final String DAEMON_TASK_EXECUTOR = "lowPriorityTaskExecutor";
 
     /**
      * MDC任务装饰器
@@ -65,6 +65,11 @@ public class ThreadPoolConfigure implements AsyncConfigurer {
      * CPU核心数
      */
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+
+    /**
+     * 线程池属性
+     */
+    private final ThreadPoolProperties threadPoolProperties;
 
     @Primary
     @Bean(name = IO_TASK_EXECUTOR)

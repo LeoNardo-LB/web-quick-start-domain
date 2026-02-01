@@ -53,7 +53,6 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-            <optional>true</optional>
         </dependency>
 
         <!-- AWS S3 SDK（用于 RustFS 对象存储，100% 兼容 S3 协议）-->

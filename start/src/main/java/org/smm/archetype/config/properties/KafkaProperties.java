@@ -1,7 +1,6 @@
 package org.smm.archetype.config.properties;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
@@ -14,8 +13,7 @@ import java.util.List;
  * @author Leonardo
  * @since 2026/1/10
  */
-@Getter
-@Setter
+@Data
 @ConfigurationProperties(prefix = "middleware.kafka.consumer")
 public class KafkaProperties {
 
@@ -41,7 +39,7 @@ public class KafkaProperties {
      * 订阅的主题列表
      * <p>默认：["domain-events"]
      */
-    private List<String> topics = new ArrayList<>(List.of("domain-events"));
+    private List<String> topics = new ArrayList<>(List.of("domainEvent"));
 
     /**
      * Key反序列化器

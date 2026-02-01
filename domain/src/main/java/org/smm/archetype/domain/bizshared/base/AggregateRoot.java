@@ -3,10 +3,11 @@ package org.smm.archetype.domain.bizshared.base;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.bizshared.event.DomainEventPublisher;
+import org.smm.archetype.domain.bizshared.event.Event;
+import org.smm.archetype.domain.bizshared.event.Status;
+import org.smm.archetype.domain.bizshared.event.dto.DomainEventDTO;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -36,7 +37,7 @@ import java.util.UUID;
  *         order.status = OrderStatus.CREATED;
  *
  *         // 发布领域事件
- *         order.addDomainEvent(new OrderCreatedEvent(order.orderId, customerId));
+ *         order.addDomainEvent(new OrderCreatedEventDTO(order.orderId, customerId));
  *
  *         return order;
  *     }
@@ -47,73 +48,53 @@ import java.util.UUID;
  */
 @Slf4j
 @Getter
-@SuperBuilder(setterPrefix = "set")
+@SuperBuilder(setterPrefix = "set", builderMethodName = "ABuilder")
 public abstract class AggregateRoot extends Entity {
 
-    /**
-     * 受保护的默认构造函数
-     * <p>供子类工厂方法使用
-     */
-    protected AggregateRoot() {
-        super();
-    }
-
-    /**
-     * 领域事件列表
-     */
-    private final List<DomainEvent> domainEvents = new ArrayList<>();
+    private final DomainEventPublisher domainEventPublisher;
 
     /**
      * 添加领域事件
      *
      * <p>在聚合根的业务方法中调用此方法来记录领域事件。
      * 事件会在聚合根保存时通过EventPublisher发布。
-     * @param event 领域事件
+     * @param eventDTO 领域事件DTO
      */
-    protected void addDomainEvent(DomainEvent event) {
-        if (event == null) {
+    protected void addEvent(DomainEventDTO eventDTO) {
+        if (eventDTO == null) {
             throw new IllegalArgumentException("Domain event cannot be null");
         }
-        this.domainEvents.add(event);
-        log.debug("Added domain event: {} to aggregate: {}", event.getClass().getSimpleName(), this.getClass().getSimpleName());
+        // 如果没有配置事件发布器，仅记录日志（支持单元测试场景）
+        if (domainEventPublisher == null) {
+            log.debug("DomainEventPublisher not set, skipping event publish: {} from aggregate: {}",
+                    eventDTO.getClass().getSimpleName(), this.getClass().getSimpleName());
+            return;
+        }
+        Event<DomainEventDTO> event = Event.<DomainEventDTO>builder()
+                                              .setEid(UUID.randomUUID().toString())
+                                              .setOccurredOn(java.time.Instant.now())
+                                              .setStatus(Status.CREATED)
+                                              .setPayload(eventDTO)
+                                              .build();
+        domainEventPublisher.publish(event);
+        log.debug("Added domain event: {} to aggregate: {}", eventDTO.getClass().getSimpleName(), this.getClass().getSimpleName());
     }
 
     /**
-     * 获取未提交的领域事件
+     * 聚合根类型枚举
      *
-     * <p>此方法由基础设施层在保存聚合后调用，用于发布事件。
-     * @return 未提交的领域事件列表（不可修改）
+     * <p>定义系统中所有聚合根的类型，用于事件溯源和领域事件处理。
+     * @author Leonardo
+     * @since 2026/01/09
      */
-    public List<DomainEvent> getUncommittedEvents() {
-        return Collections.unmodifiableList(domainEvents);
-    }
+    @Getter
+    public enum AggregateType {
 
-    /**
-     * 标记所有事件为已提交
-     *
-     * <p>此方法由基础设施层在成功发布事件后调用。
-     */
-    public void markEventsAsCommitted() {
-        this.domainEvents.clear();
-        log.debug("All domain events committed for aggregate: {}", this.getClass().getSimpleName());
-    }
+        /**
+         * 未知类型
+         */
+        UNKNOWN
 
-    /**
-     * 检查是否有未提交的事件
-     * @return 如果有未提交的事件返回true
-     */
-    public boolean hasUncommittedEvents() {
-        return !domainEvents.isEmpty();
-    }
-
-    /**
-     * 生成唯一ID
-     *
-     * <p>默认使用UUID，子类可以重写使用其他ID生成策略。
-     * @return 唯一ID
-     */
-    protected String generateId() {
-        return UUID.randomUUID().toString().replace("-", "");
     }
 
 }

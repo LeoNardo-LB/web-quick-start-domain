@@ -55,13 +55,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- 配置属性处理器（支持YAML配置跳转） -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- 核心框架 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -146,13 +139,6 @@
             </dependency>
             <!--系统依赖End-->
             <!--bomStart-->
-            <dependency>
-                <groupId>com.alibaba.cola</groupId>
-                <artifactId>cola-components-bom</artifactId>
-                <version>5.0.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-bom</artifactId>
@@ -275,8 +261,7 @@
             <dependency>
                 <groupId>org.springframework.kafka</groupId>
                 <artifactId>spring-kafka</artifactId>
-                <version>3.3.11</version>
-                <optional>true</optional>
+                <version>4.0.2</version>
             </dependency>
 
              <!-- JSON序列化 -->

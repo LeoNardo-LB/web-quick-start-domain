@@ -1,7 +1,6 @@
 package org.smm.archetype.config.properties;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -11,62 +10,43 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Leonardo
  * @since 2026-01-11
  */
-@Getter
+@Data
 @ConfigurationProperties(prefix = "middleware.email")
 public class EmailProperties {
 
     /**
-     * 阿里云邮件配置
+     * 访问密钥ID
      */
-    private final Aliyun aliyun = new Aliyun();
-    /**
-     * 邮件服务类型（aliyun、tencent等）
-     */
-    @Setter
-    private       String type   = "aliyun";
+    private String accessKeyId;
 
     /**
-     * 阿里云邮件服务配置
+     * 访问密钥Secret
      */
-    @Getter
-    @Setter
-    public static class Aliyun {
+    private String accessKeySecret;
 
-        /**
-         * 访问密钥ID
-         */
-        private String accessKeyId;
+    /**
+     * 区域ID（默认：cn-hangzhou）
+     */
+    private String regionId = "cn-hangzhou";
 
-        /**
-         * 访问密钥Secret
-         */
-        private String accessKeySecret;
+    /**
+     * 发信地址（例如：noreply@example.com）
+     */
+    private String fromAddress;
 
-        /**
-         * 区域ID（默认：cn-hangzhou）
-         */
-        private String regionId = "cn-hangzhou";
+    /**
+     * 发信人别名（可选）
+     */
+    private String fromAlias;
 
-        /**
-         * 发信地址（例如：noreply@example.com）
-         */
-        private String fromAddress;
+    /**
+     * 账户名称（通常是发信地址）
+     */
+    private String accountName;
 
-        /**
-         * 发信人别名（可选）
-         */
-        private String fromAlias;
-
-        /**
-         * 账户名称（通常是发信地址）
-         */
-        private String accountName;
-
-        /**
-         * 回信地址（可选）
-         */
-        private String replyToAddress;
-
-    }
+    /**
+     * 回信地址（可选）
+     */
+    private String replyToAddress;
 
 }

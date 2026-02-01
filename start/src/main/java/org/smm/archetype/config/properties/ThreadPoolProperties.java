@@ -1,7 +1,6 @@
 package org.smm.archetype.config.properties;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -11,11 +10,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Leonardo
  * @since 2026/1/10
  */
-@Getter
-@Setter
+@Data
 @ConfigurationProperties(prefix = "middleware.thread-pool")
 public class ThreadPoolProperties {
 
+    // Getter 方法（Lombok可能未正常工作）
     /**
      * IO密集型线程池配置
      * <p>用于执行IO密集型任务（文件读写、网络请求等）
@@ -40,28 +39,10 @@ public class ThreadPoolProperties {
      */
     private Scheduler scheduler = new Scheduler();
 
-    // Getter 方法（Lombok可能未正常工作）
-    public Io getIo() {
-        return io;
-    }
-
-    public Cpu getCpu() {
-        return cpu;
-    }
-
-    public Daemon getDaemon() {
-        return daemon;
-    }
-
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
-
     /**
      * IO密集型线程池配置
      */
-    @Getter
-    @Setter
+    @Data
     public static class Io {
 
         /**
@@ -100,8 +81,7 @@ public class ThreadPoolProperties {
     /**
      * CPU密集型线程池配置
      */
-    @Getter
-    @Setter
+    @Data
     public static class Cpu {
 
         /**
@@ -140,8 +120,7 @@ public class ThreadPoolProperties {
     /**
      * 守护线程池配置
      */
-    @Getter
-    @Setter
+    @Data
     public static class Daemon {
 
         /**
@@ -179,8 +158,7 @@ public class ThreadPoolProperties {
     /**
      * 任务调度线程池配置
      */
-    @Getter
-    @Setter
+    @Data
     public static class Scheduler {
 
         /**

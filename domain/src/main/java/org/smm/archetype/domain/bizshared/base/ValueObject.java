@@ -1,6 +1,7 @@
 package org.smm.archetype.domain.bizshared.base;
 
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Arrays;
 
@@ -30,13 +31,14 @@ import java.util.Arrays;
  * @author Leonardo
  * @since 2025/12/30
  */
-@Getter
+@RequiredArgsConstructor
+@SuperBuilder(setterPrefix = "set")
 public abstract class ValueObject {
 
     /**
      * 获取用于相等性比较的属性值
-     *
-     * <p>子类可以重写此方法来指定哪些属性参与相等性比较。
+     * <p>
+     * 子类可以重写此方法来指定哪些属性参与相等性比较。
      * 默认实现返回null，表示使用所有字段（通过@EqualsAndHashCode）。
      * @return 参与相等性比较的属性值数组
      */
@@ -68,7 +70,6 @@ public abstract class ValueObject {
         if (fields != null && fields.length > 0) {
             return Arrays.hashCode(fields);
         }
-
         return super.hashCode();
     }
 

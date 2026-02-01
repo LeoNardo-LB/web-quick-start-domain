@@ -1,151 +1,167 @@
--- ============================================================
--- 订单系统表结构 DDL
--- 符合项目代码编写规范
--- ============================================================
+## ================================================================================
+## 表模板
+## ================================================================================
+# CREATE TABLE IF NOT EXISTS `TODO 表名`
+# (
+#     -- 主键
+#     `id`          BIGINT    NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+#
+#     -- TODO 业务字段
+#
+#     -- 审计字段（来自BaseDO）
+#     `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+#     `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+#     `create_user` VARCHAR(64)        DEFAULT NULL COMMENT '创建人ID',
+#     `update_user` VARCHAR(64)        DEFAULT NULL COMMENT '更新人ID',
+#
+#     -- 逻辑删除字段
+#     `delete_time` BIGINT    NOT NULL DEFAULT 0 COMMENT '删除标记：0=未删除，非0=删除时间戳',
+#     `delete_user` VARCHAR(64)        DEFAULT NULL COMMENT '删除人ID',
+#
+#     -- 主键和索引
+#     PRIMARY KEY (`id`),
+#     UNIQUE KEY `uk_<业务唯一字段>_delete_time` (`<业务唯一字段>`, `delete_time`) COMMENT '时间范围',
+#     TODO 普通的Key索引
+# ) ENGINE = InnoDB
+#   DEFAULT CHARSET = utf8mb4
+#   COLLATE = utf8mb4_unicode_ci COMMENT ='TODO';
+#
+## ================================================================================
+## 说明
+## ================================================================================
+## 1. 所有表使用 InnoDB 引擎，支持事务和行级锁
+## 2. 所有表使用 utf8mb4 字符集，支持完整的Unicode字符（包括emoji）
+## 3. 所有表使用 utf8mb4_unicode_ci 排序规则，支持不区分大小写的比较
+## 4. 所有表使用 CREATE TABLE IF NOT EXISTS 语法，避免重复创建错误
+## 5. 所有表包含6个审计字段：create_time, update_time, create_user, update_user
+## 6. 所有索引命名遵循以下规则：
+##    - 唯一索引：uk_表名_字段名（多个字段用下划线分隔）
+##    - 普通索引：idx_表名_字段名（多个字段用下划线分隔）
+## 7. 乐观锁 version 可加可不加，视具体业务而定
+## 8. 不使用物理外键约束，使用逻辑外键（通过注释说明关联关系）
+## 9. 字段命名采用下划线命名法（从Java驼峰命名转换）
+## 10. 主键使用 BIGINT AUTO_INCREMENT，自增ID
+## 11. TIMESTAMP字段默认值为CURRENT_TIMESTAMP，更新时间字段使用ON UPDATE CURRENT_TIMESTAMP自动更新
+## 12. 逻辑删除字段（delete_time, delete_user）用于软删除，NULL表示未删除
+## 13. JSON类型用于JSON序列化对象
+## 14. TEXT类型用于存储大字段（复杂文本、错误信息等）
+## 15. VARCHAR长度根据实际业务需求选择（32/64/128/256/512）
+## 16. 组合索引字段顺序优化：等值条件字段优先，范围条件字段其次，排序字段最后
+## ================================================================================
 
--- ------------------------------------------------------------
--- 1. 订单表（order）- 聚合根
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `order_aggr`
+-- ================================================================================
+-- event_consume - 事件消费表
+-- ================================================================================
+CREATE TABLE IF NOT EXISTS `event`
 (
-    `id`             BIGINT         NOT NULL AUTO_INCREMENT COMMENT '订单ID',
-    `order_no`       VARCHAR(64)    NOT NULL COMMENT '订单编号',
-    `customer_id`    VARCHAR(64)    NOT NULL COMMENT '客户ID',
-    `customer_name`  VARCHAR(128)   NOT NULL COMMENT '客户姓名',
-    `status`         VARCHAR(32)    NOT NULL COMMENT '订单状态：CREATED-已创建, PAID-已支付, CANCELLED-已取消, SHIPPED-已发货, COMPLETED-已完成',
-    `total_amount`   DECIMAL(18, 2) NOT NULL COMMENT '订单总金额',
-    `currency`       VARCHAR(16)    NOT NULL DEFAULT 'CNY' COMMENT '货币类型',
-    `payment_method` VARCHAR(32)             DEFAULT NULL COMMENT '支付方式',
-    `remark`         VARCHAR(512)            DEFAULT NULL COMMENT '备注',
+    -- 主键
+    `id`              BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
 
-    -- 审计字段（必须）
-    `create_time`    TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`    TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `delete_time`    TIMESTAMP      NULL     DEFAULT NULL COMMENT '删除时间',
-    `create_user`    VARCHAR(64)             DEFAULT NULL COMMENT '创建人ID',
-    `update_user`    VARCHAR(64)             DEFAULT NULL COMMENT '更新人ID',
-    `delete_user`    VARCHAR(64)             DEFAULT NULL COMMENT '删除人ID',
+    -- 业务字段
+    `eid`             VARCHAR(64)  NOT NULL COMMENT '事件id',
+    `action`          VARCHAR(256) NOT NULL COMMENT '事件动作 PUBLISH(发布)/CONSUME(消费)',
+    `source`          VARCHAR(256) NOT NULL COMMENT '事件来源 INTERNAL(内部)/xxx(外部)',
+    `type`            VARCHAR(256) NOT NULL COMMENT '事件类型',
+    `status`          VARCHAR(32)  NOT NULL COMMENT '事件状态：PUBLISH CREATED(已创建)/READY(就绪)/PUBLISHED(已发布)；CONSUME READY(准备消费)/PROCESSING(处理中)/CONSUMED(已消费)/RETRY(重试中)/FAILED(失败)',
+    `payload`         JSON                  DEFAULT NULL COMMENT '事件载荷（JSON格式）',
+    `executor`        VARCHAR(256)          DEFAULT NULL COMMENT '执行者 发布者id或消费者id',
+    `executor_group`  VARCHAR(256)          DEFAULT NULL COMMENT '执行者组 发布者组或消费者组',
+    `message`         TEXT                  DEFAULT NULL COMMENT '事件消息',
+    `trace_id`        VARCHAR(128)          DEFAULT NULL COMMENT '跟踪ID',
 
+    -- 重试相关
+    `retry_times`     INT                   DEFAULT 0 COMMENT '当前重试次数',
+    `max_retry_times` INT                   DEFAULT 0 COMMENT '最大重试次数',
+    `next_retry_time` TIMESTAMP    NULL     DEFAULT NULL COMMENT '下次重试时间',
+
+    -- 审计字段（来自BaseDO）
+    `create_time`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `create_user`     VARCHAR(64)           DEFAULT NULL COMMENT '创建人ID',
+    `update_user`     VARCHAR(64)           DEFAULT NULL COMMENT '更新人ID',
+
+    -- 逻辑删除字段
+    `delete_time`     BIGINT       NOT NULL DEFAULT 0 COMMENT '删除标记：0=未删除，非0=删除时间戳',
+    `delete_user`     VARCHAR(64)           DEFAULT NULL COMMENT '删除人ID',
+
+    -- 主键和索引
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_order_order_no` (`order_no`),
-    KEY `idx_order_customer_id` (`customer_id`),
-    KEY `idx_order_status` (`status`),
-    KEY `idx_order_create_time` (`create_time`)
+    UNIQUE KEY `uk_eid_action_executor` (`eid`, `action`, `executor_group`),
+    KEY `idx_status_next_retry` (`status`, `next_retry_time`),
+    KEY `idx_trace_id` (`trace_id`),
+    KEY `idx_create_time` (`create_time`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='订单表-聚合根';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='事件发布表';
 
--- ------------------------------------------------------------
--- 2. 订单项表（order_item）- 实体
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `order_item`
+-- ================================================================================
+-- file_metadata - 文件元数据表
+-- ================================================================================
+CREATE TABLE IF NOT EXISTS `file_metadata`
 (
-    `id`           BIGINT         NOT NULL AUTO_INCREMENT COMMENT '订单项ID',
-    `order_id`     BIGINT         NOT NULL COMMENT '订单ID',
-    `product_id`   VARCHAR(64)    NOT NULL COMMENT '商品ID',
-    `product_name` VARCHAR(256)   NOT NULL COMMENT '商品名称',
-    `sku_code`     VARCHAR(64)    NOT NULL COMMENT 'SKU编码',
-    `unit_price`   DECIMAL(18, 2) NOT NULL COMMENT '单价',
-    `currency`     VARCHAR(16)    NOT NULL DEFAULT 'CNY' COMMENT '货币类型',
-    `quantity`     INT            NOT NULL COMMENT '数量',
-    `subtotal`     DECIMAL(18, 2) NOT NULL COMMENT '小计金额',
+    -- 主键
+    `id`           BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
 
-    -- 审计字段（必须）
-    `create_time`  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `delete_time`  TIMESTAMP      NULL     DEFAULT NULL COMMENT '删除时间',
-    `create_user`  VARCHAR(64)             DEFAULT NULL COMMENT '创建人ID',
-    `update_user`  VARCHAR(64)             DEFAULT NULL COMMENT '更新人ID',
-    `delete_user`  VARCHAR(64)             DEFAULT NULL COMMENT '删除人ID',
+    -- 业务字段
+    `md5`          VARCHAR(64)  NOT NULL COMMENT '文件MD5值',
+    `content_type` VARCHAR(128) NOT NULL COMMENT '文件MIME类型',
+    `size`         BIGINT       NOT NULL COMMENT '文件大小（字节）',
+    `url`          VARCHAR(512) NOT NULL COMMENT '文件访问URL',
+    `url_expire`   TIMESTAMP    NULL     DEFAULT NULL COMMENT 'URL过期时间',
+    `path`         VARCHAR(512) NOT NULL COMMENT '文件存储路径',
 
+    -- 审计字段
+    `create_time`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `create_user`  VARCHAR(64)           DEFAULT NULL COMMENT '创建人ID',
+    `update_user`  VARCHAR(64)           DEFAULT NULL COMMENT '更新人ID',
+
+    -- 逻辑删除字段
+    `delete_time`  BIGINT       NOT NULL DEFAULT 0 COMMENT '删除标记：0=未删除，非0=删除时间戳',
+    `delete_user`  VARCHAR(64)           DEFAULT NULL COMMENT '删除人ID',
+
+    -- 主键和索引
     PRIMARY KEY (`id`),
-    KEY `idx_order_item_order_id` (`order_id`),
-    KEY `idx_order_item_product_id` (`product_id`)
+    UNIQUE KEY `uk_file_metadata_md5` (`md5`),
+    KEY `idx_file_metadata_content_type` (`content_type`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='订单项表-实体';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='文件元数据表';
 
--- ------------------------------------------------------------
--- 3. 订单地址表（order_address）- 值对象
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `order_address`
+-- ================================================================================
+-- file_business - 文件业务关联表
+-- ================================================================================
+CREATE TABLE IF NOT EXISTS `file_business`
 (
-    `id`             BIGINT       NOT NULL AUTO_INCREMENT COMMENT '地址ID',
-    `order_id`       BIGINT       NOT NULL COMMENT '订单ID',
-    `province`       VARCHAR(64)  NOT NULL COMMENT '省份',
-    `city`           VARCHAR(64)  NOT NULL COMMENT '城市',
-    `district`       VARCHAR(64)           DEFAULT NULL COMMENT '区县',
-    `detail_address` VARCHAR(512) NOT NULL COMMENT '详细地址',
-    `postal_code`    VARCHAR(16)           DEFAULT NULL COMMENT '邮政编码',
+    -- 主键
+    `id`           BIGINT       NOT NULL AUTO_INCREMENT COMMENT '主键ID',
 
-    -- 审计字段（必须）
-    `create_time`    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `delete_time`    TIMESTAMP    NULL     DEFAULT NULL COMMENT '删除时间',
-    `create_user`    VARCHAR(64)           DEFAULT NULL COMMENT '创建人ID',
-    `update_user`    VARCHAR(64)           DEFAULT NULL COMMENT '更新人ID',
-    `delete_user`    VARCHAR(64)           DEFAULT NULL COMMENT '删除人ID',
+    -- 业务字段
+    `file_meta_id` VARCHAR(64)  NOT NULL COMMENT '文件ID，关联file_metadata.id（逻辑外键，无物理外键约束）',
+    `business_id`  VARCHAR(64)  NOT NULL COMMENT '业务ID',
+    `name`         VARCHAR(256) NOT NULL COMMENT '文件业务名称',
+    `type`         VARCHAR(128) NOT NULL COMMENT '业务类型',
+    `usage`        VARCHAR(128)          DEFAULT NULL COMMENT '使用场景',
+    `sort`         INT                   DEFAULT 0 COMMENT '排序序号',
+    `remark`       VARCHAR(512)          DEFAULT NULL COMMENT '备注',
 
+    -- 审计字段
+    `create_time`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `create_user`  VARCHAR(64)           DEFAULT NULL COMMENT '创建人ID',
+    `update_user`  VARCHAR(64)           DEFAULT NULL COMMENT '更新人ID',
+
+    -- 逻辑删除字段
+    `delete_time`  BIGINT       NOT NULL DEFAULT 0 COMMENT '删除标记：0=未删除，非0=删除时间戳',
+    `delete_user`  VARCHAR(64)           DEFAULT NULL COMMENT '删除人ID',
+
+    -- 主键和索引
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_order_address_order_id` (`order_id`)
+    KEY `idx_file_business_file_meta_id` (`file_meta_id`),
+    KEY `idx_file_business_business_id` (`business_id`),
+    KEY `idx_file_business_type` (`type`),
+    KEY `idx_file_business_usage` (`usage`),
+    KEY `idx_file_business_sort` (`sort`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='订单地址表-值对象';
-
--- ------------------------------------------------------------
--- 4. 订单联系信息表（order_contact_info）- 值对象
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `order_contact_info`
-(
-    `id`            BIGINT       NOT NULL AUTO_INCREMENT COMMENT '联系信息ID',
-    `order_id`      BIGINT       NOT NULL COMMENT '订单ID',
-    `contact_name`  VARCHAR(128) NOT NULL COMMENT '联系人姓名',
-    `contact_phone` VARCHAR(32)  NOT NULL COMMENT '联系人电话',
-    `contact_email` VARCHAR(128)          DEFAULT NULL COMMENT '联系人邮箱',
-
-    -- 审计字段（必须）
-    `create_time`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `delete_time`   TIMESTAMP    NULL     DEFAULT NULL COMMENT '删除时间',
-    `create_user`   VARCHAR(64)           DEFAULT NULL COMMENT '创建人ID',
-    `update_user`   VARCHAR(64)           DEFAULT NULL COMMENT '更新人ID',
-    `delete_user`   VARCHAR(64)           DEFAULT NULL COMMENT '删除人ID',
-
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_order_contact_info_order_id` (`order_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='订单联系信息表-值对象';
-
--- ------------------------------------------------------------
--- 5. 支付记录表（payment）- 支付记录
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `payment`
-(
-    `id`             BIGINT         NOT NULL AUTO_INCREMENT COMMENT '支付记录ID',
-    `payment_no`     VARCHAR(64)    NOT NULL COMMENT '支付编号',
-    `order_id`       BIGINT         NOT NULL COMMENT '订单ID',
-    `order_no`       VARCHAR(64)    NOT NULL COMMENT '订单编号',
-    `payment_method` VARCHAR(32)    NOT NULL COMMENT '支付方式：ALIPAY-支付宝, WECHAT-微信, STRIPE-Stripe',
-    `amount`         DECIMAL(18, 2) NOT NULL COMMENT '支付金额',
-    `currency`       VARCHAR(16)    NOT NULL DEFAULT 'CNY' COMMENT '货币类型',
-    `status`         VARCHAR(32)    NOT NULL COMMENT '支付状态：PENDING-待支付, SUCCESS-成功, FAILED-失败, REFUNDED-已退款',
-    `transaction_id` VARCHAR(128)            DEFAULT NULL COMMENT '第三方交易ID',
-    `failed_reason`  VARCHAR(512)            DEFAULT NULL COMMENT '失败原因',
-
-    -- 审计字段（必须）
-    `create_time`    TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`    TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `delete_time`    TIMESTAMP      NULL     DEFAULT NULL COMMENT '删除时间',
-    `create_user`    VARCHAR(64)             DEFAULT NULL COMMENT '创建人ID',
-    `update_user`    VARCHAR(64)             DEFAULT NULL COMMENT '更新人ID',
-    `delete_user`    VARCHAR(64)             DEFAULT NULL COMMENT '删除人ID',
-
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_payment_payment_no` (`payment_no`),
-    KEY `idx_payment_order_id` (`order_id`),
-    KEY `idx_payment_order_no` (`order_no`),
-    KEY `idx_payment_status` (`status`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='支付记录表';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='文件业务关联表';

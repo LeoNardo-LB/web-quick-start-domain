@@ -1,22 +1,18 @@
 package org.smm.archetype.adapter.listener;
 
-import org.smm.archetype.domain.bizshared.base.DomainEvent;
+import org.smm.archetype.domain.bizshared.event.Event;
 
 /**
- * 事件监听器接口
- *
- * <p>作为入口调用方，接收外部事件消息并委托给 EventHandler 处理。
+ * 消费接口
  * @author Leonardo
- * @since 2026/1/9
+ * @since 2026/1/10
  */
-public interface EventListener {
+public interface EventListener<T extends Event<?>> {
 
     /**
-     * 处理领域事件
-     *
-     * <p>此方法作为入口点，将事件委托给合适的 EventHandler 处理。
+     * 消费领域事件
      * @param event 领域事件
      */
-    void onEvent(DomainEvent event);
+    void consume(T event);
 
 }

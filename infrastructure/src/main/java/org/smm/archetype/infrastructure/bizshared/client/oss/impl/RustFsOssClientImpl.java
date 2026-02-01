@@ -2,7 +2,6 @@ package org.smm.archetype.infrastructure.bizshared.client.oss.impl;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.bizshared.client.IdClient;
 import org.smm.archetype.domain.common.file.FileMetadata;
 import org.smm.archetype.domain.common.file.FileMetadata.Status;
 import org.smm.archetype.infrastructure.bizshared.client.oss.AbstractOssClient;
@@ -57,17 +56,15 @@ public class RustFsOssClientImpl extends AbstractOssClient {
      * @param secretKey      Secret Key
      * @param bucket         Bucket名称
      * @param metadataMapper 文件元数据 Mapper
-     * @param idClient       ID 生成服务
      */
     public RustFsOssClientImpl(
             String endpoint,
             String accessKey,
             String secretKey,
             String bucket,
-            FileMetadataMapper metadataMapper,
-            IdClient idClient) {
+            FileMetadataMapper metadataMapper) {
 
-        super(metadataMapper, idClient);
+        super(metadataMapper);
         this.bucket = bucket;
 
         // 创建 S3 Client（参考 RustFS 官方文档）

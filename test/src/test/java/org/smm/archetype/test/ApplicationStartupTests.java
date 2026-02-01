@@ -3,10 +3,11 @@ package org.smm.archetype.test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.smm.archetype.domain.bizshared.client.SearchClient;
+import org.smm.archetype.domain.common.search.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.smm.archetype.domain.common.search.SearchService;
-import support.ITestBase;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisplayName("应用启动测试")
 @SpringBootTest(classes = TestBootstrap.class)
-class ApplicationStartupTests extends ITestBase {
+@ActiveProfiles("integration")
+@TestPropertySource(locations = "classpath:config/application-integration.yaml")
+class ApplicationStartupTests {
 
     @Autowired(required = false)
     private SearchClient searchClient;

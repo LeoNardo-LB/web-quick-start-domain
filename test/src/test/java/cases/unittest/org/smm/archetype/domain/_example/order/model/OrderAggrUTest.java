@@ -262,12 +262,12 @@ class OrderAggrUTest extends UnitTestBase {
     void updateShippingAddress_CreatedStatus_UpdatesAddress() {
         // Arrange
         OrderAggr order = createTestOrder();
-        Address newAddress = Address.builder()
-                                     .province("上海市")
-                                     .city("上海市")
-                                     .district("浦东新区")
-                                     .detailAddress("陆家嘴金融中心")
-                                     .postalCode("200120")
+        Address newAddress = Address.ABuilder()
+                                     .setProvince("上海市")
+                                     .setCity("上海市")
+                                     .setDistrict("浦东新区")
+                                     .setDetailAddress("陆家嘴金融中心")
+                                     .setPostalCode("200120")
                                      .build();
 
         // Act
@@ -320,20 +320,20 @@ class OrderAggrUTest extends UnitTestBase {
     }
 
     private Address createTestAddress() {
-        return Address.builder()
-                       .province("北京市")
-                       .city("北京市")
-                       .district("朝阳区")
-                       .detailAddress("望京SOHO T1 1001室")
-                       .postalCode("100102")
+        return Address.ABuilder()
+                       .setProvince("北京市")
+                       .setCity("北京市")
+                       .setDistrict("朝阳区")
+                       .setDetailAddress("望京SOHO T1 1001室")
+                       .setPostalCode("100102")
                        .build();
     }
 
     private ContactInfo createTestContactInfo() {
         return ContactInfo.builder()
-                       .contactName("张三")
-                       .contactPhone("13800138000")
-                       .contactEmail("zhangsan@example.com")
+                       .setContactName("张三")
+                       .setContactPhone("13800138000")
+                       .setContactEmail("zhangsan@example.com")
                        .build();
     }
 

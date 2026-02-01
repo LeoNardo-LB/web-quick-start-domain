@@ -54,9 +54,7 @@ public interface BaseRepository<T extends AggregateRoot> {
      * @return 聚合根
      */
     default T getById(Long id) {
-        return findById(id).orElseThrow(() ->
-                                                new IllegalArgumentException("Aggregate not found with id: " + id)
-        );
+        return findById(id).orElseThrow(() -> new IllegalArgumentException("Aggregate not found with id: " + id));
     }
 
     /**

@@ -2,7 +2,6 @@ package org.smm.archetype.infrastructure.bizshared.client.oss.impl;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.bizshared.client.IdClient;
 import org.smm.archetype.domain.common.file.FileMetadata;
 import org.smm.archetype.domain.common.file.FileMetadata.Status;
 import org.smm.archetype.infrastructure.bizshared.client.oss.AbstractOssClient;
@@ -59,14 +58,12 @@ public class LocalOssClientImpl extends AbstractOssClient {
      * @param basePath       基础存储路径（可选，默认：用户文件夹/.project/${spring.application.name}/oss）
      * @param zeroCopy       是否使用零拷贝（NIO transferTo/transferFrom）
      * @param metadataMapper 文件元数据 Mapper
-     * @param idClient       ID 生成服务
      * @throws IOException 如果创建存储目录失败
      */
     public LocalOssClientImpl(String basePath,
                               boolean zeroCopy,
-                              FileMetadataMapper metadataMapper,
-                              IdClient idClient) throws IOException {
-        super(metadataMapper, idClient);
+                              FileMetadataMapper metadataMapper) throws IOException {
+        super(metadataMapper);
         this.zeroCopy = zeroCopy;
 
         // 解析基础路径: 用户文件夹/.project/${spring.application.name}/oss

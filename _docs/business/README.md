@@ -746,7 +746,7 @@ curl -X POST "https://api.example.com/api/v1/user/login" \
 ```json
 {
   "eventId": "evt-20260121-00001",
-  "eventType": "ORDER_CREATED",
+  "domainEventType": "ORDER_CREATED",
   "timestamp": 1642857600000,
   "data": {
     "orderId": 10001,

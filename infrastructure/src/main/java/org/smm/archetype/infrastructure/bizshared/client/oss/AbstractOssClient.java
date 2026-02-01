@@ -2,7 +2,6 @@ package org.smm.archetype.infrastructure.bizshared.client.oss;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.bizshared.client.IdClient;
 import org.smm.archetype.domain.bizshared.client.OssClient;
 import org.smm.archetype.domain.common.file.FileMetadata;
 import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.FileMetadataDO;
@@ -35,11 +34,6 @@ public abstract class AbstractOssClient implements OssClient {
      * 文件元数据 Mapper
      */
     protected final FileMetadataMapper metadataMapper;
-
-    /**
-     * ID 生成服务
-     */
-    protected final IdClient idClient;
 
     // ==================== OssClient 接口实现（模板方法） ====================
 
@@ -302,12 +296,11 @@ public abstract class AbstractOssClient implements OssClient {
      * @param path        文件存储路径
      */
     protected void saveFileMetadata(String fileName, String md5, String contentType, long size, String path) {
-        FileMetadataDO metadata = FileMetadataDO.builder()
-                                          .setMd5(md5)
-                                          .setContentType(contentType)
-                                          .setSize(size)
-                                          .setPath(path)
-                                          .build();
+        FileMetadataDO metadata = new FileMetadataDO();
+        metadata.setMd5(md5);
+        metadata.setContentType(contentType);
+        metadata.setSize(size);
+        metadata.setPath(path);
 
         metadataMapper.insert(metadata);
         log.debug("File metadata saved: id={}, path={}", metadata.getId(), path);

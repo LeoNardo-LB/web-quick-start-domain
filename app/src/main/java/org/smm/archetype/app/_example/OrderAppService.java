@@ -18,9 +18,8 @@ import org.smm.archetype.app._example.dto.OrderItemDTO.OrderItemDTOBuilder;
 import org.smm.archetype.app._example.query.GetOrderByIdQuery;
 import org.smm.archetype.app._example.query.GetOrdersByCustomerQuery;
 import org.smm.archetype.app._example.query.OrderListQuery;
-import org.smm.archetype.app.bizshared.result.PageResult;
-import org.smm.archetype.domain.bizshared.base.BasePageResult;
-import org.smm.archetype.domain.bizshared.event.EventPublisher;
+import org.smm.archetype.domain.bizshared.base.PageResult;
+import org.smm.archetype.domain.bizshared.event.DomainEventPublisher;
 import org.smm.archetype.domain.example.model.OrderAggr;
 import org.smm.archetype.domain.example.model.OrderItem;
 import org.smm.archetype.domain.example.model.valueobject.Address;
@@ -51,15 +50,15 @@ import java.util.stream.Collectors;
 public class OrderAppService {
 
     private final OrderAggrRepository orderRepository;
-    private final OrderDomainService  orderDomainService;
-    private final EventPublisher      eventPublisher;
+    private final OrderDomainService   orderDomainService;
+    private final DomainEventPublisher domainEventPublisher;
 
     public OrderAppService(OrderAggrRepository orderRepository,
                            OrderDomainService orderDomainService,
-                           EventPublisher eventPublisher) {
+                           DomainEventPublisher domainEventPublisher) {
         this.orderRepository = orderRepository;
         this.orderDomainService = orderDomainService;
-        this.eventPublisher = eventPublisher;
+        this.domainEventPublisher = domainEventPublisher;
     }
 
     /**
@@ -107,9 +106,6 @@ public class OrderAppService {
             throw new RuntimeException("锁定库存失败: " + e.getMessage());
         }
 
-        // 6. 发布领域事件
-        publishDomainEvents(savedOrder);
-
         log.info("订单创建成功: orderId={}, orderNo={}", savedOrder.getId(), savedOrder.getOrderNo());
 
         return toDTO(savedOrder);
@@ -136,9 +132,6 @@ public class OrderAppService {
 
         // 4. 保存订单
         OrderAggr savedOrder = orderRepository.save(order);
-
-        // 5. 发布领域事件
-        publishDomainEvents(savedOrder);
 
         log.info("订单支付成功: orderId={}", savedOrder.getId());
 
@@ -171,9 +164,6 @@ public class OrderAppService {
         // 4. 保存订单
         OrderAggr savedOrder = orderRepository.save(order);
 
-        // 5. 发布领域事件
-        publishDomainEvents(savedOrder);
-
         log.info("订单取消成功: orderId={}", savedOrder.getId());
 
         return toDTO(savedOrder);
@@ -197,9 +187,6 @@ public class OrderAppService {
         // 3. 保存订单
         OrderAggr savedOrder = orderRepository.save(order);
 
-        // 4. 发布领域事件
-        publishDomainEvents(savedOrder);
-
         log.info("订单发货成功: orderId={}", savedOrder.getId());
 
         return toDTO(savedOrder);
@@ -222,9 +209,6 @@ public class OrderAppService {
 
         // 3. 保存订单
         OrderAggr savedOrder = orderRepository.save(order);
-
-        // 4. 发布领域事件
-        publishDomainEvents(savedOrder);
 
         log.info("订单完成成功: orderId={}", savedOrder.getId());
 
@@ -261,9 +245,9 @@ public class OrderAppService {
      * @return 分页结果
      */
     @Transactional(readOnly = true)
-    public PageResult<List<OrderDTO>> getOrderList(OrderListQuery query) {
+    public org.smm.archetype.app.bizshared.result.PageResult<List<OrderDTO>> getOrderList(OrderListQuery query) {
         // 调用Repository分页查询
-        BasePageResult<OrderAggr> page = orderRepository.findOrders(
+        PageResult<OrderAggr> page = orderRepository.findOrders(
                 query.getCustomerId(),
                 query.getPageNumber(),
                 query.getPageSize()
@@ -275,7 +259,7 @@ public class OrderAppService {
                                       .collect(Collectors.toList());
 
         // 构建返回结果
-        return PageResult.<List<OrderDTO>>pageResultBuilder()
+        return org.smm.archetype.app.bizshared.result.PageResult.<List<OrderDTO>>PRBuilder()
                        .setData(dtos)
                        .setPageNumber(page.getPageNumber())
                        .setPageSize(page.getPageSize())
@@ -301,18 +285,6 @@ public class OrderAppService {
     private OrderAggr findOrderById(Long orderId) {
         return orderRepository.findById(orderId)
                        .orElseThrow(() -> new RuntimeException("订单不存在: " + orderId));
-    }
-
-    /**
-     * 发布领域事件
-     */
-    private void publishDomainEvents(OrderAggr order) {
-        if (order.hasUncommittedEvents()) {
-            eventPublisher.publish(order.getUncommittedEvents());
-            order.markEventsAsCommitted();
-            log.debug("发布领域事件: orderId={}, eventsCount={}",
-                    order.getId(), order.getUncommittedEvents().size());
-        }
     }
 
     /**

@@ -1,7 +1,7 @@
 package org.smm.archetype.domain.example.repository;
 
+import org.smm.archetype.domain.bizshared.base.PageResult;
 import org.smm.archetype.domain.example.model.OrderAggr;
-import org.smm.archetype.domain.bizshared.base.BasePageResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +55,7 @@ public interface OrderAggrRepository {
      * @param pageSize   每页大小
      * @return 分页结果
      */
-    BasePageResult<OrderAggr> findOrders(String customerId, Long pageNumber, Long pageSize);
+    PageResult<OrderAggr> findOrders(String customerId, Long pageNumber, Long pageSize);
 
     /**
      * 检查订单号是否存在
