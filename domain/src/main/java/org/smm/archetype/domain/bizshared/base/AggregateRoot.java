@@ -20,11 +20,8 @@ public abstract class AggregateRoot extends Entity {
 
     private final DomainEventPublisher domainEventPublisher;
 
-    /**
-     * 添加领域事件
-     *
-     * <p>在聚合根的业务方法中调用此方法来记录领域事件。
-     * 事件会在聚合根保存时通过EventPublisher发布。
+/**
+     * 添加领域事件。
      * @param eventDTO 领域事件DTO
      */
     protected void addEvent(DomainEventDTO eventDTO) {
@@ -47,12 +44,8 @@ public abstract class AggregateRoot extends Entity {
         log.debug("Added domain event: {} to aggregate: {}", eventDTO.getClass().getSimpleName(), this.getClass().getSimpleName());
     }
 
-    /**
-     * 聚合根类型枚举
-     *
-     * <p>定义系统中所有聚合根的类型，用于事件溯源和领域事件处理。
-     * @author Leonardo
-     * @since 2026/01/09
+/**
+     * 聚合根类型枚举。
      */
     @Getter
     public enum AggregateType {

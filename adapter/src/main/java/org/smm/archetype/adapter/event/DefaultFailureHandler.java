@@ -75,11 +75,9 @@ public class DefaultFailureHandler implements FailureHandler {
     }
 
     /**
-     * 发送告警通知
-     *
-     * <p>实现邮件告警功能，可扩展其他通知方式（钉钉、企微等）。
-     * @param event         事件
-     * @param consumeRecord 消费记录值对象
+     * 发送告警通知。
+     * @param event 事件
+     * @param consumeRecord 消费记录
      */
     private void sendAlert(Event<?> event, EventConsumeRecord consumeRecord) {
         try {
@@ -214,9 +212,7 @@ public class DefaultFailureHandler implements FailureHandler {
     }
 
     /**
-     * 获取告警邮箱地址
-     *
-     * <p>可从配置文件读取，或使用系统环境变量。
+     * 获取告警邮箱地址。
      * @return 告警邮箱地址
      */
     private String getAlertEmail() {

@@ -15,9 +15,6 @@ import java.util.List;
 
 /**
  * 事件分发器，统一控制事件消费的完整生命周期。
- *
- * @author Leonardo
- * @since 2026/1/31
  */
 @Slf4j
 public class EventDispatcher {
@@ -61,12 +58,10 @@ public class EventDispatcher {
         this.defaultMaxRetryTimes = defaultMaxRetryTimes;
     }
 
-    /**
-     * 分发事件
-     *
-     * <p>统一的事件处理入口，控制完整的消费生命周期。
-     * @param event   领域事件
-     * @param isRetry 是否为重试（true=Scheduler调用，false=Listener调用）
+/**
+     * 分发事件。
+     * @param event 领域事件
+     * @param isRetry 是否为重试
      */
     public void dispatch(Event<?> event, boolean isRetry) {
         String eventId = event.getEid();
