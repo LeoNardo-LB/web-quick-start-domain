@@ -6,9 +6,7 @@ import lombok.Getter;
 import org.smm.archetype.domain.bizshared.base.Query;
 
 /**
- * 查询客户订单列表
- * @author Leonardo
- * @since 2026/1/11
+ * 查询客户订单列表的查询对象。
  */
 @Getter
 @Builder(setterPrefix = "set")

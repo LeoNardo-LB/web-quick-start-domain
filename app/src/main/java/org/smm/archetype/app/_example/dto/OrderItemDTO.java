@@ -8,9 +8,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 /**
- * 订单项DTO
- * @author Leonardo
- * @since 2026/1/11
+ * 订单项数据传输对象。
  */
 @Getter
 @Builder(setterPrefix = "set")

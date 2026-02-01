@@ -9,9 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 分页结果
- * @author Leonardo
- * @since 2026/1/6
+ * 分页结果对象，封装分页数据和总记录数。
  */
 @Getter
 @Setter

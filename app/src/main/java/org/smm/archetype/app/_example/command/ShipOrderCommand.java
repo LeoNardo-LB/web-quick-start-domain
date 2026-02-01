@@ -5,9 +5,7 @@ import lombok.Setter;
 import org.smm.archetype.domain.bizshared.base.Command;
 
 /**
- * 发货订单命令
- * @author Leonardo
- * @since 2026/1/11
+ * 发货订单命令，包含订单ID。
  */
 @Setter
 @Getter

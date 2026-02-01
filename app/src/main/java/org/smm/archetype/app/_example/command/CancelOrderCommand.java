@@ -5,9 +5,7 @@ import lombok.Setter;
 import org.smm.archetype.domain.bizshared.base.Command;
 
 /**
- * 取消订单命令
- * @author Leonardo
- * @since 2026/1/11
+ * 取消订单命令，包含订单ID和取消原因。
  */
 @Setter
 @Getter

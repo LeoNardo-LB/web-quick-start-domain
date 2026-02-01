@@ -7,9 +7,7 @@ import org.smm.archetype.domain.example.model.valueobject.Money;
 import org.smm.archetype.domain.bizshared.base.Command;
 
 /**
- * 支付订单命令
- * @author Leonardo
- * @since 2026/1/11
+ * 支付订单命令，包含订单ID和支付信息。
  */
 @Setter
 @Getter

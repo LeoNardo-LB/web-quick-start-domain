@@ -11,9 +11,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * 订单DTO
- * @author Leonardo
- * @since 2026/1/11
+ * 订单数据传输对象，用于应用层和适配层交互。
  */
 @Getter
 @Builder(setterPrefix = "set")

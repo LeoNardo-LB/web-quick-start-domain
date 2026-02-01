@@ -34,17 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 订单应用服务
- *
- * <p>职责：
- * <ul>
- *   <li>编排订单相关用例</li>
- *   <li>管理事务边界</li>
- *   <li>DTO转换</li>
- *   <li>发布领域事件</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 订单应用服务，编排订单相关用例和事务管理。
  */
 @Slf4j
 public class OrderAppService {

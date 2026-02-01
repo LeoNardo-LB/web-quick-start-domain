@@ -8,9 +8,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 /**
- * 统一结果返回
- * @author Leonardo
- * @since 2026/1/6
+ * 统一结果返回对象，封装错误码和数据。
  */
 @Getter
 @Setter

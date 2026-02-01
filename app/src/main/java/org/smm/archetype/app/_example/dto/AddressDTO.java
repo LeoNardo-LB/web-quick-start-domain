@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 地址DTO
- * @author Leonardo
- * @since 2026/1/11
+ * 地址数据传输对象。
  */
 @Getter
 @Builder(setterPrefix = "set")

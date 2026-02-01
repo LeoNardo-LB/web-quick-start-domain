@@ -5,9 +5,7 @@ import lombok.experimental.SuperBuilder;
 import org.smm.archetype.domain.bizshared.base.PageRequest;
 
 /**
- * 订单列表查询
- * @author Leonardo
- * @since 2026/1/11
+ * 订单列表查询对象，支持分页。
  */
 @Getter
 @SuperBuilder(setterPrefix = "set", builderMethodName = "OLQBuilder")

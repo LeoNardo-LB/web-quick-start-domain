@@ -11,9 +11,7 @@ import org.smm.archetype.domain.bizshared.base.Command;
 import java.util.List;
 
 /**
- * 创建订单命令
- * @author Leonardo
- * @since 2026/1/11
+ * 创建订单命令，包含订单基本信息和订单项。
  */
 @Setter
 @Getter
