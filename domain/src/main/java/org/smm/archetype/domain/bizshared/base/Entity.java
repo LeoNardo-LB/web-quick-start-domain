@@ -45,7 +45,7 @@ public abstract class Entity implements Identifier {
     /**
      * 标记为已创建
      *
-     * <p>在实体创建时调用此方法设置创建时间。
+    在实体创建时调用此方法设置创建时间。
      */
     protected void markAsCreated() {
         if (this.createTime == null) {
@@ -58,7 +58,7 @@ public abstract class Entity implements Identifier {
     /**
      * 标记为已更新
      *
-     * <p>在实体的业务方法中修改状态后调用此方法更新时间戳和版本号。
+    在实体的业务方法中修改状态后调用此方法更新时间戳和版本号。
      */
     protected void markAsUpdated() {
         this.updateTime = Instant.now();

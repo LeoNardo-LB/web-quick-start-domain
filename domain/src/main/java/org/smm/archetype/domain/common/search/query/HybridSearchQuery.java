@@ -49,7 +49,7 @@ public class HybridSearchQuery {
     /**
      * BM25权重
      *
-     * <p>最终分数 = bm25Weight * bm25_score + (1 - bm25Weight) * vector_score
+    最终分数 = bm25Weight * bm25_score + (1 - bm25Weight) * vector_score
      */
     @Builder.Default
     private final Float bm25Weight = 0.5f;

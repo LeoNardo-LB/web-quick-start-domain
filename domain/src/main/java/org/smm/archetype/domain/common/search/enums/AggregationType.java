@@ -3,7 +3,7 @@ package org.smm.archetype.domain.common.search.enums;
 /**
  * 聚合类型枚举
  *
- * <p>定义支持的聚合类型
+定义支持的聚合类型
  *
 
 

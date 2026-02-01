@@ -22,7 +22,7 @@ public class VectorSearchResult<T> {
     /**
      * 命中的文档列表
      *
-     * <p>按相似度排序
+    按相似度排序
      */
     private final List<VectorSearchHit<T>> hits;
 

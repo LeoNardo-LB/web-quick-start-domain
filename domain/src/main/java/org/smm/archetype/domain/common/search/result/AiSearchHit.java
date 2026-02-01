@@ -27,7 +27,7 @@ public class AiSearchHit<T> {
     /**
      * 综合得分
      *
-     * <p>经过重排序后的最终分数
+    经过重排序后的最终分数
      */
     private final Float score;
 
@@ -39,29 +39,29 @@ public class AiSearchHit<T> {
     /**
      * BM25分数（可选）
      *
-     * <p>原始全文搜索的分数
+    原始全文搜索的分数
      */
     private final Float bm25Score;
 
     /**
      * 向量/AI分数（可选）
      *
-     * <p>AI模型计算的分数
+    AI模型计算的分数
      */
     private final Float aiScore;
 
     /**
      * 重排名次变化（可选）
      *
-     * <p>正值表示排名上升，负值表示排名下降
-     * <p>0表示排名未变化
+    正值表示排名上升，负值表示排名下降
+    0表示排名未变化
      */
     private final Integer rankChange;
 
     /**
      * 额外信息（可选）
      *
-     * <p>包含高亮信息、查询扩展词等
+    包含高亮信息、查询扩展词等
      */
     private final Map<String, Object> extraInfo;
 }

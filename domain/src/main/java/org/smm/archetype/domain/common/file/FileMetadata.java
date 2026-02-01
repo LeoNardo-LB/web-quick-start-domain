@@ -150,7 +150,7 @@ public class FileMetadata extends Entity {
     /**
      * 文件内容类型枚举
      *
-     * <p>定义系统支持的文件内容类型，用于分类和管理
+    定义系统支持的文件内容类型，用于分类和管理
      */
     @Getter
     public enum ContentType {
@@ -202,7 +202,7 @@ public class FileMetadata extends Entity {
         /**
          * 从 MIME 类型转换为内容类型
          *
-         * <p>根据 MIME 类型判断文件内容类型，如果无法识别返回 UNKNOWN
+        根据 MIME 类型判断文件内容类型，如果无法识别返回 UNKNOWN
          * @param mimeType MIME 类型
          * @return 内容类型枚举
          */
@@ -239,7 +239,7 @@ public class FileMetadata extends Entity {
         /**
          * 从字符串转换为内容类型
          *
-         * <p>如果转换失败，返回 UNKNOWN
+        如果转换失败，返回 UNKNOWN
          * @param value 类型字符串
          * @return 内容类型枚举
          */
@@ -260,7 +260,7 @@ public class FileMetadata extends Entity {
         /**
          * 从文件扩展名判断内容类型
          *
-         * <p>根据文件扩展名判断文件内容类型
+        根据文件扩展名判断文件内容类型
          * @param extension 文件扩展名（包含点号，如 ".jpg"）
          * @return 内容类型枚举
          */
@@ -304,7 +304,7 @@ public class FileMetadata extends Entity {
         /**
          * 获取 MIME 类型字符串
          *
-         * <p>用于持久化到数据库或传递给外部系统
+        用于持久化到数据库或传递给外部系统
          * @return MIME 类型字符串或 code 值
          */
         public String toMimeType() {

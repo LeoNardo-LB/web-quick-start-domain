@@ -47,7 +47,7 @@ public class FileBusiness extends Entity {
 
     /**
      * 业务实体类型枚举
-     * <p>定义文件可以关联的业务实体类型
+    定义文件可以关联的业务实体类型
      */
     @Getter
     public enum Type {

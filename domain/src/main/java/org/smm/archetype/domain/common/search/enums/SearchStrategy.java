@@ -3,7 +3,7 @@ package org.smm.archetype.domain.common.search.enums;
 /**
  * 搜索策略枚举
  *
- * <p>定义支持的搜索策略类型
+定义支持的搜索策略类型
  *
 
 

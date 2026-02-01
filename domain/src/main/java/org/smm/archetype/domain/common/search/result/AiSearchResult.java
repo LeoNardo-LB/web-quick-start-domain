@@ -22,7 +22,7 @@ public class AiSearchResult<T> {
     /**
      * 命中的文档列表
      *
-     * <p>按综合得分排序
+    按综合得分排序
      */
     private final List<AiSearchHit<T>> hits;
 
@@ -39,7 +39,7 @@ public class AiSearchResult<T> {
     /**
      * 查询扩展词（可选）
      *
-     * <p>当启用查询扩展时，包含AI生成的扩展词
+    当启用查询扩展时，包含AI生成的扩展词
      */
     private final List<String> expandedTerms;
 }

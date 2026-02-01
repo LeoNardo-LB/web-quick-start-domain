@@ -3,7 +3,7 @@ package org.smm.archetype.domain.common.search.enums;
 /**
  * 过滤操作符枚举
  *
- * <p>定义支持的过滤操作符类型
+定义支持的过滤操作符类型
  *
 
 

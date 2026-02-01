@@ -27,7 +27,7 @@ public class AiSearchQuery {
     /**
      * AI模型类型（必填）
      *
-     * <p>默认: ELSER
+    默认: ELSER
      */
     @Builder.Default
     private final AiSearchModelType modelType = AiSearchModelType.ELSER;
@@ -35,7 +35,7 @@ public class AiSearchQuery {
     /**
      * 返回结果数量（必填）
      *
-     * <p>默认: 10
+    默认: 10
      */
     @Builder.Default
     private final Integer size = 10;
@@ -43,7 +43,7 @@ public class AiSearchQuery {
     /**
      * 起始位置（可选）
      *
-     * <p>默认: 0
+    默认: 0
      */
     @Builder.Default
     private final Integer from = 0;
@@ -51,7 +51,7 @@ public class AiSearchQuery {
     /**
      * 重排序策略（可选）
      *
-     * <p>默认: NONE
+    默认: NONE
      */
     @Builder.Default
     private final RerankStrategyType rerankStrategy = RerankStrategyType.NONE;
@@ -59,8 +59,8 @@ public class AiSearchQuery {
     /**
      * BM25权重（用于SCORE_WEIGHTED策略）
      *
-     * <p>范围：[0, 1]
-     * <p>默认: 0.5（表示BM25和向量分数各占50%）
+    范围：[0, 1]
+    默认: 0.5（表示BM25和向量分数各占50%）
      */
     @Builder.Default
     private final Float bm25Weight = 0.5f;
@@ -68,15 +68,15 @@ public class AiSearchQuery {
     /**
      * 过滤条件（可选）
      *
-     * <p>支持在AI搜索前应用过滤条件
+    支持在AI搜索前应用过滤条件
      */
     private final List<SearchFilter> filters;
 
     /**
      * 是否启用查询扩展（可选）
      *
-     * <p>true表示使用AI模型扩展查询
-     * <p>默认: false
+    true表示使用AI模型扩展查询
+    默认: false
      */
     @Builder.Default
     private final boolean enableQueryExpansion = false;
@@ -84,8 +84,8 @@ public class AiSearchQuery {
     /**
      * 查询扩展的最大词数（可选）
      *
-     * <p>仅当enableQueryExpansion=true时有效
-     * <p>默认: 5
+    仅当enableQueryExpansion=true时有效
+    默认: 5
      */
     @Builder.Default
     private final Integer maxExpansionTerms = 5;
