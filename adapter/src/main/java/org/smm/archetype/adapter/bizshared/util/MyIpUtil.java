@@ -11,17 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 public class MyIpUtil {
 
     /**
-     * 获取客户端真实IP地址
-     * 当前端使用Nginx等反向代理时，不能通过request.getRemoteAddr()直接获取真实IP。
-     * 本方法会依次尝试从以下HTTP头中获取IP地址：
-     * 1. x-forwarded-for
-     * 2. Proxy-Client-IP
-     * 3. WL-Proxy-Client-IP
-     * 4. HTTP_CLIENT_IP
-     * 5. HTTP_X_FORWARDED_FOR
-     * 6. request.getRemoteAddr()
-     * @param request HttpServletRequest对象
-     * @return 客户端真实IP地址，如果获取失败则返回null
+     * 获取客户端真实IP地址，支持反向代理场景。
+     * @param request HTTP请求对象
+     * @return 客户端IP地址
      */
     public static String getIpAddr(HttpServletRequest request) {
         String unknown = "unknown";

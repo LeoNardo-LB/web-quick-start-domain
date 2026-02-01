@@ -16,11 +16,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class WebExceptionAdvise {
 
     /**
-     * 处理系统异常
-     *
-     * 拦截并处理SysException类型的异常，记录错误日志并将异常信息转换为失败响应返回。
+     * 处理系统异常。
      * @param e 系统异常对象
-     * @return 包含异常信息的失败响应
+     * @return 失败响应
      */
     @ExceptionHandler(SysException.class)
     public BaseResult<Void> handleSysException(SysException e) {
@@ -32,11 +30,9 @@ public class WebExceptionAdvise {
     }
 
     /**
-     * 处理业务异常
-     *
-     * 拦截并处理BizException类型的异常，记录错误日志并将异常信息转换为失败响应返回。
+     * 处理业务异常。
      * @param e 业务异常对象
-     * @return 包含异常信息的失败响应
+     * @return 失败响应
      */
     @ExceptionHandler(BizException.class)
     public BaseResult<Void> handleBizException(BizException e) {
@@ -48,11 +44,9 @@ public class WebExceptionAdvise {
     }
 
     /**
-     * 处理未知异常
-     *
-     * 拦截并处理所有未被其他异常处理器处理的异常，记录错误日志并将异常信息转换为失败响应返回。
+     * 处理未知异常。
      * @param e 异常对象
-     * @return 包含异常信息的失败响应
+     * @return 失败响应
      */
     @ExceptionHandler(Exception.class)
     public BaseResult<Void> handleException(Exception e) {
