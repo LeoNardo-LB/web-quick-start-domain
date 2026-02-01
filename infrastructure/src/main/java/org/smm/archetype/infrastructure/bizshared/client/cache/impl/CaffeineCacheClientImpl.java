@@ -14,8 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Caffeine本地缓存实现，支持自定义过期和访问追踪。
- * @author Leonardo
- * @since 2026-01-10
  */
 @Slf4j
 public class CaffeineCacheClientImpl extends AbstractCacheClient {
