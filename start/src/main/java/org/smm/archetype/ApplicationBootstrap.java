@@ -12,10 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Spring Boot应用启动类
- *
- * 作为整个应用程序的入口点，负责初始化Spring Boot应用上下文，
- * 启动Web服务器，并在应用启动完成后执行一些初始化操作。
+ * Spring Boot应用启动类，作为应用程序入口点。
  */
 @Slf4j
 @EnableAsync

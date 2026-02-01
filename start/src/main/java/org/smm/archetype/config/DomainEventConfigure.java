@@ -29,15 +29,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 领域事件配置
- *
- * <p>负责创建事件发布、事件消费、事件分发等相关的 Bean。
- *
- * <h3>事件发布器自动检测机制</h3>
- *
- * <p>本配置使用 Spring Boot 的自动配置机制，根据 Kafka 依赖的存在性自动选择事件发布器：
- *
- * <ul>
+ * 领域事件配置类，负责创建事件发布和消费相关的Bean。
+ */
  *   <li><b>Kafka 场景</b>：当 KafkaTemplate Bean 存在时，
  *       kafkaEventPublisher 会被创建（见 KafkaEventConfigure）。</li>
  *   <li><b>本地场景</b>：当 KafkaTemplate Bean 不存在时，

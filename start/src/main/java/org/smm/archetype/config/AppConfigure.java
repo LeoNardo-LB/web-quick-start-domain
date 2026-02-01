@@ -11,22 +11,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.sql.DataSource;
 
 /**
- * Application层统一配置类
- *
- * <p>职责：
- * <ul>
- *   <li>启用事务管理</li>
- *   <li>注册应用层Bean</li>
- *   <li>配置事务模板</li>
- * </ul>
- *
- * <p>依赖注入原则：
- * <ul>
- *   <li>跨配置类依赖：使用构造器注入</li>
- *   <li>同配置类依赖：使用@Bean方法参数注入</li>
- * </ul>
- * @author Leonardo
- * @since 2026/01/10
+ * Application层配置类，启用事务管理并注册应用层Bean。
  */
 @Configuration
 @EnableTransactionManagement

@@ -20,33 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 订单聚合根配置（示例）
- *
- * <p>聚合根：OrderAggr
- *
- * <p>职责：
- * <ul>
- *   <li>注册订单相关的所有Bean：应用服务、仓储实现、领域服务、事件处理器、中间件服务</li>
- *   <li>集中管理订单聚合根的依赖注入</li>
- *   <li>提供条件装配支持（@ConditionalOnMissingBean）</li>
- * </ul>
- *
- * <p>设计原则：
- * <ul>
- *   <li>按聚合根命名配置类（OrderAggr → OrderConfigure）</li>
- *   <li>使用 @Configuration + @Bean 模式（而非 @Component/@Service/@Repository）</li>
- *   <li>示例配置类位于 start/src/main/java/org/smm/archetype/config/_example/</li>
- *   <li>使用构造器注入（而非 @Autowired 字段注入）</li>
- * </ul>
- *
- * <p>说明：
- * <ul>
- *   <li>这是一个示例配置类，用于演示如何为订单聚合根配置Bean</li>
- *   <li>实际项目中，应该将此配置类移到config包下，并删除_example后缀</li>
- *   <li>通过@ConditionalOnMissingBean确保用户可以自定义配置</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 订单聚合根配置类，注册订单相关的所有Bean。
  */
 @Configuration
 public class OrderConfigure {
