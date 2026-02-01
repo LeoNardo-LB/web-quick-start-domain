@@ -7,16 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 订单仓储接口
- *
- * <p>职责：
- * <ul>
- *   <li>持久化和查询订单聚合根</li>
- *   <li>封装数据访问细节</li>
- *   <li>提供聚合根级别的操作</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 订单仓储接口，提供订单聚合根的持久化操作。
  */
 public interface OrderAggrRepository {
 

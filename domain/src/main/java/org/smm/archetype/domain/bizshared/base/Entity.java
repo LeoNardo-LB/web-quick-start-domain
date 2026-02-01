@@ -6,45 +6,7 @@ import lombok.experimental.SuperBuilder;
 import java.time.Instant;
 
 /**
- * 实体基类
- *
- * <p>实体特征：
- * <ul>
- *   <li>有唯一标识</li>
- *   <li>可变性</li>
- *   <li>通过业务方法修改状态，而不是直接setter</li>
- *   <li>封装业务规则</li>
- * </ul>
- *
- * <p>设计原则：
- * <ul>
- *   <li>移除@Setter以保护封装性</li>
- *   <li>通过业务方法修改状态</li>
- *   <li>在业务方法中维护不变性约束</li>
- * </ul>
- *
- * <p>使用示例：
- * <pre>{@code
- * public class Order extends AggregateRoot {
- *     private OrderStatus status;
- *     private BigDecimal totalAmount;
- *
- *     // 通过业务方法修改状态，而不是直接setter
- *     public void pay(PaymentMethod method) {
- *         if (this.status != OrderStatus.CREATED) {
- *             throw new IllegalStateException("Only created orders can be paid");
- *         }
- *         this.status = OrderStatus.PAID;
- *         this.paymentMethod = method;
- *         this.paymentTime = Instant.now();
- *
- *         // 发布领域事件
- *         addDomainEvent(new OrderPaidEventDTO(this.orderId, this.totalAmount));
- *     }
- * }
- * }</pre>
- * @author Leonardo
- * @since 2025/7/14
+ * 实体基类，提供唯一标识和审计字段。
  */
 @Getter
 @SuperBuilder(setterPrefix = "set")

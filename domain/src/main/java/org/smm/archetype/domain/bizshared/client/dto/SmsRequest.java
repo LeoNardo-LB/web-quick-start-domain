@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 短信请求
- * @author Leonardo
- * @since 2026/01/09
+ * 短信请求DTO，包含手机号和模板参数。
  */
 @Getter
 @Setter

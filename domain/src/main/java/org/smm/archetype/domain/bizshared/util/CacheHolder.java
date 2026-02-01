@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 缓存工具类
- * @author Leonardo
- * @since 2026/1/7
+ * 缓存工具类，提供类型化缓存key前缀。
  */
 public class CacheHolder {
 

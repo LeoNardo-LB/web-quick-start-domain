@@ -18,24 +18,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 /**
- * 订单聚合根
- *
- * <p>职责：
- * <ul>
- *   <li>管理订单的生命周期（创建、支付、发货、取消、完成）</li>
- *   <li>维护订单状态转换的业务规则</li>
- *   <li>发布领域事件</li>
- *   <li>维护订单项、地址、联系信息等聚合边界</li>
- * </ul>
- *
- * <p>状态转换：
- * <pre>
- * CREATED → PAID → SHIPPED → COMPLETED
- *     ↓
- * CANCELLED
- * </pre>
- * @author Leonardo
- * @since 2026/1/11
+ * 订单聚合根，管理订单生命周期和状态转换。
  */
 @Slf4j
 @Getter

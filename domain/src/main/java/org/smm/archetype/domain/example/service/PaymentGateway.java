@@ -5,23 +5,7 @@ import org.smm.archetype.domain.example.model.PaymentMethod;
 import java.math.BigDecimal;
 
 /**
- * 支付网关端口接口（六边形架构）
- *
- * <p>职责：
- * <ul>
- *   <li>定义支付操作的抽象</li>
- *   <li>由基础设施层实现（适配器）</li>
- *   <li>支持多种支付方式（支付宝、微信、Stripe等）</li>
- * </ul>
- *
- * <p>设计原则：
- * <ul>
- *   <li>接口定义在领域层</li>
- *   <li>实现在基础设施层</li>
- *   <li>遵循依赖倒置原则</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 支付网关端口接口，定义支付操作的抽象。
  */
 public interface PaymentGateway {
 

@@ -5,12 +5,7 @@ import org.smm.archetype.domain.bizshared.client.dto.SmsRequest;
 import org.smm.archetype.domain.bizshared.client.dto.SmsResult;
 
 /**
- * 短信服务接口
- *
- * <p>支持多云服务商（阿里云、腾讯云、华为云）。
- *
- * @author Leonardo
- * @since 2026/01/09
+ * 短信服务接口，支持多云服务商。
  */
 public interface SmsClient {
 

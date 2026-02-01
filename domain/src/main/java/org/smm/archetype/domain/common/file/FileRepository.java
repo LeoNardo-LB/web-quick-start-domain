@@ -4,11 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 通用文件仓储接口
- *
- * <p>负责FileBusiness和FileMeta的持久化操作
- * @author Leonardo
- * @since 2026/01/10
+ * 通用文件仓储接口，负责文件业务对象和元数据的持久化。
  */
 public interface FileRepository {
 

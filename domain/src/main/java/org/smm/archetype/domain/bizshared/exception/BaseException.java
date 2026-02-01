@@ -1,9 +1,7 @@
 package org.smm.archetype.domain.bizshared.exception;
 
 /**
- * 基础异常
- * @author Leonardo
- * @since 2026/1/6
+ * 基础异常类，提供通用异常构造方法。
  */
 public abstract class BaseException extends RuntimeException {
 

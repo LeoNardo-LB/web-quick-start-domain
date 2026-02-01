@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MemoryUserStorage测试类
- * 测试getNullPropertyNames方法
+ * Bean工具类，提供非空属性复制方法。
  */
 public class MyBeanUtil {
 

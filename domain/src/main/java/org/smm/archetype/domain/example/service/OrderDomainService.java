@@ -11,24 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 订单领域服务
- *
- * <p>职责：
- * <ul>
- *   <li>封装跨聚合根的业务规则</li>
- *   <li>验证订单项</li>
- *   <li>计算订单总金额</li>
- *   <li>验证库存</li>
- * </ul>
- *
- * <p>特点：
- * <ul>
- *   <li>无状态</li>
- *   <li>纯业务逻辑</li>
- *   <li>可测试性强</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 订单领域服务，封装跨聚合根的业务规则。
  */
 @Slf4j
 @RequiredArgsConstructor

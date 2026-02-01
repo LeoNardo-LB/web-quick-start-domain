@@ -4,30 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 仓储（Repository）接口
- *
- * <p>仓储特征：
- * <ul>
- *   <li>像集合一样管理聚合根</li>
- *   <li>隐藏数据访问细节</li>
- *   <li>只对聚合根提供仓储</li>
- *   <li>提供领域语言的查询方法</li>
- * </ul>
- *
- * <p>使用示例：
- * <pre>{@code
- * // 定义订单仓储接口
- * public interface OrderRepository extends Repository<Order, Long> {
- *     // 基本操作由父接口提供
- *
- *     // 领域特定的查询方法
- *     List<Order> findByCustomerId(CustomerId customerId);
- *     Optional<Order> findByOrderNumber(OrderNumber orderNumber);
- * }
- * }</pre>
- * @param <T> 聚合根类型
- * @author Leonardo
- * @since 2025/12/30
+ * 仓储接口，提供聚合根的持久化操作。
  */
 public interface BaseRepository<T extends AggregateRoot> {
 

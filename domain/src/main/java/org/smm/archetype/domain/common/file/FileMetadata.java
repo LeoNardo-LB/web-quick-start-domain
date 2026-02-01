@@ -9,11 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.smm.archetype.domain.bizshared.base.Entity;
 
 /**
- * 文件领域模型
- *
- * <p>表示上传到对象存储的文件。
- * @author Leonardo
- * @since 2026/01/09
+ * 文件领域模型，表示上传到对象存储的文件。
  */
 @Getter
 @Setter

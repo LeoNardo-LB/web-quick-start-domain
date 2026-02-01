@@ -5,16 +5,7 @@ import lombok.experimental.SuperBuilder;
 import org.smm.archetype.domain.bizshared.base.ValueObject;
 
 /**
- * 订单项信息值对象
- *
- * <p>特征：
- * <ul>
- *   <li>不可变性（Immutable）</li>
- *   <li>包含商品ID、SKU、单价、数量</li>
- *   <li>用于创建订单项</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 订单项信息值对象，包含商品和价格信息。
  */
 @Getter
 @SuperBuilder(setterPrefix = "set")

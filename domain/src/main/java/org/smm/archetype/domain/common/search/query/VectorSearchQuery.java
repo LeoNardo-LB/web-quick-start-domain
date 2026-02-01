@@ -9,10 +9,7 @@ import org.smm.archetype.domain.common.search.enums.VectorIndexType;
 import java.util.List;
 
 /**
- * 向量搜索查询对象
- *
- * @author Leonardo
- * @since 2026-01-14
+ * 向量搜索查询对象，支持向量相似度搜索。
  */
 @Getter
 @Builder

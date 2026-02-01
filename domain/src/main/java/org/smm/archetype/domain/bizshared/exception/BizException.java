@@ -1,9 +1,7 @@
 package org.smm.archetype.domain.bizshared.exception;
 
 /**
- * 业务异常
- * @author Leonardo
- * @since 2026/1/6
+ * 业务异常类，表示可预期的业务错误。
  */
 public class BizException extends BaseException {
 

@@ -11,40 +11,7 @@ import org.smm.archetype.domain.bizshared.event.dto.DomainEventDTO;
 import java.util.UUID;
 
 /**
- * 聚合根基类
- *
- * <p>聚合根特征：
- * <ul>
- *   <li>是聚合的入口点</li>
- *   <li>有全局唯一标识</li>
- *   <li>负责维护聚合内部的一致性边界</li>
- *   <li>外部对象只能持有聚合根的引用</li>
- * </ul>
- *
- * <p>使用示例：
- * <pre>{@code
- * public class Order extends AggregateRoot {
- *     private Long orderId;
- *     private CustomerId customerId;
- *     private List<OrderItem> items;
- *     private OrderStatus status;
- *
- *     public static Order create(CustomerId customerId, List<OrderItem> items) {
- *         Order order = new Order();
- *         order.orderId = Long.generate();
- *         order.customerId = customerId;
- *         order.items = items;
- *         order.status = OrderStatus.CREATED;
- *
- *         // 发布领域事件
- *         order.addDomainEvent(new OrderCreatedEventDTO(order.orderId, customerId));
- *
- *         return order;
- *     }
- * }
- * }</pre>
- * @author Leonardo
- * @since 2025/12/30
+ * 聚合根基类，提供事件发布和一致性边界管理。
  */
 @Slf4j
 @Getter

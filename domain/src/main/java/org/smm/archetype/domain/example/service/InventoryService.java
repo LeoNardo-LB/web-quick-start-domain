@@ -5,23 +5,7 @@ import org.smm.archetype.domain.example.model.event.OrderCreatedEventDTO;
 import java.util.List;
 
 /**
- * 库存服务端口接口（六边形架构）
- *
- * <p>职责：
- * <ul>
- *   <li>定义库存操作的抽象</li>
- *   <li>由基础设施层实现（适配器）</li>
- *   <li>支持库存锁定、释放、验证等操作</li>
- * </ul>
- *
- * <p>设计原则：
- * <ul>
- *   <li>接口定义在领域层</li>
- *   <li>实现在基础设施层</li>
- *   <li>遵循依赖倒置原则</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 库存服务端口接口，定义库存操作的抽象。
  */
 public interface InventoryService {
 

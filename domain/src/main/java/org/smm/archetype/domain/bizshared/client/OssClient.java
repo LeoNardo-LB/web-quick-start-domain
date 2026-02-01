@@ -6,9 +6,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- *
- * @author Leonardo
- * @since 2026/1/7
+ * 对象存储服务接口，提供文件上传下载操作。
  */
 public interface OssClient {
 

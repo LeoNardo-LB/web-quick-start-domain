@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 搜索结果
- *
- * @author Leonardo
- * @since 2026-01-14
+ * 搜索结果对象，包含命中文档和聚合信息。
  */
 @Getter
 @Builder

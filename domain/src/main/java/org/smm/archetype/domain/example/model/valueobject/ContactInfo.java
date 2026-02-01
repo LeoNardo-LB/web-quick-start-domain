@@ -7,16 +7,7 @@ import org.smm.archetype.domain.bizshared.base.ValueObject;
 import java.util.regex.Pattern;
 
 /**
- * 联系信息值对象
- *
- * <p>特征：
- * <ul>
- *   <li>不可变性（Immutable）</li>
- *   <li>包含姓名、电话、邮箱</li>
- *   <li>验证联系信息格式</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 联系信息值对象，包含姓名、电话和邮箱。
  */
 @Getter
 @SuperBuilder(setterPrefix = "set")

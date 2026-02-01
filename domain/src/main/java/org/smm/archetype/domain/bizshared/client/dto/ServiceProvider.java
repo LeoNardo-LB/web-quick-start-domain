@@ -3,12 +3,7 @@ package org.smm.archetype.domain.bizshared.client.dto;
 import lombok.Getter;
 
 /**
- * 服务商枚举
- *
- * <p>支持短信和邮件的多云服务商。
- *
- * @author Leonardo
- * @since 2026/01/09
+ * 云服务商枚举，支持阿里云、腾讯云、华为云。
  */
 @Getter
 public enum ServiceProvider {

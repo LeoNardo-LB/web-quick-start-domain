@@ -3,16 +3,7 @@ package org.smm.archetype.domain.example.model;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 订单状态枚举
- *
- * <p>订单状态流转：
- * <pre>
- * CREATED → PAID → SHIPPED → COMPLETED
- *    ↓         ↓
- * CANCELLED CANCELLED
- * </pre>
- * @author Leonardo
- * @since 2026/1/11
+ * 订单状态枚举，支持状态流转验证。
  */
 @RequiredArgsConstructor
 public enum OrderStatus {

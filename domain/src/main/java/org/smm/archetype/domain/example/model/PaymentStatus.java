@@ -3,21 +3,7 @@ package org.smm.archetype.domain.example.model;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 支付状态枚举
- *
- * <p>支付状态流转：
- * <pre>
- * PENDING → SUCCESS
- *    ↓
- * FAILED
- * </pre>
- *
- * <p>退款状态流转：
- * <pre>
- * SUCCESS → REFUNDED
- * </pre>
- * @author Leonardo
- * @since 2026/1/11
+ * 支付状态枚举，支持支付和退款状态流转。
  */
 @RequiredArgsConstructor
 public enum PaymentStatus {

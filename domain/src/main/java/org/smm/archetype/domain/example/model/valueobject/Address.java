@@ -5,16 +5,7 @@ import lombok.experimental.SuperBuilder;
 import org.smm.archetype.domain.bizshared.base.ValueObject;
 
 /**
- * 地址值对象
- *
- * <p>特征：
- * <ul>
- *   <li>不可变性（Immutable）</li>
- *   <li>包含省、市、区、详细地址、邮编</li>
- *   <li>基于属性值的相等性</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 地址值对象，包含省市区和详细地址信息。
  */
 @Getter
 @SuperBuilder(setterPrefix = "set", builderMethodName = "ABuilder")

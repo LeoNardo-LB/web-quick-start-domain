@@ -6,17 +6,7 @@ import org.smm.archetype.domain.example.model.valueobject.Money;
 import org.smm.archetype.domain.bizshared.base.Entity;
 
 /**
- * 订单项实体
- *
- * <p>特征：
- * <ul>
- *   <li>有唯一标识</li>
- *   <li>属于OrderAggr聚合根</li>
- *   <li>包含商品信息和价格</li>
- *   <li>计算小计金额</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 订单项实体，属于订单聚合根。
  */
 @Getter
 @SuperBuilder(setterPrefix = "set")

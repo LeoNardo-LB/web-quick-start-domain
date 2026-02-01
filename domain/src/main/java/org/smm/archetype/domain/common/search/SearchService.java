@@ -11,12 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 搜索服务接口
- *
- * <p>提供业务层的搜索能力，封装技术客户端（SearchClient）提供的方法
- *
- * @author Leonardo
- * @since 2026-01-14
+ * 搜索服务接口，提供业务层的搜索能力。
  */
 public interface SearchService {
 

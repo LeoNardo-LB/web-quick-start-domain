@@ -4,43 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 数据访问器接口
- *
- * <p>用于访问非聚合根的实体数据。
- *
- * <p>与Repository的区别：
- * <ul>
- *   <li>Repository - 专门用于聚合根，维护一致性边界</li>
- *   <li>DataAccessor - 用于独立实体或只读实体</li>
- * </ul>
- *
- * <p>使用场景：
- * <ul>
- *   <li>日志实体（Log）</li>
- *   <li>审计记录</li>
- *   <li>统计信息</li>
- *   <li>配置数据</li>
- *   <li>其他不属于任何聚合的实体</li>
- * </ul>
- *
- * <p>设计原则：
- * <ul>
- *   <li>不包含业务逻辑</li>
- *   <li>简单的CRUD操作</li>
- *   <li>不发布领域事件</li>
- *   <li>不维护一致性边界</li>
- * </ul>
- *
- * <p>使用示例：
- * <pre>{@code
- * public interface LogDataAccessor extends DataAccessor<Log> {
- *     List<Log> findByCustomerId(Long customerId);
- *     List<Log> findByTimeRange(Instant start, Instant end);
- * }
- * }</pre>
- * @param <T> 实体类型
- * @author Leonardo
- * @since 2025/12/30
+ * 数据访问器接口，用于非聚合根实体的持久化。
  */
 public interface DataAccessor<T extends Entity> {
 

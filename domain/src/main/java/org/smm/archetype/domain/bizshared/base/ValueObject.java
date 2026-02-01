@@ -6,30 +6,7 @@ import lombok.experimental.SuperBuilder;
 import java.util.Arrays;
 
 /**
- * 值对象基类
- *
- * <p>值对象特征：
- * <ul>
- *   <li>不可变性（Immutable）</li>
- *   <li>基于属性值的相等性</li>
- *   <li>没有唯一标识</li>
- *   <li>可以自由共享</li>
- * </ul>
- *
- * <p>使用示例：
- * <pre>{@code
- * public class Money extends ValueObject {
- *     private final BigDecimal amount;
- *     private final String currency;
- *
- *     public Money(BigDecimal amount, String currency) {
- *         this.amount = Objects.requireNonNull(amount);
- *         this.currency = Objects.requireNonNull(currency);
- *     }
- * }
- * }</pre>
- * @author Leonardo
- * @since 2025/12/30
+ * 值对象基类，提供不可变性和基于属性值的相等性。
  */
 @RequiredArgsConstructor
 @SuperBuilder(setterPrefix = "set")

@@ -7,9 +7,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * 通用文件服务，整合OssClient、业务文件对象、文件元数据对象
- * @author Leonardo
- * @since 2026/01/09
+ * 通用文件服务，整合对象存储客户端和文件领域对象。
  */
 public interface FileDomainService {
 

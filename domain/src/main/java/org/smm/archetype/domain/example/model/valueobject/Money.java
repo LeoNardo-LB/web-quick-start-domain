@@ -8,17 +8,7 @@ import java.math.RoundingMode;
 import java.util.Objects;
 
 /**
- * 金额值对象
- *
- * <p>特征：
- * <ul>
- *   <li>不可变性（Immutable）</li>
- *   <li>包含金额和货币类型</li>
- *   <li>提供金额运算方法</li>
- *   <li>支持精确的数学运算</li>
- * </ul>
- * @author Leonardo
- * @since 2026/1/11
+ * 金额值对象，提供精确的金额运算和比较。
  */
 @Getter
 public class Money extends ValueObject {

@@ -9,10 +9,7 @@ import org.smm.archetype.domain.common.search.enums.SearchStrategy;
 import java.util.List;
 
 /**
- * 搜索查询对象
- *
- * @author Leonardo
- * @since 2026-01-14
+ * 搜索查询对象，封装搜索条件和过滤参数。
  */
 @Getter
 @Builder

@@ -9,9 +9,7 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * 邮件请求
- * @author Leonardo
- * @since 2026/01/09
+ * 邮件请求DTO，包含收件人、主题和正文。
  */
 @Getter
 @Setter

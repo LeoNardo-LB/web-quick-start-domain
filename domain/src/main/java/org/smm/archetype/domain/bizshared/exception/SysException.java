@@ -1,9 +1,7 @@
 package org.smm.archetype.domain.bizshared.exception;
 
 /**
- * 系统异常
- * @author Leonardo
- * @since 2026/1/6
+ * 系统异常类，表示非预期的系统错误。
  */
 public class SysException extends BaseException {
 

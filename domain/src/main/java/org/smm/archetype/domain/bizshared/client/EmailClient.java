@@ -5,12 +5,7 @@ import org.smm.archetype.domain.bizshared.client.dto.EmailResult;
 import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
 
 /**
- * 邮件服务接口
- *
- * <p>支持多云服务商（阿里云、腾讯云、华为云）。
- *
- * @author Leonardo
- * @since 2026/01/09
+ * 邮件服务接口，支持多云服务商。
  */
 public interface EmailClient {
 
