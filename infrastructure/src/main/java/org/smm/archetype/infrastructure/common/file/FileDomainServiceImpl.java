@@ -3,10 +3,10 @@ package org.smm.archetype.infrastructure.common.file;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.OssClient;
-import org.smm.archetype.domain.common.file.FileRepository;
-import org.smm.archetype.domain.common.file.FileDomainService;
 import org.smm.archetype.domain.common.file.FileBusiness;
+import org.smm.archetype.domain.common.file.FileDomainService;
 import org.smm.archetype.domain.common.file.FileMetadata;
+import org.smm.archetype.domain.common.file.FileRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
@@ -29,7 +29,7 @@ public class FileDomainServiceImpl implements FileDomainService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void uploadFile(InputStream inputStream, FileMetadata fileMetadata, FileBusiness fileBusiness) {
-        log.info("Uploading file: fileName={}, businessId={}, type={}, usage={}",
+        log.info("正在上传文件: 文件名={}, 业务ID={}, 类型={}, 用途={}",
                 fileMetadata.getFileName(),
                 fileBusiness.getBusinessId(),
                 fileBusiness.getType(),
@@ -40,7 +40,7 @@ public class FileDomainServiceImpl implements FileDomainService {
                 fileMetadata.getContentType() != null
                         ? fileMetadata.getContentType().toMimeType()
                         : null);
-        log.debug("File uploaded to OSS: filePath={}", filePath);
+        log.debug("文件已上传到OSS: filePath={}", filePath);
 
         // 2. 设置文件元数据
         fileMetadata.setFilePath(filePath);
@@ -52,7 +52,7 @@ public class FileDomainServiceImpl implements FileDomainService {
         // 4. 保存到数据库（ID由数据库自动生成）
         fileRepository.save(fileBusiness);
 
-        log.info("File uploaded successfully: businessId={}", fileBusiness.getBusinessId());
+        log.info("文件上传成功: businessId={}", fileBusiness.getBusinessId());
     }
 
     @Override
@@ -74,10 +74,10 @@ public class FileDomainServiceImpl implements FileDomainService {
 
     @Override
     public FileMetadata getFileMeta(String id) {
-        log.debug("Getting file meta: id={}", id);
+        log.debug("获取文件元数据: id={}", id);
 
         return fileRepository.findFileMetaByFileId(id)
-                       .orElseThrow(() -> new IllegalArgumentException("File meta not found: " + id));
+                       .orElseThrow(() -> new IllegalArgumentException("文件元数据未找到: " + id));
     }
 
     @Override
@@ -87,7 +87,7 @@ public class FileDomainServiceImpl implements FileDomainService {
         FileMetadata fileMetadata = getFileMeta(fileMetaId);
         String url = ossClient.generateUrl(fileMetadata.getFilePath(), 0); // 永久有效
 
-        log.debug("File URL generated: fileId={}, url={}", fileMetaId, url);
+        log.debug("获取文件URL: fileMetaId={}", fileMetaId);
         return url;
     }
 

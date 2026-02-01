@@ -24,7 +24,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             return doGet(key);
         } catch (Exception e) {
-            log.error("Cache get error, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
+            log.error("缓存读取错误, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
             return null;
         }
     }
@@ -34,7 +34,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             return doGetList(key);
         } catch (Exception e) {
-            log.error("Cache getList error, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
+            log.error("缓存列表读取错误, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
             return List.of();
         }
     }
@@ -44,7 +44,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             return doGetList(key, beginIdx, endIdx);
         } catch (Exception e) {
-            log.error("Cache getList with range error, key: {}, range: [{}, {}], implementation: {}",
+            log.error("缓存范围列表读取错误, key: {}, range: [{}, {}], implementation: {}",
                     key, beginIdx, endIdx, this.getClass().getSimpleName(), e);
             return List.of();
         }
@@ -55,7 +55,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             doPut(key, value);
         } catch (Exception e) {
-            log.error("Cache put error, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
+            log.error("缓存写入错误, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
         }
     }
 
@@ -64,7 +64,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             doPut(key, value, duration);
         } catch (Exception e) {
-            log.error("Cache put with duration error, key: {}, duration: {}, implementation: {}",
+            log.error("缓存写入超时错误, key: {}, duration: {}, implementation: {}",
                     key, duration, this.getClass().getSimpleName(), e);
         }
     }
@@ -74,7 +74,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             doAppend(key, value);
         } catch (Exception e) {
-            log.error("Cache append error, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
+            log.error("缓存追加错误, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
         }
     }
 
@@ -83,7 +83,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             doDelete(key);
         } catch (Exception e) {
-            log.error("Cache delete error, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
+            log.error("缓存删除错误, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
         }
     }
 
@@ -92,7 +92,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             return doHasKey(key);
         } catch (Exception e) {
-            log.error("Cache hasKey error, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
+            log.error("缓存存在性检查错误, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
             return false;
         }
     }
@@ -102,7 +102,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             return doExpire(key, timeout, unit);
         } catch (Exception e) {
-            log.error("Cache expire error, key: {}, timeout: {}, unit: {}, implementation: {}",
+            log.error("缓存过期设置错误, key: {}, timeout: {}, unit: {}, implementation: {}",
                     key, timeout, unit, this.getClass().getSimpleName(), e);
             return false;
         }
@@ -113,7 +113,7 @@ public abstract class AbstractCacheClient implements CacheClient {
         try {
             return doGetExpire(key);
         } catch (Exception e) {
-            log.error("Cache getExpire error, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
+            log.error("缓存过期读取错误, key: {}, implementation: {}", key, this.getClass().getSimpleName(), e);
             return -1L;
         }
     }

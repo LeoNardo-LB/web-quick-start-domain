@@ -101,10 +101,10 @@ public class DefaultFailureHandler implements FailureHandler {
             // 可扩展：发送企业微信通知
             // sendWeChatAlert(event, consumeRecord);
 
-            log.info("Alert sent for failed event: eventId={}", event.getEid());
+            log.info("已发送失败事件告警: eventId={}", event.getEid());
         } catch (Exception e) {
             // 告警发送失败不应该影响主流程
-            log.error("Failed to send alert for event: eventId={}", event.getEid(), e);
+            log.error("发送事件告警失败: eventId={}", event.getEid(), e);
         }
     }
 
@@ -127,7 +127,7 @@ public class DefaultFailureHandler implements FailureHandler {
 
         emailClient.sendEmail(emailRequest);
 
-        log.info("Email alert sent: eventId={}, to={}", event.getEid(), getAlertEmail());
+        log.info("已发送邮件告警: eventId={}, to={}", event.getEid(), getAlertEmail());
     }
 
     /**

@@ -52,7 +52,7 @@ public abstract class DomainEventCollectPublisher implements DomainEventPublishe
     public final void publish(@NonNull Event<?> event) {
         List<Event<?>> events = MyContext.getDomainEvents();
         events.add(event);
-        log.debug("Added event: {}", event);
+        log.debug("已添加事件: {}", event);
 
         // 注册事务同步，在事务提交后发布事件（仅首次注册）
         if (TransactionSynchronizationManager.isSynchronizationActive() && !SYNC_REGISTERED.get()) {
@@ -88,7 +88,7 @@ public abstract class DomainEventCollectPublisher implements DomainEventPublishe
             return;
         }
 
-        log.info("Publishing {} events", events.size());
+        log.info("正在发布 {} 个事件", events.size());
 
         events.forEach(event -> {
             try {
@@ -101,9 +101,9 @@ public abstract class DomainEventCollectPublisher implements DomainEventPublishe
                 // 3. 更新状态为SUCCESS
                 updateEventStatus(event.getEid(), Status.SUCCESS);
 
-                log.debug("Event published: eventId={}", event.getEid());
+                log.debug("事件已发布: eventId={}", event.getEid());
             } catch (Exception e) {
-                log.error("Error publishing event: eventId={}", event.getEid(), e);
+                log.error("发布事件失败: eventId={}", event.getEid(), e);
                 // 如果发布失败，则更新状态为 RETRYING
                 updateEventStatus(event.getEid(), Status.RETRYING);
             }
@@ -131,7 +131,7 @@ public abstract class DomainEventCollectPublisher implements DomainEventPublishe
         eventDO.setMaxRetryTimes(event.getMaxRetryTimes());
         eventDO.setNextRetryTime(Instant.now());
 
-        log.debug("Event saved: eventId={}", event.getEid());
+        log.debug("事件已保存: eventId={}", event.getEid());
     }
 
     /**
@@ -144,9 +144,9 @@ public abstract class DomainEventCollectPublisher implements DomainEventPublishe
             EventDO eventDO = new EventDO();
             eventDO.setStatus(status.name());
             eventMapper.updateByQuery(eventDO, QueryWrapper.create().where("event_id = ?", eventId));
-            log.debug("Event status updated: eventId={}, status={}", eventId, status);
+            log.debug("事件状态已更新: eventId={}, status={}", eventId, status);
         } catch (Exception e) {
-            log.error("Failed to update event status: eventId={}, status={}", eventId, status, e);
+            log.error("更新事件状态失败: eventId={}, status={}", eventId, status, e);
         }
     }
 

@@ -63,7 +63,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
                              .expireAfter(expiry)
                              .build();
 
-        log.info("Caffeine cache initialized with custom expiry: initialCapacity={}, maximumSize={}, defaultExpireAfterWrite={}",
+        log.info("Caffeine缓存初始化成功（自定义过期时间）: 初始容量={}, 最大大小={}, 默认写入过期时间={}",
                 initialCapacity,
                 maximumSize,
                 expireAfterWrite);
@@ -216,7 +216,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
     private static class CaffeineExpiry implements Expiry<String, CacheValueWrapper> {
 
         /**
-         * Entry 创建时调用，返回过期时间
+         * 缓存条目创建时调用，返回过期时间
          *
          * <p>此方法在 Caffeine 的同步保护下调用，保证线程安全。
          * @param key         缓存键
@@ -227,19 +227,18 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
         @Override
         public long expireAfterCreate(String key, CacheValueWrapper wrapper, long currentTime) {
             long expireNanos = wrapper.getExpireTimeNanos();
-            log.debug("Entry created: key={}, expireNanos={}", key, expireNanos);
+            log.debug("缓存条目创建: key={}, expireNanos={}", key, expireNanos);
             return expireNanos;
         }
 
         /**
-         * Entry 更新时调用，返回新的过期时间
+         * 缓存条目更新时调用，返回新的过期时间
          *
          * <p>此方法在 Caffeine 的同步保护下调用，保证线程安全。
          * 当通过 put(key, value) 更新缓存时，会重新计算过期时间。
-         * @param key             缓存键
-         * @param wrapper         新的缓存值包装器
+         * @param key         缓存键
+         * @param wrapper     新的缓存值包装器
          * @param currentTime     Caffeine 内部当前时间（纳秒）
-         * @param currentDuration 当前的剩余时间（纳秒）
          * @return 新的过期时间纳秒数
          */
         @Override
@@ -247,7 +246,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
                                       long currentTime, long currentDuration) {
             // 更新时重新计算过期时间
             long expireNanos = wrapper.getExpireTimeNanos();
-            log.debug("Entry updated: key={}, expireNanos={}", key, expireNanos);
+            log.debug("缓存条目更新: key={}, expireNanos={}", key, expireNanos);
             return expireNanos;
         }
 
@@ -272,7 +271,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
 
             // 保持原过期时间，不基于访问时间重置
             // 如果想基于访问时间延长过期，可以返回 wrapper.getExpireTimeNanos()
-            log.debug("Entry accessed: key={}, currentDuration={}", key, currentDuration);
+            log.debug("缓存条目访问: key={}, currentDuration={}", key, currentDuration);
             return currentDuration; // 保持不变
         }
 

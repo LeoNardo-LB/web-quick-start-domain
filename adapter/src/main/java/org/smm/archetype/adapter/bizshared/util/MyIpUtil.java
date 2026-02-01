@@ -46,7 +46,7 @@ public class MyIpUtil {
                 ip = request.getRemoteAddr();
             }
         } catch (Exception e) {
-            log.error("IPUtils ERROR ", e);
+            log.error("IP工具异常", e);
         }
         return ip;
     }

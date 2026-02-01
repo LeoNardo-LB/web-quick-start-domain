@@ -72,7 +72,7 @@ public class ExternalSchedulerRetryStrategy implements RetryStrategy {
 
     @Override
     public Instant calculateNextRetryTime(int retryTimes) {
-        log.debug("External scheduler retry strategy: retryTimes={}, nextRetry={}min",
+        log.debug("外部调度器重试策略: retryTimes={}, nextRetry={}min",
                 retryTimes, retryIntervalMinutes);
 
         // 返回预估的下次重试时间

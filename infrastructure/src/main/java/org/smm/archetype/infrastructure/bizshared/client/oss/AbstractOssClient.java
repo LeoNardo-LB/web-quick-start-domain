@@ -39,7 +39,7 @@ public abstract class AbstractOssClient implements OssClient {
 
     @Override
     public final String upload(InputStream inputStream, String fileName, String contentType) {
-        log.info("Uploading file: fileName={}, contentType={}", fileName, contentType);
+        log.info("正在上传文件: 文件名={}, 内容类型={}", fileName, contentType);
 
         try {
             // 1. 参数验证
@@ -57,23 +57,23 @@ public abstract class AbstractOssClient implements OssClient {
 
             // 3. 调用扩展点（由子类实现）
             String filePath = doUpload(contentBytes, fileName, contentType);
-            log.debug("File uploaded to: {}", filePath);
+            log.debug("文件已上传到: 路径={}", filePath);
 
             // 4. 持久化元数据到 file_metadata 表
             saveFileMetadata(fileName, md5, contentType, fileSize, filePath);
 
-            log.info("File uploaded successfully: fileName={}, filePath={}", fileName, filePath);
+            log.info("文件上传成功: 文件名={}, 路径={}", fileName, filePath);
             return filePath;
 
         } catch (Exception e) {
-            log.error("Failed to upload file: fileName={}", fileName, e);
+            log.error("文件上传失败: 文件名={}", fileName, e);
             throw new RuntimeException("File upload failed: " + fileName, e);
         }
     }
 
     @Override
     public final InputStream download(String filePath) {
-        log.info("Downloading file: filePath={}", filePath);
+        log.info("正在下载文件: 路径={}", filePath);
 
         try {
             // 1. 参数验证
@@ -100,7 +100,7 @@ public abstract class AbstractOssClient implements OssClient {
             return inputStream;
 
         } catch (Exception e) {
-            log.error("Failed to download file: filePath={}", filePath, e);
+            log.error("文件下载失败: 路径={}", filePath, e);
             throw new RuntimeException("File download failed: " + filePath, e);
         }
     }
@@ -124,7 +124,7 @@ public abstract class AbstractOssClient implements OssClient {
             );
 
             if (metadata == null) {
-                log.warn("FileMetadata not found for deletion: filePath={}", filePath);
+                log.warn("删除时文件元数据未找到: 路径={}", filePath);
                 return;
             }
 
@@ -133,7 +133,7 @@ public abstract class AbstractOssClient implements OssClient {
 
             // 4. TODO: 标记删除（如果需要软删除功能，可以在这里实现）
 
-            log.info("File deleted successfully: filePath={}", filePath);
+            log.info("文件删除成功: 路径={}", filePath);
 
         } catch (Exception e) {
             log.error("Failed to delete file: filePath={}", filePath, e);
@@ -158,7 +158,7 @@ public abstract class AbstractOssClient implements OssClient {
             return url;
 
         } catch (Exception e) {
-            log.error("Failed to generate URL: filePath={}", filePath, e);
+            log.error("文件生成URL失败: 路径={}", filePath, e);
             throw new RuntimeException("URL generation failed: " + filePath, e);
         }
     }
@@ -176,7 +176,7 @@ public abstract class AbstractOssClient implements OssClient {
             return fileMetadata;
 
         } catch (Exception e) {
-            log.error("Failed to search files: {}", fileNamePattern, e);
+            log.error("文件搜索失败: 文件名模式={}", fileNamePattern, e);
             throw new RuntimeException("FileMetadata search failed", e);
         }
     }

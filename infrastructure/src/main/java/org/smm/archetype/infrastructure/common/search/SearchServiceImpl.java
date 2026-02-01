@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.SearchClient;
 import org.smm.archetype.domain.common.search.SearchService;
+import org.smm.archetype.domain.common.search.enums.RerankStrategyType;
+import org.smm.archetype.domain.common.search.enums.VectorDistanceType;
+import org.smm.archetype.domain.common.search.enums.VectorIndexType;
 import org.smm.archetype.domain.common.search.query.AiSearchQuery;
 import org.smm.archetype.domain.common.search.query.HybridSearchQuery;
 import org.smm.archetype.domain.common.search.query.SearchAggregation;
@@ -13,17 +16,14 @@ import org.smm.archetype.domain.common.search.query.SearchFilter;
 import org.smm.archetype.domain.common.search.query.SearchQuery;
 import org.smm.archetype.domain.common.search.query.SearchSort;
 import org.smm.archetype.domain.common.search.query.VectorSearchQuery;
+import org.smm.archetype.domain.common.search.result.AggregationBucket;
 import org.smm.archetype.domain.common.search.result.AiSearchHit;
 import org.smm.archetype.domain.common.search.result.AiSearchResult;
-import org.smm.archetype.domain.common.search.enums.RerankStrategyType;
-import org.smm.archetype.domain.common.search.result.AggregationBucket;
 import org.smm.archetype.domain.common.search.result.SearchAggregationResult;
 import org.smm.archetype.domain.common.search.result.SearchHit;
 import org.smm.archetype.domain.common.search.result.SearchResult;
 import org.smm.archetype.domain.common.search.result.VectorSearchHit;
 import org.smm.archetype.domain.common.search.result.VectorSearchResult;
-import org.smm.archetype.domain.common.search.enums.VectorIndexType;
-import org.smm.archetype.domain.common.search.enums.VectorDistanceType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,8 +58,8 @@ public class SearchServiceImpl implements SearchService {
             // 转换结果
             return convertSearchResult(response, documentClass);
         } catch (Exception e) {
-            log.error("Failed to search: index={}, query={}", index, query.getKeyword(), e);
-            throw new RuntimeException("Failed to search", e);
+            log.error("搜索失败: index={}, 查询词={}", index, query.getKeyword(), e);
+            throw new RuntimeException("搜索失败", e);
         }
     }
 
@@ -70,8 +70,8 @@ public class SearchServiceImpl implements SearchService {
             Map<String, Object> documentMap = objectMapper.convertValue(document, Map.class);
             searchClient.index(index, id, documentMap);
         } catch (Exception e) {
-            log.error("Failed to index document: index={}, id={}", index, id, e);
-            throw new RuntimeException("Failed to index document", e);
+            log.error("索引文档失败: index={}, id={}", index, id, e);
+            throw new RuntimeException("索引文档失败", e);
         }
     }
 
@@ -88,8 +88,8 @@ public class SearchServiceImpl implements SearchService {
 
             searchClient.bulkIndex(index, documentsList);
         } catch (Exception e) {
-            log.error("Failed to bulk index: index={}, count={}", index, documents.size(), e);
-            throw new RuntimeException("Failed to bulk index", e);
+            log.error("批量索引失败: index={}, 文档数={}", index, documents.size(), e);
+            throw new RuntimeException("批量索引失败", e);
         }
     }
 
@@ -112,8 +112,8 @@ public class SearchServiceImpl implements SearchService {
             }
             return objectMapper.convertValue(source, documentClass);
         } catch (Exception e) {
-            log.error("Failed to get document: index={}, id={}", index, id, e);
-            throw new RuntimeException("Failed to get document", e);
+            log.error("获取文档失败: index={}, id={}", index, id, e);
+            throw new RuntimeException("获取文档失败", e);
         }
     }
 
@@ -129,8 +129,8 @@ public class SearchServiceImpl implements SearchService {
             }
             return documents;
         } catch (Exception e) {
-            log.error("Failed to bulk get: index={}, count={}", index, ids.size(), e);
-            throw new RuntimeException("Failed to bulk get", e);
+            log.error("批量获取失败: index={}, count={}", index, ids.size(), e);
+            throw new RuntimeException("批量获取失败", e);
         }
     }
 
@@ -213,8 +213,8 @@ public class SearchServiceImpl implements SearchService {
 
             return objectMapper.writeValueAsString(queryNode);
         } catch (Exception e) {
-            log.error("Failed to build query DSL", e);
-            throw new RuntimeException("Failed to build query DSL", e);
+            log.error("构建查询DSL失败", e);
+            throw new RuntimeException("构建查询DSL失败", e);
         }
     }
 
@@ -439,8 +439,8 @@ public class SearchServiceImpl implements SearchService {
             // 转换结果
             return convertVectorSearchResult(response, documentClass);
         } catch (Exception e) {
-            log.error("Failed to execute vector search: index={}", index, e);
-            throw new RuntimeException("Failed to execute vector search", e);
+            log.error("执行向量搜索失败: index={}", index, e);
+            throw new RuntimeException("执行向量搜索失败", e);
         }
     }
 
@@ -453,8 +453,8 @@ public class SearchServiceImpl implements SearchService {
 
             searchClient.createVectorIndex(index, vectorField, dimension, indexTypeStr, distanceTypeStr);
         } catch (Exception e) {
-            log.error("Failed to create vector index: index={}, field={}", index, vectorField, e);
-            throw new RuntimeException("Failed to create vector index", e);
+            log.error("创建向量索引失败: index={}, field={}", index, vectorField, e);
+            throw new RuntimeException("创建向量索引失败", e);
         }
     }
 
@@ -761,8 +761,8 @@ public class SearchServiceImpl implements SearchService {
             return convertAiSearchResult(response, documentClass, query.getRerankStrategy());
 
         } catch (Exception e) {
-            log.error("Failed to execute AI search: index={}", index, e);
-            throw new RuntimeException("Failed to execute AI search", e);
+            log.error("执行AI搜索失败: index={}", index, e);
+            throw new RuntimeException("执行AI搜索失败", e);
         }
     }
 
@@ -782,8 +782,8 @@ public class SearchServiceImpl implements SearchService {
             return convertSearchResult(response, documentClass);
 
         } catch (Exception e) {
-            log.error("Failed to execute hybrid search: index={}", index, e);
-            throw new RuntimeException("Failed to execute hybrid search", e);
+            log.error("执行混合搜索失败: index={}", index, e);
+            throw new RuntimeException("执行混合搜索失败", e);
         }
     }
 }

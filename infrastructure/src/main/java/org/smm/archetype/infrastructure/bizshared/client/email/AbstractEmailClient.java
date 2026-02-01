@@ -1,9 +1,9 @@
 package org.smm.archetype.infrastructure.bizshared.client.email;
 
 import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.bizshared.client.EmailClient;
 import org.smm.archetype.domain.bizshared.client.dto.EmailRequest;
 import org.smm.archetype.domain.bizshared.client.dto.EmailResult;
-import org.smm.archetype.domain.bizshared.client.EmailClient;
 import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
 
 import java.util.List;
@@ -63,15 +63,15 @@ public abstract class AbstractEmailClient implements EmailClient {
     public final EmailResult sendEmail(EmailRequest request, ServiceProvider provider) {
         // 1. 参数校验
         if (request == null) {
-            log.error("Email request cannot be null");
+            log.error("邮件请求不能为空");
             throw new IllegalArgumentException("Email request cannot be null");
         }
         if (provider == null) {
-            log.error("Service provider cannot be null");
+            log.error("服务提供者不能为空");
             throw new IllegalArgumentException("Service provider cannot be null");
         }
 
-        log.debug("Sending email: to={}, provider={}", request.getTo(), provider);
+        log.debug("正在发送邮件: 接收方={}, 提供者={}", request.getTo(), provider);
 
         try {
             // 2. 调用子类实现的具体发送逻辑
@@ -79,16 +79,16 @@ public abstract class AbstractEmailClient implements EmailClient {
 
             // 3. 记录结果
             if (result.isSuccess()) {
-                log.info("Email sent successfully: to={}, provider={}, messageId={}",
+                log.info("邮件发送成功: 接收方={}, 提供者={}, 消息ID={}",
                         request.getTo(), provider, result.getMessageId());
             } else {
-                log.warn("Email sending failed: to={}, provider={}, error={}",
+                log.warn("邮件发送失败: 接收方={}, 提供者={}, 错误={}",
                         request.getTo(), provider, result.getErrorMessage());
             }
 
             return result;
         } catch (Exception e) {
-            log.error("Unexpected error sending email: to={}, provider={}", request.getTo(), provider, e);
+            log.error("发送邮件时出现意外错误: 接收方={}, 提供者={}", request.getTo(), provider, e);
             return EmailResult.builder()
                            .setSuccess(false)
                            .setErrorMessage("Unexpected error: " + e.getMessage())

@@ -36,7 +36,7 @@ public class ExponentialBackoffRetryStrategy implements RetryStrategy {
         int index = Math.min(retryTimes - 1, DELAYS.length - 1);
         int delayMinutes = DELAYS[index];
 
-        log.debug("Calculated next retry time: retryTimes={}, delay={}min", retryTimes, delayMinutes);
+        log.debug("计算下次重试时间: retryTimes={}, delay={}min", retryTimes, delayMinutes);
 
         return Instant.now().plusSeconds(delayMinutes * 60L);
     }

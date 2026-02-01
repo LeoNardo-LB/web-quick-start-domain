@@ -78,7 +78,7 @@ public class LocalOssClientImpl extends AbstractOssClient {
 
         // 创建目录（如果不存在）
         Files.createDirectories(baseStoragePath);
-        log.info("Local object storage initialized: basePath={}, zeroCopy={}",
+        log.info("本地对象存储初始化: basePath={}, 零拷贝={}",
                 baseStoragePath.toAbsolutePath(), zeroCopy);
     }
 
@@ -107,7 +107,7 @@ public class LocalOssClientImpl extends AbstractOssClient {
                      FileChannel targetChannel = FileChannel.open(filePath,
                              StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
                     long size = sourceChannel.transferTo(0, sourceChannel.size(), targetChannel);
-                    log.debug("Zero-copy upload completed: size={}, path={}", size, filePath);
+                    log.debug("零拷贝上传完成: 大小={}, 路径={}", size, filePath);
                 }
             } finally {
                 // 删除临时文件
@@ -116,7 +116,7 @@ public class LocalOssClientImpl extends AbstractOssClient {
         } else {
             // 传统拷贝方式
             Files.write(filePath, contentBytes, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-            log.debug("Traditional upload completed: path={}", filePath);
+            log.debug("传统上传完成: 路径={}", filePath);
         }
 
         // 返回相对路径
@@ -143,9 +143,9 @@ public class LocalOssClientImpl extends AbstractOssClient {
         boolean deleted = Files.deleteIfExists(fullPath);
 
         if (deleted) {
-            log.debug("File deleted: path={}", fullPath);
+            log.debug("文件删除: 路径={}", fullPath);
         } else {
-            log.warn("File not found for deletion: path={}", fullPath);
+            log.warn("删除时文件未找到: 路径={}", fullPath);
         }
     }
 

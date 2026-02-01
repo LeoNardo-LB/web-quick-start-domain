@@ -85,7 +85,7 @@ public class EmailClientImpl extends AbstractEmailClient {
      */
     @Override
     protected EmailResult doSendEmail(EmailRequest request, ServiceProvider provider) {
-        log.info("========== Email Service (Mock) ==========");
+        log.info("========== 邮件服务（模拟）==========");
         log.info("Provider: {}", provider);
         log.info("To: {}", request.getTo());
         log.info("Subject: {}", request.getSubject());
@@ -96,7 +96,7 @@ public class EmailClientImpl extends AbstractEmailClient {
         // 模拟发送邮件（实际生产环境需要调用真实API）
         String messageId = "MOCK_EMAIL_" + UUID.randomUUID();
 
-        log.info("Email sent successfully (mock): messageId={}, to={}", messageId, request.getTo());
+        log.info("邮件发送成功（模拟）: messageId={}, 接收方={}", messageId, request.getTo());
 
         return EmailResult.builder()
                        .setSuccess(true)

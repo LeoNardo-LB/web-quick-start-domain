@@ -70,15 +70,15 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
     @Override
     @Scheduled(cron = "${middleware.domain-event.retry.cron}")
     public void scheduleRetry() {
-        log.debug("Event retry scheduler started");
+        log.debug("事件重试调度器已启动");
 
         try {
             processRetryEvents();
         } catch (Exception e) {
-            log.error("Error in event retry scheduler", e);
+            log.error("事件重试调度器异常", e);
         }
 
-        log.debug("Event retry scheduler completed");
+        log.debug("事件重试调度器已完成");
     }
 
     /**
@@ -89,11 +89,11 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
         List<EventConsumeRecord> records = eventRepository.findRetryConsumeEvents(batchSize);
 
         if (records.isEmpty()) {
-            log.debug("No pending events to retry");
+            log.debug("无待重试事件");
             return;
         }
 
-        log.info("Found {} pending events to retry", records.size());
+        log.info("发现 {} 个待重试事件", records.size());
 
         // 使用虚拟线程池并发处理
         List<CompletableFuture<Void>> futures = records.stream()
@@ -104,7 +104,7 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
         // 等待所有任务完成
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
-        log.info("Completed retrying {} events", records.size());
+        log.info("已完成 {} 个事件的重试", records.size());
     }
 
     /**
@@ -117,7 +117,7 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
         Type eventType = record.getType();
 
         try {
-            log.debug("Replaying event: eventId={}, type={}", eventId, eventType);
+            log.debug("正在重放事件: eventId={}, type={}", eventId, eventType);
 
             // 使用 Type 枚举反序列化事件载荷（只是 payload，不是整个 Event）
             Object payload = eventType.deserialize(record.getPayload());
@@ -134,10 +134,10 @@ public class EventRetrySchedulerImpl implements EventRetryScheduler {
             // 委托给 EventDispatcher 处理（重试模式）
             eventDispatcher.dispatch(event, true);
 
-            log.debug("Event replayed: eventId={}", eventId);
+            log.debug("事件已重放: eventId={}", eventId);
 
         } catch (Exception e) {
-            log.error("Error replaying event: eventId={}, type={}", eventId, eventType, e);
+            log.error("重放事件异常: eventId={}, type={}", eventId, eventType, e);
             // 异常已在 EventDispatcher 中处理，这里仅记录日志
         }
     }

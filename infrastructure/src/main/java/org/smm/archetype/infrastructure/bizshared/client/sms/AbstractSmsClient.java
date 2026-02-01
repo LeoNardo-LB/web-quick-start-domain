@@ -1,10 +1,10 @@
 package org.smm.archetype.infrastructure.bizshared.client.sms;
 
 import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.bizshared.client.SmsClient;
 import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
 import org.smm.archetype.domain.bizshared.client.dto.SmsRequest;
 import org.smm.archetype.domain.bizshared.client.dto.SmsResult;
-import org.smm.archetype.domain.bizshared.client.SmsClient;
 
 import java.util.List;
 
@@ -63,15 +63,15 @@ public abstract class AbstractSmsClient implements SmsClient {
     public final SmsResult sendSms(SmsRequest request, ServiceProvider provider) {
         // 1. 参数校验
         if (request == null) {
-            log.error("SMS request cannot be null");
+            log.error("短信请求不能为空");
             throw new IllegalArgumentException("SMS request cannot be null");
         }
         if (provider == null) {
-            log.error("Service provider cannot be null");
+            log.error("服务提供者不能为空");
             throw new IllegalArgumentException("Service provider cannot be null");
         }
 
-        log.debug("Sending SMS: to={}, provider={}", request.getPhoneNumber(), provider);
+        log.debug("正在发送短信: 接收方={}, 提供者={}", request.getPhoneNumber(), provider);
 
         try {
             // 2. 调用子类实现的具体发送逻辑
@@ -79,16 +79,16 @@ public abstract class AbstractSmsClient implements SmsClient {
 
             // 3. 记录结果
             if (result.isSuccess()) {
-                log.info("SMS sent successfully: to={}, provider={}, messageId={}",
+                log.info("短信发送成功: 接收方={}, 提供者={}, 消息ID={}",
                         request.getPhoneNumber(), provider, result.getMessageId());
             } else {
-                log.warn("SMS sending failed: to={}, provider={}, error={}",
+                log.warn("短信发送失败: 接收方={}, 提供者={}, 错误={}",
                         request.getPhoneNumber(), provider, result.getErrorMessage());
             }
 
             return result;
         } catch (Exception e) {
-            log.error("Unexpected error sending SMS: to={}, provider={}", request.getPhoneNumber(), provider, e);
+            log.error("发送短信时出现意外错误: 接收方={}, 提供者={}", request.getPhoneNumber(), provider, e);
             return SmsResult.builder()
                            .setSuccess(false)
                            .setErrorMessage("Unexpected error: " + e.getMessage())

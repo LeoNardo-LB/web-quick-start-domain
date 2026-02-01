@@ -39,7 +39,7 @@ public class SpringDomainEventListener {
     @EventListener
     @Async("virtualTaskExecutor")
     public void onEvent(Event<?> event) {
-        log.debug("Received event from Spring: eventId={}, type={}",
+        log.debug("已接收 Spring 事件: eventId={}, type={}",
                 event.getEid(), event.getClass().getSimpleName());
 
         // 忽略非 DOMAIN 源的事件
