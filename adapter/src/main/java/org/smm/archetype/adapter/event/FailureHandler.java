@@ -6,26 +6,7 @@ import org.smm.archetype.infrastructure.bizshared.event.repository.EventConsumeR
 import org.springframework.core.Ordered;
 
 /**
- * 事件失败处理器接口
- *
- * <p>用于处理最终失败的事件（达到最大重试次数）。
- *
- * <p>实现类可以根据不同的业务场景实现不同的处理策略：
- * <ul>
- *   <li>发送告警通知</li>
- *   <li>记录到专门的失败表</li>
- *   <li>调用人工介入接口</li>
- *   <li>执行补偿事务</li>
- * </ul>
- *
- * <p>设计说明：
- * <ul>
- *   <li>使用EventConsumeRecord（Domain层值对象）而非EventConsumeDO（Infrastructure层）</li>
- *   <li>避免App层直接依赖Infrastructure层的DO对象</li>
- *   <li>符合DDD分层架构原则</li>
- * </ul>
- * @author Leonardo
- * @since 2026/01/09
+ * 事件失败处理器接口，处理达到最大重试次数的失败事件。
  */
 public interface FailureHandler extends Ordered {
 

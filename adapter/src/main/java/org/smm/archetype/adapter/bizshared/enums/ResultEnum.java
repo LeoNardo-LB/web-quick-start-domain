@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 错误码枚举类
- * 定义系统中使用的标准错误码，用于Web层统一响应处理
+ * 错误码枚举，定义系统标准错误码。
  */
 @Getter
 @AllArgsConstructor

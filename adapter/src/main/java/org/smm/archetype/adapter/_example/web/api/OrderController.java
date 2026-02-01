@@ -32,11 +32,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * 订单控制器
- *
- * <p>提供订单相关的HTTP接口
- * @author Leonardo
- * @since 2026/1/11
+ * 订单控制器，提供订单相关的HTTP接口。
  */
 @Slf4j
 @RestController

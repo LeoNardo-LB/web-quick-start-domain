@@ -4,10 +4,7 @@ import org.smm.archetype.domain.bizshared.event.Event;
 import org.springframework.core.Ordered;
 
 /**
- * 事件处理接口
- * @param <T> 事件负载类型
- * @author Leonardo
- * @since 2026/1/31
+ * 事件处理接口，定义事件处理契约。
  */
 public interface EventHandler<T> extends Ordered {
 

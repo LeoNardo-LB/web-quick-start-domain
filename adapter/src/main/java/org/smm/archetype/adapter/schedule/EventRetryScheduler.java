@@ -1,11 +1,7 @@
 package org.smm.archetype.adapter.schedule;
 
 /**
- * 事件重试处理器接口
- *
- * <p>定义事件重试处理的标准接口，用于处理失败事件的重试逻辑。
- * @author Leonardo
- * @since 2026/01/09
+ * 事件重试调度接口，处理失败事件的重试逻辑。
  */
 public interface EventRetryScheduler {
 

@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Web全局异常处理器
- *
- * 用于统一处理Web层抛出的各类异常，包括系统异常、业务异常和未知异常，
- * 并将异常信息转换为统一的响应格式返回给客户端。
+ * Web全局异常处理器，统一处理Web层异常并转换为标准响应。
  */
 @Slf4j
 @RestControllerAdvice
