@@ -8,11 +8,8 @@ import java.util.Optional;
  */
 public interface BaseRepository<T extends AggregateRoot> {
 
-    /**
-     * 保存聚合根
-     *
-     * <p>根据聚合根的状态自动判断是新增还是更新。
-     * 同时负责发布聚合根中的领域事件。
+/**
+     * 保存聚合根。
      * @param aggregate 聚合根
      * @return 保存后的聚合根
      */
