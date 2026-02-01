@@ -8,10 +8,7 @@ import support.UnitTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * SortOrder枚举单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * SortOrder枚举单元测试。
  */
 @DisplayName("SortOrder枚举单元测试")
 class SortOrderUTest extends UnitTestBase {

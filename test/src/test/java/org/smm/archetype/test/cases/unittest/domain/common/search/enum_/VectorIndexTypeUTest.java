@@ -8,10 +8,7 @@ import support.UnitTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * VectorIndexType枚举单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * VectorIndexType枚举单元测试。
  */
 @DisplayName("VectorIndexType枚举单元测试")
 class VectorIndexTypeUTest extends UnitTestBase {

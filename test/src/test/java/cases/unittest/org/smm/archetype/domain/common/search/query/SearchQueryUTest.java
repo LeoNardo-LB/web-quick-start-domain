@@ -11,10 +11,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * SearchQuery单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * SearchQuery单元测试。
  */
 @DisplayName("SearchQuery单元测试")
 class SearchQueryUTest extends UnitTestBase {

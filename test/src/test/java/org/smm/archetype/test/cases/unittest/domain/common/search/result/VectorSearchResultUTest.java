@@ -11,10 +11,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * VectorSearchResult单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * VectorSearchResult单元测试。
  */
 @DisplayName("VectorSearchResult单元测试")
 class VectorSearchResultUTest {

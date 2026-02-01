@@ -14,9 +14,7 @@ import support.UnitTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * LogAspect单元测试
- *
- * 测试LogAspect的AOP切面逻辑，包括方法执行的日志记录和指标采集。
+ * LogAspect单元测试，验证AOP切面日志记录和指标采集。
  */
 @DisplayName("LogAspect单元测试")
 @ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)

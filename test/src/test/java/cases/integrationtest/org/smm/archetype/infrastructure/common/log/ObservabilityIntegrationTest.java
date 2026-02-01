@@ -9,19 +9,7 @@ import support.ITestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Observability集成测试
- *
- * <p>测试范围：
- * <ul>
- *   <li>Actuator健康检查端点</li>
- *   <li>Actuator Prometheus端点</li>
- *   <li>Actuator Metrics端点</li>
- *   <li>标准文本日志输出</li>
- *   <li>链路追踪集成</li>
- * </ul>
- *
- * @author Leonardo
- * @since 2026-01-30
+ * Observability集成测试，验证Actuator端点和监控指标。
  */
 @TestPropertySource(properties = {
         "server.servlet.context-path=",  // 清空 context-path 便于测试

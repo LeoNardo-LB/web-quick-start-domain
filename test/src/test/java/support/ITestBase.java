@@ -13,16 +13,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.Duration;
 
 /**
- * 集成测试基类 - 启动完整Spring上下文
- *
- * <p>特点：
- * <ul>
- *   <li>✅ 启动完整的Spring上下文</li>
- *   <li>✅ 使用 Testcontainers + MySQL（完全隔离，与生产环境一致）</li>
- *   <li>✅ MyBatis-Flex自动建表</li>
- *   <li>✅ 事务回滚保证隔离性</li>
- *   <li>✅ 提供WebTestClient用于Web测试</li>
- * </ul>
+ * 集成测试基类，启动完整Spring上下文并提供WebTestClient。
  */
 @SpringBootTest(classes = org.smm.archetype.test.TestBootstrap.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")

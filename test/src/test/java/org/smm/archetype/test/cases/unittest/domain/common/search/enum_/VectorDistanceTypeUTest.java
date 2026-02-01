@@ -8,10 +8,7 @@ import support.UnitTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * VectorDistanceType枚举单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * VectorDistanceType枚举单元测试。
  */
 @DisplayName("VectorDistanceType枚举单元测试")
 class VectorDistanceTypeUTest extends UnitTestBase {

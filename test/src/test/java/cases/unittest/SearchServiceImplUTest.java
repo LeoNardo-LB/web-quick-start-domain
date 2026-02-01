@@ -39,10 +39,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * SearchServiceImpl单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * SearchServiceImpl单元测试。
  */
 @DisplayName("SearchServiceImpl单元测试")
 class SearchServiceImplUTest extends UnitTestBase {

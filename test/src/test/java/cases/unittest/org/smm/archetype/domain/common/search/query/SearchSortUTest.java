@@ -9,10 +9,7 @@ import support.UnitTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * SearchSort单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * SearchSort单元测试。
  */
 @DisplayName("SearchSort单元测试")
 class SearchSortUTest extends UnitTestBase {

@@ -8,10 +8,7 @@ import support.UnitTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * SearchStrategy枚举单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * SearchStrategy枚举单元测试。
  */
 @DisplayName("SearchStrategy枚举单元测试")
 class SearchStrategyUTest extends UnitTestBase {

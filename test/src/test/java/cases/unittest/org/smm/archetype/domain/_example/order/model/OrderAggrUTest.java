@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * OrderAggr聚合根单元测试 - 简化版本
+ * OrderAggr聚合根单元测试。
  */
 @DisplayName("OrderAggr聚合根单元测试")
 class OrderAggrUTest extends UnitTestBase {

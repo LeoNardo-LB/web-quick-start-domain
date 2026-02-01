@@ -8,10 +8,7 @@ import support.UnitTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * FilterOperator枚举单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * FilterOperator枚举单元测试。
  */
 @DisplayName("FilterOperator枚举单元测试")
 class FilterOperatorUTest extends UnitTestBase {

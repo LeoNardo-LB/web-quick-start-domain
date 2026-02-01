@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Money值对象单元测试 - 简化版本
+ * Money值对象单元测试。
  */
 @DisplayName("Money值对象单元测试")
 class MoneyUTest extends UnitTestBase {

@@ -11,10 +11,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * AggregationBucket单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * AggregationBucket单元测试。
  */
 @DisplayName("AggregationBucket单元测试")
 class AggregationBucketUTest extends UnitTestBase {

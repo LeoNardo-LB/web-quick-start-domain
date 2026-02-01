@@ -11,10 +11,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * SearchAggregation单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * SearchAggregation单元测试。
  */
 @DisplayName("SearchAggregation单元测试")
 class SearchAggregationUTest extends UnitTestBase {

@@ -11,10 +11,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * SearchHit单元测试
- *
- * @author Leonardo
- * @since 2026-01-14
+ * SearchHit单元测试。
  */
 @DisplayName("SearchHit单元测试")
 class SearchHitUTest extends UnitTestBase {
