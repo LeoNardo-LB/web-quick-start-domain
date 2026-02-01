@@ -7,8 +7,8 @@ import org.smm.archetype.domain.example.model.valueobject.Money;
 
 /**
  * 支付订单请求
- * @author Leonardo
- * @since 2026/1/11
+
+
  */
 @Getter
 @Setter

@@ -6,8 +6,8 @@ import org.smm.archetype.app._example.dto.ContactInfoDTO;
 
 /**
  * 联系信息响应
- * @author Leonardo
- * @since 2026/1/11
+
+
  */
 @Getter
 @Setter

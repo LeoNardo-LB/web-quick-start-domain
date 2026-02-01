@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 
 /**
  * 金额响应
- * @author Leonardo
- * @since 2026/1/11
+
+
  */
 @Getter
 @Setter
