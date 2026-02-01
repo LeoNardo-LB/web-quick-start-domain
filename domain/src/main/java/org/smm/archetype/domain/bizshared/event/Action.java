@@ -2,8 +2,8 @@ package org.smm.archetype.domain.bizshared.event;
 
 /**
  * 行为
- * @author Leonardo
- * @since 2026/1/31
+
+
  */
 public enum Action {
 

@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * 混合搜索查询对象（BM25 + 向量）
  *
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 @Getter
 @Builder

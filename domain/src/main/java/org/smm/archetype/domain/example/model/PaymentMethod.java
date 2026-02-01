@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 支付方式枚举
- * @author Leonardo
- * @since 2026/1/11
+
+
  */
 @RequiredArgsConstructor
 public enum PaymentMethod {

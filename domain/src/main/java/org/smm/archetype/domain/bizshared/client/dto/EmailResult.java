@@ -8,8 +8,8 @@ import lombok.Setter;
 
 /**
  * 邮件发送结果
- * @author Leonardo
- * @since 2026/01/09
+
+
  */
 @Getter
 @Setter

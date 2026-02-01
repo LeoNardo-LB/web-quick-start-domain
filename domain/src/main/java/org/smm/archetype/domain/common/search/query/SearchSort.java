@@ -9,8 +9,8 @@ import org.smm.archetype.domain.common.search.enums.SortOrder;
 /**
  * 搜索排序条件
  *
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 @Getter
 @Builder

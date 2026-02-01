@@ -10,8 +10,8 @@ import java.util.function.Function;
  * 事件类型
  *
  * <p>每个业务事件必须在此枚举中显式注册，未注册的事件无法解析类型，将被丢弃。
- * @author Leonardo
- * @since 2026/01/09
+
+
  */
 @Getter
 @RequiredArgsConstructor

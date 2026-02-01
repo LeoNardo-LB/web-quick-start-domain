@@ -8,8 +8,8 @@ import org.smm.archetype.domain.bizshared.event.dto.DomainEventDTO;
  * 订单发货事件
  *
  * <p>当订单发货时发布此事件
- * @author Leonardo
- * @since 2026/1/11
+
+
  */
 @Getter
 @SuperBuilder(setterPrefix = "set", builderMethodName = "OSEBuilder")

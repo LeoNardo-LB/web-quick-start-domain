@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * 高亮配置对象
  *
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 @Getter
 @Builder

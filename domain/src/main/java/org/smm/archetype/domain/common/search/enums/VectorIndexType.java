@@ -3,8 +3,8 @@ package org.smm.archetype.domain.common.search.enums;
 /**
  * 向量索引类型
  *
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 public enum VectorIndexType {
 

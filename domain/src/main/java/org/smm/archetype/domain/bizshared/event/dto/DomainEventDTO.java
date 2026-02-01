@@ -6,8 +6,8 @@ import org.smm.archetype.domain.bizshared.base.AggregateRoot.AggregateType;
 
 /**
  * 领域事件基类
- * @author Leonardo
- * @since 2026/1/31
+
+
  */
 @Getter
 @SuperBuilder(setterPrefix = "set")

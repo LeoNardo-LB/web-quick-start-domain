@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 缓存服务
- * @author Leonardo
- * @since 2026/1/7
+
+
  */
 public interface CacheClient {
 

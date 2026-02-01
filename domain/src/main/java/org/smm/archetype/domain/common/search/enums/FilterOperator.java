@@ -5,8 +5,8 @@ package org.smm.archetype.domain.common.search.enums;
  *
  * <p>定义支持的过滤操作符类型
  *
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 public enum FilterOperator {
 

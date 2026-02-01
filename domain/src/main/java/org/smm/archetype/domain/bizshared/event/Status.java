@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 /**
  *
  *
- * @author Leonardo
- * @since 2026/1/31
+
+
  */
 @Getter
 @RequiredArgsConstructor

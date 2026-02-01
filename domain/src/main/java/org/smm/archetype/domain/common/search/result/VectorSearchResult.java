@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * 向量搜索结果
  *
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 @Getter
 @Builder

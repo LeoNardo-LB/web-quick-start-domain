@@ -3,8 +3,8 @@ package org.smm.archetype.domain.common.search.enums;
 /**
  * AI搜索模型类型
  *
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 public enum AiSearchModelType {
 

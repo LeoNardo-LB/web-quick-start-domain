@@ -11,8 +11,8 @@ import java.util.Map;
 /**
  * 索引配置对象
  *
- * @author Leonardo
- * @since 2026-01-14
+
+
  */
 @Getter
 @Builder

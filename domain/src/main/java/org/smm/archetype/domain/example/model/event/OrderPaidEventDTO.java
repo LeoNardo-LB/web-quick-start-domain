@@ -12,8 +12,8 @@ import java.time.Instant;
  * 订单支付事件
  *
  * <p>当订单支付成功时发布此事件
- * @author Leonardo
- * @since 2026/1/11
+
+
  */
 @Getter
 @SuperBuilder(setterPrefix = "set", builderMethodName = "OPEBuilder")
