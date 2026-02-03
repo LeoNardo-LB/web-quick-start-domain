@@ -347,9 +347,8 @@ web-quick-start-domain/
 │
 ├── _docs/               # 文档目录
 │   ├── 业务代码生成(AI)流程.md        # 验证流程 ⭐
-│   ├── 测试示例指南.md         # 测试示例
 │   ├── 业务代码编写规范.md     # 编码规范
-│   └── 测试代码编写规范.md     # 测试规范
+│   └── 测试代码编写与示例指南.md   # 测试规范+示例
 │
 ├── README.md            # 本文件
 └── pom.xml              # Maven配置
@@ -581,7 +580,7 @@ class OrderControllerTest extends IntegrationTestBase {
 }
 ```
 
-> **详细规范**：[测试代码编写规范](_docs/specification/测试代码编写规范.md) - 测试编写最佳实践
+> **详细规范**：[测试代码编写与示例指南](_docs/specification/测试代码编写与示例指南.md) - 测试编写最佳实践
 
 
 
@@ -606,12 +605,11 @@ mvn test -Dtest=ApplicationStartupTests -pl test
 
 ### 📚 完整文档索引
 
-| 文档 | 用途 | 读者 |
-|------|------|------|
-| **[验证流程指南](_docs/specification/业务代码生成(AI)流程.md)** | 验证流程 | 开发者 ⭐ |
-| **[测试示例指南](_docs/specification/测试示例指南.md)** | 测试示例 | 开发者 |
-| **[业务代码编写规范](_docs/specification/业务代码编写规范.md)** | 编码标准 | 开发者 |
-| **[测试代码编写规范](_docs/specification/测试代码编写规范.md)** | 测试规范 | 开发者 |
+| 文档                                                    | 用途      | 读者    |
+|-------------------------------------------------------|---------|-------|
+| **[验证流程指南](_docs/specification/业务代码生成(AI)流程.md)**     | 验证流程    | 开发者 ⭐ |
+| **[业务代码编写规范](_docs/specification/业务代码编写规范.md)**       | 编码标准    | 开发者   |
+| **[测试代码编写与示例指南](_docs/specification/测试代码编写与示例指南.md)** | 测试规范+示例 | 开发者   |
 
 ### 🎯 按角色查找文档
 

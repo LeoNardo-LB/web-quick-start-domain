@@ -1,117 +1,132 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated**: 2026-01-29 21:00:00
-**Commit**: latest
+**生成时间**: 2026-02-03
+**Commit**: e24817a
 **Branch**: main
 
-## OVERVIEW
-DDD-compliant Maven multi-module Java project (JDK 25, Spring Boot 4.0.2) implementing four-layer architecture (Domain-App-Infra-Adapter) with CQRS and event-driven patterns.
+## 概述
 
-## STRUCTURE
+符合 DDD 规范的 Maven 多模块 Java 项目（JDK 25, Spring Boot 4.0.2），实现四层架构（Domain-App-Infra-Adapter）和 CQRS、事件驱动模式。
+
+## 结构
+
 ```
 web-quick-start-domain/
-├── adapter/          # Interface adapters (Controllers, Listeners, Schedulers)
-├── app/             # Application orchestration (CQRS, Commands, Queries)
-├── domain/           # Core business logic (Aggregates, Entities, VOs, Events)
-├── infrastructure/    # Technical implementations (Repositories, Cache, Search, OSS)
-├── start/           # Bootstrap module (Bean assembly via *Configure classes)
-├── test/            # Independent test module with startup validation
-├── _docs/           # Project documentation and specifications
-└── pom.xml          # Root Maven POM
+├── adapter/          # 接口适配层（Controller、Listener、Scheduler）
+├── app/             # 应用编排层（CQRS、Command、Query）
+├── domain/           # 核心业务逻辑（Aggregate、Entity、VO、Event）
+├── infrastructure/    # 技术实现（Repository、Cache、Search、OSS）
+├── start/           # 启动模块（Bean 组装通过 *Configure 类）
+├── test/            # 独立测试模块，启动验证
+├── _docs/           # 项目文档和规范
+└── pom.xml          # 根 Maven POM
 ```
 
-## WHERE TO LOOK
-| Task | Location | Notes |
-|------|----------|-------|
-| Entry point | start/src/main/java/org/smm/archetype/ApplicationBootstrap.java | Spring Boot main, CommandLineRunner |
-| Domain models | domain/src/main/java/org/smm/archetype/domain/ | Aggregates, Entities, Value Objects |
-| Application services | app/src/main/java/org/smm/archetype/app/ | CQRS orchestration |
-| Repository implementations | infrastructure/src/main/java/org/smm/archetype/infrastructure/ | MyBatis-Flex mappers |
-| Controllers | adapter/src/main/java/org/smm/archetype/adapter/ | REST endpoints |
-| Bean configs | start/src/main/java/org/smm/archetype/config/ | All *Configure classes |
-| Test validation | test/src/test/java/org/smm/archetype/test/ApplicationStartupTests.java | Startup integration test |
+## 关键位置
 
-## CODE MAP
-(Not available - LSP symbols not queried)
+| 任务            | 位置                                                                     | 备注                               |
+|---------------|------------------------------------------------------------------------|----------------------------------|
+| 入口点           | start/src/main/java/org/smm/archetype/ApplicationBootstrap.java        | Spring Boot 主类，CommandLineRunner |
+| 领域模型          | domain/src/main/java/org/smm/archetype/domain/                         | 聚合根、实体、值对象                       |
+| 应用服务          | app/src/main/java/org/smm/archetype/app/                               | CQRS 编排                          |
+| Repository 实现 | infrastructure/src/main/java/org/smm/archetype/infrastructure/         | MyBatis-Flex Mapper              |
+| Controller    | adapter/src/main/java/org/smm/archetype/adapter/                       | REST 端点                          |
+| Bean 配置       | start/src/main/java/org/smm/archetype/config/                          | 所有 *Configure 类                  |
+| 测试验证          | test/src/test/java/org/smm/archetype/test/ApplicationStartupTests.java | 启动集成测试                           |
 
-## CONVENTIONS
+## 代码映射
 
-**Non-standard naming (intentional project style)**:
-- Configuration classes: `*Configure` (e.g., `OrderConfigure`, NOT `OrderConfig`)
-- Shared packages: `bizshared` (not `shared`/`common`)
-- Example code: `_example/` prefix within production modules
+(暂无 - LSP 符号未查询)
 
-**Standard DDD layering**:
-- Adapter → Application → Domain ← Infrastructure (dependency rule)
-- Domain layer: NO external dependencies, pure business logic
-- Repository interfaces in Domain, implementations in Infrastructure
+## 约定（非标准）
 
-**Configuration rules**:
-- All `@Configuration` classes MUST be in `start/src/main/java/org/smm/archetype/config/`
-- Naming: `{Aggregate}Configure` (e.g., `OrderConfigure`)
-- Bean assembly via `@Bean` methods only (no `@Component` scanning for beans)
+**非标准命名（项目特定风格）**：
 
-**Lombok rules**:
-- `@Data`: ❌ FORBIDDEN (uncontrolled code generation)
-- Use: `@Getter`, `@Setter`, `@Builder`, `@RequiredArgsConstructor`
+- 配置类：`*Configure`（如 `OrderConfigure`，而非 `OrderConfig`）
+- 共享包：`bizshared`（而非 `shared`/`common`）
+- 示例代码：`_example/` 前缀在生产模块内
 
-## ANTI-PATTERNS (THIS PROJECT)
+**标准 DDD 分层**：
 
-**Forbidden patterns**:
-1. `@Data` annotation - Uncontrolled equals/hashCode generation
-2. `@Lazy`, `ObjectProvider` for circular deps - Must refactor instead
-3. Configuration classes outside `start/` module - Only `start/config/` allowed
-4. Tests in production modules - Must use separate `test/` module
-5. External dependencies in Domain layer - Domain must remain pure
+- Adapter → Application → Domain ← Infrastructure（依赖规则）
+- Domain 层：无外部依赖，纯业务逻辑
+- Repository 接口在 Domain 层，实现在 Infrastructure 层
 
-## UNIQUE STYLES
+**配置规则**：
 
-**Event-driven architecture**:
-- Auto-detection: Spring Events (default) vs Kafka (conditional on Bean presence)
-- Retry strategies: Exponential backoff, External scheduler (XXL-JOB/PowerJob support)
+- 所有 `@Configuration` 类必须在 `start/src/main/java/org/smm/archetype/config/`
+- 命名：`{Aggregate}Configure`（如 `OrderConfigure`）
+- Bean 组装仅通过 `@Bean` 方法（无 `@Component` 扫描）
 
-**Test-first validation**:
-- Mandatory 4-step verification: compile → test → startup → coverage
-- Independent test module with `ApplicationStartupTests` for Spring context validation
+**Lombok 规则**：
 
-**Bean assembly pattern**:
-- Constructor injection with `@RequiredArgsConstructor` preferred
-- `@Bean` method parameters for intra-config dependencies
-- Optional/`@ConditionalOnBean` for cross-config circular deps
+- `@Data`：❌ 禁止（不可控的代码生成）
+- 使用：`@Getter`、`@Setter`、`@Builder`、`@RequiredArgsConstructor`
 
-## COMMANDS
+## 反模式（本项目）
+
+**禁止模式**：
+
+1. `@Data` 注解 - 不可控的 equals/hashCode 生成
+2. `@Lazy`、`ObjectProvider` 用于循环依赖 - 必须重构
+3. 配置类在 `start/` 模块外 - 仅 `start/config/` 允许
+4. 测试在生产模块中 - 必须使用独立的 `test/` 模块
+5. Domain 层的外部依赖 - Domain 必须保持纯净
+
+## 独特风格
+
+**事件驱动架构**：
+
+- 自动检测：Spring Events（默认）vs Kafka（基于 Bean 存在条件判断）
+- 重试策略：指数退避、外部调度器（支持 XXL-JOB/PowerJob）
+
+**测试优先验证**：
+
+- 强制 4 步验证：编译 → 测试 → 启动 → 覆盖率
+- 独立测试模块，包含 `ApplicationStartupTests` 用于 Spring 上下文验证
+
+**Bean 组装模式**：
+
+- 构造函数注入优先（`@RequiredArgsConstructor`）
+- `@Bean` 方法参数用于配置内依赖
+- 跨配置循环依赖：Optional/`@ConditionalOnBean`
+
+## 命令
+
 ```bash
-# Compile
+# 编译
 mvn clean compile
 
-# Test (with JaCoCo coverage, requires JDK 25)
+# 测试（含 JaCoCo 覆盖率，需要 JDK 25）
 mvn test
 
-# Startup validation (most critical)
+# 启动验证（最关键）
 mvn test -Dtest=ApplicationStartupTests -pl test
 
-# Run application
+# 运行应用
 mvn spring-boot:run -pl start
 
-# Generate archetype (for new projects)
+# 生成 archetype（用于新项目）
 mvn archetype:generate -DarchetypeGroupId=org.smm.archetype -DarchetypeArtifactId=web-quick-start-domain -DarchetypeVersion=1.0.0
 ```
 
-## NOTES
+## 注意事项
 
-**Deviation warnings** (documented in `_docs/specification/业务代码编写规范.md`):
+**偏差警告**（`_docs/specification/业务代码编写规范.md` 文档中已记录）：
 
-- Spring Boot version mismatch: pom.xml shows 4.0.2, README mentions 4.0.2
-- MyBatis-Flex: Manual dependency management instead of spring-boot-starter
-- Test structure: Isolated `test/` module (not co-located with production)
+- Spring Boot 版本不匹配：pom.xml 显示 4.0.2，README 提及 4.0.2
+- MyBatis-Flex：手动依赖管理而非 spring-boot-starter
+- 测试结构：独立的 `test/` 模块（非与生产代码共存）
 
-**Coverage requirements**:
-- Line coverage: ≥95%
-- Branch coverage: 100%
-- Test pass rate: 100%
+**覆盖率要求**：
 
-**Gotchas**:
-- JDK 25 required (virtual threads enabled)
-- Middleware optional: Kafka, Redis, Elasticsearch - all auto-detected via `@ConditionalOnBean`
-- Example code (`_example/`) is part of production modules, not separate
-- Startup validation test is the gatekeeper for Spring context health
+- 行覆盖率：≥95%
+- 分支覆盖率：100%
+- 测试通过率：100%
+
+**关键点**：
+
+- JDK 25 必需（启用虚拟线程）
+- 中间件可选：Kafka、Redis、Elasticsearch - 全部通过 `@ConditionalOnBean` 自动检测
+- 示例代码（`_example/`）是生产模块的一部分，而非独立模块
+- 启动验证测试是 Spring 上下文健康的守门员

@@ -1,38 +1,83 @@
-# DOMAIN LAYER
+# DOMAIN 层
 
-Core DDD business logic - pure domain models with no external dependencies.
+核心DDD业务逻辑 - 纯净领域模型，无外部依赖。
 
-## STRUCTURE
+## 概述
+
+- **职责**：聚合根、实体、值对象、领域事件、仓储接口定义
+- **依赖规则**：零外部依赖（无Spring、MyBatis等）
+- **关键特点**：业务规则封装、不变性保护、事件溯源
+
+## 结构
 ```
 domain/
-├── bizshared/       # Shared domain base classes
+├── bizshared/       # 共享领域基类
 │   ├── base/        # AggregateRoot, Entity, DomainEvent, Identifier
-│   ├── client/      # Technical client interfaces
-│   └── event/       # Domain event base
-├── common/          # Reusable domain concepts
-│   ├── file/        # File metadata value objects
-│   └── search/      # Search abstractions
-└── example/         # Example domain (Order aggregate)
-    └── order/       # OrderAggr, OrderItem, Money VOs
+│   ├── client/      # 技术客户端接口（CacheClient, NotificationClient）
+│   └── event/       # DomainEvent 基类
+├── common/          # 通用领域对象
+│   ├── file/        # FileMetadata, FileType 值对象
+│   └── search/      # SearchCondition, SortCondition
+└── _example/        # 订单示例（75个类）
+    └── order/
+        ├── model/
+        │   ├── OrderAggr.java          # 聚合根
+        │   ├── entity/                 # 实体
+        │   ├── valueobject/            # 值对象（Money, OrderStatus）
+        │   └── event/                  # 领域事件（OrderCreatedEvent）
+        ├── repository/                # 仓储接口
+        └── service/                    # 领域服务
 ```
 
-## WHERE TO LOOK
-| Task | Location | Notes |
-|------|----------|-------|
-| Aggregates | domain/**/model/*Aggr.java | Aggregate roots with business rules |
-| Value Objects | domain/**/model/valueobject/ | Immutable, no identity |
-| Domain Events | domain/**/model/event/ | DomainEvent subclasses |
-| Repository Interfaces | domain/**/repository/ | NO implementations here |
-| Domain Services | domain/**/service/ | Cross-aggregate logic |
+## 关键位置
 
-## CONVENTIONS
-- **NO external dependencies** - pure business logic only
-- Repository: interfaces only, implementations in infrastructure/
-- Aggregates: protect invariants via public methods
-- Events: recorded via `recordEvent()` in AggregateRoot
+| 任务   | 位置                           | 备注                      |
+|------|------------------------------|-------------------------|
+| 聚合根  | domain/**/model/*Aggr.java   | 业务规则封装                  |
+| 值对象  | domain/**/model/valueobject/ | 不可变、无身份标识               |
+| 领域事件 | domain/**/model/event/       | DomainEvent 子类          |
+| 仓储接口 | domain/**/repository/        | 仅接口，实现在 infrastructure/ |
+| 领域服务 | domain/**/service/           | 跨聚合业务逻辑                 |
 
-## ANTI-PATTERNS
-- ❌ External libs in domain layer (Spring, MyBatis, etc.)
-- ❌ Repository implementations (only interfaces)
-- ❌ Database entities mixed with domain models
-- ❌ `@Data` annotation
+## 约定（项目特有）
+
+- **零外部依赖**：纯业务逻辑，禁用 Spring 注解
+- 聚合根：通过 `recordEvent()` 记录事件
+- 仓储：仅定义接口，实现在 infrastructure/
+- 值对象：使用 `@ValueObject` 注解标记（自定义）
+- 使用 Lombok：`@RequiredArgsConstructor`，禁止 `@Data`
+
+## 反模式
+
+- ❌ 外部库依赖（Spring、MyBatis、Lombok 部分）
+- ❌ 仓储实现（仅定义接口）
+- ❌ 数据库实体混入领域模型
+- ❌ `@Data` 注解
+- ❌ 贫血模型（业务逻辑在Service而非Entity）
+
+## DDD 模式示例
+
+```java
+// 聚合根
+public class OrderAggr extends AggregateRoot<OrderAggr, OrderId> {
+    private OrderId id;
+    private List<OrderItem> items;
+    private OrderStatus status;
+
+    public static OrderAggr create(String customerId, Money totalAmount) {
+        OrderAggr order = new OrderAggr();
+        order.id = OrderId.generate();
+        order.status = OrderStatus.CREATED;
+        order.recordEvent(new OrderCreatedEvent(order.id));
+        return order;
+    }
+
+    public void pay(PaymentMethod method) {
+        if (this.status != OrderStatus.CREATED) {
+            throw new IllegalStateException("只有已创建的订单可以支付");
+        }
+        this.status = OrderStatus.PAID;
+        this.recordEvent(new OrderPaidEvent(this.id));
+    }
+}
+```

@@ -1,10 +1,10 @@
 package org.smm.archetype.exampleorder;
 
-import org.smm.archetype.adapter._example.handler.OrderCancelledEventHandler;
-import org.smm.archetype.adapter._example.handler.OrderCreatedEventHandler;
-import org.smm.archetype.adapter._example.handler.OrderPaidEventHandler;
 import org.smm.archetype.adapter.event.EventHandler;
-import org.smm.archetype.app._example.OrderAppService;
+import org.smm.archetype.adapter.example.handler.OrderCancelledEventHandler;
+import org.smm.archetype.adapter.example.handler.OrderCreatedEventHandler;
+import org.smm.archetype.adapter.example.handler.OrderPaidEventHandler;
+import org.smm.archetype.app.example.OrderAppService;
 import org.smm.archetype.domain.bizshared.event.DomainEventPublisher;
 import org.smm.archetype.domain.example.repository.OrderAggrRepository;
 import org.smm.archetype.domain.example.service.InventoryService;

@@ -1,39 +1,82 @@
-# APP LAYER
+# APP 层
 
-Application orchestration - CQRS, transaction boundaries, use case coordination.
+应用编排层 - CQRS、事务边界、用例协调。
 
-## STRUCTURE
+## 概述
+
+- **职责**：用例编排、CQRS 分离、DTO 转换
+- **依赖规则**：依赖 Domain，被 Adapter 调用
+- **关键特点**：事务边界、多聚合协调、领域事件处理
+
+## 结构
 ```
 app/
-├── bizshared/       # Shared application services
-│   ├── result/      # BaseResult, PageResult wrappers
-│   └── query/       # Query service base classes
-└── _example/        # Example application service
-    ├── OrderAppService.java
-    ├── command/      # CQRS Commands (CreateOrderCommand, etc.)
-    ├── query/        # CQRS Queries (OrderQuery, etc.)
-    └── dto/         # App DTOs (OrderDTO, MoneyDTO)
+├── bizshared/       # 共享应用服务
+│   ├── result/      # BaseResult, PageResult 包装器
+│   └── query/       # 查询服务基类
+└── _example/        # 示例应用服务
+    └── order/
+        ├── OrderAppService.java     # 用例编排
+        ├── command/                 # CQRS Commands（CreateOrderCommand 等）
+        ├── query/                   # CQRS Queries（OrderQuery 等）
+        └── dto/                     # 应用层 DTO（OrderDTO, MoneyDTO）
 ```
 
-## WHERE TO LOOK
-| Task | Location | Notes |
-|------|----------|-------|
-| Application Services | app/**/*AppService.java | Use case orchestration |
-| CQRS Commands | app/**/command/ | Input DTOs for write ops |
-| CQRS Queries | app/**/query/ | Input DTOs for read ops |
-| App DTOs | app/**/dto/ | Data transfer objects |
-| Result Wrappers | app/bizshared/result/ | BaseResult, PageResult |
+## 关键位置
 
-## CONVENTIONS
-- **Orchestration only** - NO business rules (domain enforces invariants)
-- Transaction boundaries: `@Transactional` on ApplicationService methods
-- CQRS: Separate Command/Query DTOs and handlers
-- MapStruct for App DTO ↔ Domain/Response DTO conversion
-- Coordinate multiple aggregates/services
+| 任务            | 位置                      | 备注                     |
+|---------------|-------------------------|------------------------|
+| 应用服务          | app/**/*AppService.java | 用例编排                   |
+| CQRS Commands | app/**/command/         | 写操作输入 DTO              |
+| CQRS Queries  | app/**/query/           | 读操作输入 DTO              |
+| 应用层 DTO       | app/**/dto/             | 数据传输对象                 |
+| 结果包装器         | app/bizshared/result/   | BaseResult, PageResult |
 
-## ANTI-PATTERNS
-- ❌ Business rules (move to Domain aggregates)
-- ❌ Direct infrastructure access (use Repository interfaces from domain)
-- ❌ Domain objects exposed to adapters (convert via DTOs)
-- ❌ Configuration classes (must be in start/)
-- ❌ `@Data` annotation
+## 约定（项目特有）
+
+- **仅编排**：无业务规则（由 Domain 强制不变量）
+- 事务边界：ApplicationService 方法上使用 `@Transactional`
+- CQRS：分离 Command/Query DTO 和处理器
+- 转换器：MapStruct 做 App DTO ↔ Domain/Response DTO 转换
+- 协调多个聚合/服务
+
+## CQRS 模式示例
+
+```java
+// Command（写操作）
+public class CreateOrderCommand {
+    private String customerId;
+    private MoneyDTO totalAmount;
+}
+
+// Query（读操作）
+public class OrderQuery {
+    private String customerId;
+}
+
+// ApplicationService
+public class OrderAppService {
+    @Transactional
+    public OrderId create(CreateOrderCommand command) {
+        OrderAggr order = OrderAggr.create(command.getCustomerId(), 
+            Money.of(command.getTotalAmount()));
+        orderRepository.save(order);
+        return order.getId();
+    }
+
+    public List<OrderDTO> query(OrderQuery query) {
+        return orderRepository.findByCustomerId(query.getCustomerId())
+            .stream()
+            .map(this::toDTO)
+            .toList();
+    }
+}
+```
+
+## 反模式
+
+- ❌ 业务规则（移至 Domain 聚合）
+- ❌ 直接访问基础设施（使用 Domain 的 Repository 接口）
+- ❌ 领域对象暴露给 Adapter（通过 DTO 转换）
+- ❌ 配置类（必须在 start/）
+- ❌ `@Data` 注解
