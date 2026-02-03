@@ -1,7 +1,7 @@
 package org.smm.archetype.infrastructure.bizshared.client.search.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.infrastructure.bizshared.client.search.AbstractSearchClient;
+import org.smm.archetype.domain.bizshared.client.SearchClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import java.util.Map;
  * 用于测试和开发环境,避免依赖Elasticsearch中间件。
  */
 @Slf4j
-public class MockSearchClientImpl extends AbstractSearchClient {
+public class MockSearchClientImpl implements SearchClient {
 
     /**
      * 索引数据存储
@@ -26,13 +26,13 @@ public class MockSearchClientImpl extends AbstractSearchClient {
     private final Map<String, Boolean> indexExists = new HashMap<>();
 
     @Override
-    protected void doIndex(String index, String id, Map<String, Object> document) {
+    public void index(String index, String id, Map<String, Object> document) {
         log.debug("Mock搜索索引: index={}, id={}", index, id);
         indexData.computeIfAbsent(index, k -> new HashMap<>()).put(id, new HashMap<>(document));
     }
 
     @Override
-    protected void doBulkIndex(String index, List<Map.Entry<String, Map<String, Object>>> documents) {
+    public void bulkIndex(String index, List<Map.Entry<String, Map<String, Object>>> documents) {
         log.debug("Mock搜索批量索引: index={}, count={}", index, documents.size());
         Map<String, Map<String, Object>> indexMap = indexData.computeIfAbsent(index, k -> new HashMap<>());
         for (Map.Entry<String, Map<String, Object>> entry : documents) {
@@ -41,7 +41,7 @@ public class MockSearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected void doDelete(String index, String id) {
+    public void delete(String index, String id) {
         log.debug("Mock搜索删除: index={}, id={}", index, id);
         Map<String, Map<String, Object>> indexMap = indexData.get(index);
         if (indexMap != null) {
@@ -50,7 +50,7 @@ public class MockSearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected void doBulkDelete(String index, List<String> ids) {
+    public void bulkDelete(String index, List<String> ids) {
         log.debug("Mock搜索批量删除: index={}, count={}", index, ids.size());
         Map<String, Map<String, Object>> indexMap = indexData.get(index);
         if (indexMap != null) {
@@ -61,7 +61,7 @@ public class MockSearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected Map<String, Object> doGet(String index, String id) {
+    public Map<String, Object> get(String index, String id) {
         log.debug("Mock搜索获取: index={}, id={}", index, id);
         Map<String, Map<String, Object>> indexMap = indexData.get(index);
         if (indexMap != null) {
@@ -71,7 +71,7 @@ public class MockSearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected Map<String, Map<String, Object>> doBulkGet(String index, List<String> ids) {
+    public Map<String, Map<String, Object>> bulkGet(String index, List<String> ids) {
         log.debug("Mock搜索批量获取: index={}, count={}", index, ids.size());
         Map<String, Map<String, Object>> result = new HashMap<>();
         Map<String, Map<String, Object>> indexMap = indexData.get(index);
@@ -87,7 +87,12 @@ public class MockSearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected Map<String, Object> doSearch(String index, String query, int from, int size) {
+    public Map<String, Object> search(String index, String query) {
+        return search(index, query, 0, 10);
+    }
+
+    @Override
+    public Map<String, Object> search(String index, String query, int from, int size) {
         log.debug("Mock搜索: index={}, query={}, from={}, size={}", index, query, from, size);
         Map<String, Map<String, Object>> indexMap = indexData.get(index);
         Map<String, Object> result = new HashMap<>();
@@ -121,7 +126,7 @@ public class MockSearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected Map<String, Object> doAggregate(String index, String query) {
+    public Map<String, Object> aggregate(String index, String query) {
         log.debug("Mock聚合: index={}, query={}", index, query);
         return Map.of(
             "aggregations", new HashMap<>(),
@@ -130,33 +135,33 @@ public class MockSearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected boolean doExistsIndex(String index) {
+    public boolean existsIndex(String index) {
         log.debug("Mock搜索索引存在性检查: index={}", index);
         return indexExists.getOrDefault(index, false) || indexData.containsKey(index);
     }
 
     @Override
-    protected void doCreateIndex(String index, String mapping) {
+    public void createIndex(String index, String mapping) {
         log.debug("Mock搜索创建索引: index={}", index);
         indexExists.put(index, true);
         indexData.putIfAbsent(index, new HashMap<>());
     }
 
     @Override
-    protected void doDeleteIndex(String index) {
+    public void deleteIndex(String index) {
         log.debug("Mock搜索删除索引: index={}", index);
         indexData.remove(index);
         indexExists.remove(index);
     }
 
     @Override
-    protected void doRefresh(String index) {
+    public void refresh(String index) {
         log.debug("Mock搜索刷新索引: index={}", index);
         // Mock操作,无需实际刷新
     }
 
     @Override
-    protected Map<String, Object> doVectorSearch(String index, String query) {
+    public Map<String, Object> vectorSearch(String index, String query) {
         log.debug("Mock向量搜索: index={}, query={}", index, query);
         return Map.of(
             "hits", new HashMap<>(Map.of(
@@ -168,14 +173,14 @@ public class MockSearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected void doCreateVectorIndex(String index, String vectorField, int dimension, String indexType, String distanceType) {
+    public void createVectorIndex(String index, String vectorField, int dimension, String indexType, String distanceType) {
         log.debug("Mock创建向量索引: index={}, field={}, dimension={}, type={}, distance={}",
             index, vectorField, dimension, indexType, distanceType);
         indexExists.put(index + "_vector", true);
     }
 
     @Override
-    protected List<Map<String, Object>> doBulkVectorSearch(String index, List<String> queries) {
+    public List<Map<String, Object>> bulkVectorSearch(String index, List<String> queries) {
         log.debug("Mock批量向量搜索: index={}, count={}", index, queries.size());
         List<Map<String, Object>> results = new ArrayList<>();
         for (int i = 0; i < queries.size(); i++) {

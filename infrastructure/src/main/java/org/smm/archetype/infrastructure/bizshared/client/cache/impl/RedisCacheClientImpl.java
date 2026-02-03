@@ -1,7 +1,7 @@
 package org.smm.archetype.infrastructure.bizshared.client.cache.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.infrastructure.bizshared.client.cache.AbstractCacheClient;
+import org.smm.archetype.domain.bizshared.client.CacheClient;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.time.Duration;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * Redis缓存实现，基于Fastjson2序列化，适用于分布式场景。
  */
 @Slf4j
-public class RedisCacheClientImpl extends AbstractCacheClient {
+public class RedisCacheClientImpl implements CacheClient {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -23,7 +23,7 @@ public class RedisCacheClientImpl extends AbstractCacheClient {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T> T doGet(String key) {
+    public <T> T get(String key) {
         Object value = redisTemplate.opsForValue().get(key);
         if (value == null) {
             return null;
@@ -34,7 +34,7 @@ public class RedisCacheClientImpl extends AbstractCacheClient {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T> List<T> doGetList(String key) {
+    public <T> List<T> getList(String key) {
         List<Object> range = redisTemplate.opsForList().range(key, 0, -1);
         if (range == null || range.isEmpty()) {
             return List.of();
@@ -47,7 +47,7 @@ public class RedisCacheClientImpl extends AbstractCacheClient {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T> List<T> doGetList(String key, int beginIdx, int endIdx) {
+    public <T> List<T> getList(String key, int beginIdx, int endIdx) {
         List<Object> range = redisTemplate.opsForList().range(key, beginIdx, endIdx);
         if (range == null || range.isEmpty()) {
             return List.of();
@@ -59,37 +59,37 @@ public class RedisCacheClientImpl extends AbstractCacheClient {
     }
 
     @Override
-    protected void doPut(String key, Object value) {
+    public void put(String key, Object value) {
         redisTemplate.opsForValue().set(key, value);
     }
 
     @Override
-    protected void doPut(String key, Object value, Duration duration) {
+    public void put(String key, Object value, Duration duration) {
         redisTemplate.opsForValue().set(key, value, duration);
     }
 
     @Override
-    protected void doAppend(String key, Object value) {
+    public void append(String key, Object value) {
         redisTemplate.opsForList().rightPush(key, value);
     }
 
     @Override
-    protected void doDelete(String key) {
+    public void delete(String key) {
         redisTemplate.delete(key);
     }
 
     @Override
-    protected Boolean doHasKey(String key) {
+    public Boolean hasKey(String key) {
         return redisTemplate.hasKey(key);
     }
 
     @Override
-    protected Boolean doExpire(String key, long timeout, TimeUnit unit) {
+    public Boolean expire(String key, long timeout, TimeUnit unit) {
         return redisTemplate.expire(key, timeout, unit);
     }
 
     @Override
-    protected Long doGetExpire(String key) {
+    public Long getExpire(String key) {
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
 

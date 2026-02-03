@@ -4,29 +4,25 @@
 
 ## 概述
 
-- **职责**：聚合根、实体、值对象、领域事件、仓储接口定义
-- **依赖规则**：零外部依赖（无Spring、MyBatis等）
-- **关键特点**：业务规则封装、不变性保护、事件溯源
+职责：聚合根、实体、值对象、领域事件、仓储接口定义。
+依赖规则：零外部依赖（无Spring、MyBatis等）。
+规模：80+ Java 文件，19,358+ 行代码（项目核心）。
 
 ## 结构
+
 ```
 domain/
-├── bizshared/       # 共享领域基类
-│   ├── base/        # AggregateRoot, Entity, DomainEvent, Identifier
-│   ├── client/      # 技术客户端接口（CacheClient, NotificationClient）
-│   └── event/       # DomainEvent 基类
-├── common/          # 通用领域对象
-│   ├── file/        # FileMetadata, FileType 值对象
-│   └── search/      # SearchCondition, SortCondition
+├── bizshared/       # 共享领域基类（AggregateRoot, Entity, DomainEvent, Identifier）
+│   ├── base/        # 领域对象基类
+│   ├── client/      # 技术客户端接口
+│   ├── event/       # DomainEvent 基类
+│   └── util/        # 工具类（⚠️ MyBeanUtil.java 导入Spring，违反零依赖原则）
+├── common/          # 通用领域对象（FileMetadata, SearchCondition）
 └── _example/        # 订单示例（75个类）
     └── order/
-        ├── model/
-        │   ├── OrderAggr.java          # 聚合根
-        │   ├── entity/                 # 实体
-        │   ├── valueobject/            # 值对象（Money, OrderStatus）
-        │   └── event/                  # 领域事件（OrderCreatedEvent）
-        ├── repository/                # 仓储接口
-        └── service/                    # 领域服务
+        ├── model/    # OrderAggr（聚合根）、实体、值对象、事件
+        ├── repository/ # 仓储接口
+        └── service/    # 领域服务
 ```
 
 ## 关键位置
@@ -39,45 +35,21 @@ domain/
 | 仓储接口 | domain/**/repository/        | 仅接口，实现在 infrastructure/ |
 | 领域服务 | domain/**/service/           | 跨聚合业务逻辑                 |
 
-## 约定（项目特有）
+## 约定
 
-- **零外部依赖**：纯业务逻辑，禁用 Spring 注解
-- 聚合根：通过 `recordEvent()` 记录事件
-- 仓储：仅定义接口，实现在 infrastructure/
-- 值对象：使用 `@ValueObject` 注解标记（自定义）
-- 使用 Lombok：`@RequiredArgsConstructor`，禁止 `@Data`
+零外部依赖：纯业务逻辑，禁用 Spring 注解。
+聚合根：通过 `recordEvent()` 记录事件。
+仓储：仅定义接口，实现在 infrastructure/。
+Lombok：`@RequiredArgsConstructor`，禁止 `@Data`。
 
 ## 反模式
 
-- ❌ 外部库依赖（Spring、MyBatis、Lombok 部分）
-- ❌ 仓储实现（仅定义接口）
-- ❌ 数据库实体混入领域模型
-- ❌ `@Data` 注解
-- ❌ 贫血模型（业务逻辑在Service而非Entity）
+❌ 外部库依赖（Spring、MyBatis）、仓储实现、数据库实体（DO）混入、`@Data`、贫血模型。
 
-## DDD 模式示例
+## 架构偏差
 
-```java
-// 聚合根
-public class OrderAggr extends AggregateRoot<OrderAggr, OrderId> {
-    private OrderId id;
-    private List<OrderItem> items;
-    private OrderStatus status;
+**⚠️ P0 - Domain 层外部依赖违反**
 
-    public static OrderAggr create(String customerId, Money totalAmount) {
-        OrderAggr order = new OrderAggr();
-        order.id = OrderId.generate();
-        order.status = OrderStatus.CREATED;
-        order.recordEvent(new OrderCreatedEvent(order.id));
-        return order;
-    }
-
-    public void pay(PaymentMethod method) {
-        if (this.status != OrderStatus.CREATED) {
-            throw new IllegalStateException("只有已创建的订单可以支付");
-        }
-        this.status = OrderStatus.PAID;
-        this.recordEvent(new OrderPaidEvent(this.id));
-    }
-}
-```
+- `domain/bizshared/util/MyBeanUtil.java` 导入 Spring 类（`BeanUtils`, `BeanWrapper`）
+- **影响**：破坏 DDD 核心原则，领域层耦合 Spring，难以独立测试
+- **建议**：重构为纯 Java，使用手动属性拷贝

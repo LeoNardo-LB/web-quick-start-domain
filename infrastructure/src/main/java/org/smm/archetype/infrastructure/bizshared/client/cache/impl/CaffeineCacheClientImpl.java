@@ -6,7 +6,7 @@ import com.github.benmanes.caffeine.cache.Expiry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.infrastructure.bizshared.client.cache.AbstractCacheClient;
+import org.smm.archetype.domain.bizshared.client.CacheClient;
 
 import java.time.Duration;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  * Caffeine本地缓存实现，支持自定义过期和访问追踪。
  */
 @Slf4j
-public class CaffeineCacheClientImpl extends AbstractCacheClient {
+public class CaffeineCacheClientImpl implements CacheClient {
 
     private final Cache<String, CacheValueWrapper> cache;
 
@@ -46,7 +46,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T> T doGet(String key) {
+    public <T> T get(String key) {
         CacheValueWrapper wrapper = cache.getIfPresent(key);
         if (wrapper == null) {
             return null;
@@ -61,7 +61,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T> List<T> doGetList(String key) {
+    public <T> List<T> getList(String key) {
         CacheValueWrapper wrapper = cache.getIfPresent(key);
         if (wrapper == null) {
             return List.of();
@@ -78,7 +78,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T> List<T> doGetList(String key, int beginIdx, int endIdx) {
+    public <T> List<T> getList(String key, int beginIdx, int endIdx) {
         CacheValueWrapper wrapper = cache.getIfPresent(key);
         if (wrapper == null) {
             return List.of();
@@ -100,21 +100,21 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
     }
 
     @Override
-    protected void doPut(String key, Object value) {
+    public void put(String key, Object value) {
         // 使用默认过期时间（从配置读取）
         CacheValueWrapper wrapper = CacheValueWrapper.of(value, defaultExpireAfterWrite);
         cache.put(key, wrapper);
     }
 
     @Override
-    protected void doPut(String key, Object value, Duration duration) {
+    public void put(String key, Object value, Duration duration) {
         // 使用指定的过期时间
         CacheValueWrapper wrapper = CacheValueWrapper.of(value, duration);
         cache.put(key, wrapper);
     }
 
     @Override
-    protected void doAppend(String key, Object value) {
+    public void append(String key, Object value) {
         // Caffeine 不支持 List 操作，使用 put 覆盖
         // 实际使用中建议使用 put 而不是 append
         CacheValueWrapper wrapper = CacheValueWrapper.of(value, defaultExpireAfterWrite);
@@ -122,18 +122,18 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
     }
 
     @Override
-    protected void doDelete(String key) {
+    public void delete(String key) {
         cache.invalidate(key);
     }
 
     @Override
-    protected Boolean doHasKey(String key) {
+    public Boolean hasKey(String key) {
         CacheValueWrapper wrapper = cache.getIfPresent(key);
         return wrapper != null;
     }
 
     @Override
-    protected Boolean doExpire(String key, long timeout, TimeUnit unit) {
+    public Boolean expire(String key, long timeout, TimeUnit unit) {
         CacheValueWrapper wrapper = cache.getIfPresent(key);
         if (wrapper == null) {
             return false;
@@ -153,7 +153,7 @@ public class CaffeineCacheClientImpl extends AbstractCacheClient {
     }
 
     @Override
-    protected Long doGetExpire(String key) {
+    public Long getExpire(String key) {
         CacheValueWrapper wrapper = cache.getIfPresent(key);
         if (wrapper == null) {
             return -1L;

@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Aspect
 @Order
 @RequiredArgsConstructor
+@Slf4j
 public class LogAspect {
 
     /**
@@ -62,11 +65,19 @@ public class LogAspect {
 
     /**
      * 业务日志切点
-    
+
      * 定义切入点，拦截标记了@Log注解的方法。
      */
     @Pointcut("@annotation(org.smm.archetype.infrastructure.common.log.MyLog)")
     public void logCut() {
+    }
+
+    /**
+     * Client类切点 - 自动拦截所有Client实现类的方法
+     * 拦截org.smm.archetype.infrastructure.bizshared.client包及其子包下的所有方法
+     */
+    @Pointcut("execution(* org.smm.archetype.infrastructure.bizshared.client..*.*(..))")
+    public void clientCut() {
     }
 
     /**
@@ -96,7 +107,6 @@ public class LogAspect {
         builder.setMyLog(myLog);
         builder.setThreadName(Thread.currentThread().getName());
 
-        String className = declaringType.getSimpleName();
         String methodName = signature.getMethod().getName();
 
         try {
@@ -114,25 +124,134 @@ public class LogAspect {
             timerSample.stop(executionTimer);
             builder.setEndTime(Instant.now());
             Log log = builder.build();
-            Logger logger = LOGGER_MAP.computeIfAbsent(declaringType, k -> LoggerFactory.getLogger(declaringType));
 
-            // 日志格式约定：类 | 方法 | 业务 | 耗时ms | 线程 | 入参 | 出参
-            String logMessage = String.format(
-                    "[方法执行] %s | %s | %s | %dms | %s | %s | %s",
-                    className,
+            // 使用统一的日志记录方法
+            logExecution(
+                    declaringType,
                     methodName,
-                    myLog != null ? myLog.value() : "-",
+                    "方法执行",
+                    myLog != null ? myLog.value() : null,
                     log.getEndTime().toEpochMilli() - log.getStartTime().toEpochMilli(),
                     log.getThreadName(),
-                    toSafeJson(log.getArgs()),
-                    log.getError() == null ? toSafeJson(log.getResult()) : "ERROR"
+                    log.getArgs(),
+                    log.getResult(),
+                    log.getError()
             );
+        }
+    }
 
-            if (log.getError() == null) {
-                logger.info(logMessage);
-            } else {
-                logger.error(logMessage, log.getError());
-            }
+    /**
+     * 环绕通知 - 处理Client类的异常
+     *
+     * 与doAround不同，Client类异常被捕获并返回默认值，不抛出异常。
+     * 这样可以保证基础设施层的故障不影响业务流程。
+     * @param joinPoint 连接点对象
+     * @return 方法执行结果或默认值
+     */
+    @Around(value = "clientCut()")
+    public Object handleClientException(ProceedingJoinPoint joinPoint) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Class<?> declaringType = signature.getDeclaringType();
+        String methodName = signature.getMethod().getName();
+        String threadName = Thread.currentThread().getName();
+        long startTime = System.currentTimeMillis();
+
+        try {
+            Object result = joinPoint.proceed();
+            long duration = System.currentTimeMillis() - startTime;
+
+            // 使用统一的日志记录方法记录成功执行
+            logExecution(
+                    declaringType,
+                    methodName,
+                    "Client调用",
+                    null,
+                    duration,
+                    threadName,
+                    joinPoint.getArgs(),
+                    result,
+                    null
+            );
+            return result;
+        } catch (Throwable e) {
+            long duration = System.currentTimeMillis() - startTime;
+
+            // Client类：吞掉异常，返回默认值
+            // 记录异常日志，但不抛出异常，保证业务流程继续
+            logExecution(
+                    declaringType,
+                    methodName,
+                    "Client调用",
+                    null,
+                    duration,
+                    threadName,
+                    joinPoint.getArgs(),
+                    null,
+                    e
+            );
+            return getDefaultValue(signature.getReturnType());
+        }
+    }
+
+    /**
+     * 根据返回类型获取默认值
+     * @param returnType 方法返回类型
+     * @return 对应的默认值
+     */
+    private Object getDefaultValue(Class<?> returnType) {
+        if (returnType == void.class || returnType == Void.class) {
+            return null;
+        } else if (returnType == boolean.class || returnType == Boolean.class) {
+            return false;
+        } else if (returnType == long.class || returnType == Long.class) {
+            return -1L;
+        } else if (returnType == int.class || returnType == Integer.class) {
+            return 0;
+        } else if (returnType.isPrimitive()) {
+            return 0;
+        } else if (List.class.isAssignableFrom(returnType)) {
+            return List.of();
+        } else if (Map.class.isAssignableFrom(returnType)) {
+            return Map.of();
+        }
+        return null;
+    }
+
+    /**
+     * 统一日志记录方法
+     *
+     * 日志格式约定：[类型] 类#方法 | 业务描述 | 耗时ms | 线程 | 入参 | 出参/错误
+     * @param declaringType 声明类
+     * @param methodName    方法名
+     * @param logType       日志类型（如：方法执行、Client调用）
+     * @param businessDesc  业务描述
+     * @param durationMs    执行耗时（毫秒）
+     * @param threadName    线程名称
+     * @param args          方法参数
+     * @param result        方法结果
+     * @param error         异常信息
+     */
+    private void logExecution(Class<?> declaringType, String methodName, String logType,
+                              String businessDesc, long durationMs, String threadName,
+                              Object[] args, Object result, Throwable error) {
+        Logger logger = LOGGER_MAP.computeIfAbsent(declaringType, k -> LoggerFactory.getLogger(declaringType));
+
+        String logMessage = String.format(
+                "[%s] %s#%s | %s | %dms | %s | %s | %s",
+                logType,
+                declaringType.getSimpleName(),
+                methodName,
+                businessDesc != null && !businessDesc.isEmpty() ? businessDesc : "-",
+                durationMs,
+                threadName,
+                toSafeJson(args),
+                error != null ? "ERROR" : toSafeJson(result)
+        );
+
+        if (error == null) {
+            logger.info(logMessage);
+        } else {
+            logger.error(logMessage, error);
         }
     }
 

@@ -2,8 +2,6 @@ package org.smm.archetype.infrastructure.bizshared.client.oss;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.bizshared.exception.ClientException;
-import org.smm.archetype.domain.bizshared.exception.ClientErrorCode;
 import org.smm.archetype.domain.bizshared.client.OssClient;
 import org.smm.archetype.domain.common.file.FileMetadata;
 import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.FileMetadataDO;
@@ -59,7 +57,7 @@ public abstract class AbstractOssClient implements OssClient {
 
         } catch (Exception e) {
             log.error("文件上传失败: 文件名={}", fileName, e);
-            throw new ClientException("File upload failed: " + fileName, e, ClientErrorCode.OPERATION_FAILED);
+            throw new RuntimeException("File upload failed: " + fileName, e);
         }
     }
 
@@ -93,7 +91,7 @@ public abstract class AbstractOssClient implements OssClient {
 
         } catch (Exception e) {
             log.error("文件下载失败: 路径={}", filePath, e);
-            throw new ClientException("File download failed: " + filePath, e, ClientErrorCode.OSS_FILE_NOT_FOUND);
+            throw new RuntimeException("File download failed: " + filePath, e);
         }
     }
 
@@ -129,7 +127,7 @@ public abstract class AbstractOssClient implements OssClient {
 
         } catch (Exception e) {
             log.error("Failed to delete file: filePath={}", filePath, e);
-            throw new ClientException("FileMetadata delete failed: " + filePath, e, ClientErrorCode.OPERATION_FAILED);
+            throw new RuntimeException("FileMetadata delete failed: " + filePath, e);
         }
     }
 
@@ -151,7 +149,7 @@ public abstract class AbstractOssClient implements OssClient {
 
         } catch (Exception e) {
             log.error("文件生成URL失败: 路径={}", filePath, e);
-            throw new ClientException("URL generation failed: " + filePath, e, ClientErrorCode.OPERATION_FAILED);
+            throw new RuntimeException("URL generation failed: " + filePath, e);
         }
     }
 
@@ -169,7 +167,7 @@ public abstract class AbstractOssClient implements OssClient {
 
         } catch (Exception e) {
             log.error("文件搜索失败: 文件名模式={}", fileNamePattern, e);
-            throw new ClientException("FileMetadata search failed", e, ClientErrorCode.OPERATION_FAILED);
+            throw new RuntimeException("FileMetadata search failed", e);
         }
     }
 
@@ -213,7 +211,7 @@ public abstract class AbstractOssClient implements OssClient {
 
         } catch (Exception e) {
             log.error("Failed to get file size: filePath={}", filePath, e);
-            throw new ClientException("Failed to get file size: " + filePath, e, ClientErrorCode.OSS_FILE_NOT_FOUND);
+            throw new RuntimeException("Failed to get file size: " + filePath, e);
         }
     }
 
@@ -318,7 +316,7 @@ public abstract class AbstractOssClient implements OssClient {
             return hexString.toString();
         } catch (Exception e) {
             log.error("Failed to calculate MD5", e);
-            throw new ClientException("MD5 calculation failed", e, ClientErrorCode.OPERATION_FAILED);
+            throw new RuntimeException("MD5 calculation failed", e);
         }
     }
 

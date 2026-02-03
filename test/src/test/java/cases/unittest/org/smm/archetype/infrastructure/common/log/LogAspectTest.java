@@ -1,15 +1,12 @@
 package cases.unittest.org.smm.archetype.infrastructure.common.log;
 
-import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.smm.archetype.infrastructure.common.log.LogAspect;
-import support.UnitTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,11 +65,11 @@ class LogAspectTest {
         // Arrange
         MeterRegistry testRegistry = new SimpleMeterRegistry();
         LogAspect aspect = new LogAspect(testRegistry);
-        
+
         // Act - call init multiple times on same instance
         aspect.init();
         aspect.init();
-        
+
         // Assert
         // Due to @PostConstruct, init() is called automatically by Spring
         // Multiple calls to init() should use the same MeterRegistry instance
@@ -89,6 +86,15 @@ class LogAspectTest {
     void logCut_PointcutMethod_NoException() {
         // Act & Assert - just verify method doesn't throw
         logAspect.logCut();
+    }
+
+    // ==================== clientCut Method Tests ====================
+
+    @Test
+    @DisplayName("clientCut - Pointcut方法 - 无异常抛出")
+    void clientCut_PointcutMethod_NoException() {
+        // Act & Assert - just verify method doesn't throw
+        logAspect.clientCut();
     }
 
 }

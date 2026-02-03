@@ -1,20 +1,24 @@
 package org.smm.archetype.infrastructure.bizshared.client.search.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.infrastructure.bizshared.client.search.AbstractSearchClient;
+import org.smm.archetype.domain.bizshared.client.SearchClient;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexOperations;
-import org.springframework.data.elasticsearch.core.document.Document;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.*;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.document.Document;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class ElasticsearchClientImpl extends AbstractSearchClient {
+public class ElasticsearchClientImpl implements SearchClient {
 
     private final ElasticsearchOperations operations;
 
@@ -23,7 +27,7 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected void doIndex(String index, String id, Map<String, Object> document) {
+    public void index(String index, String id, Map<String, Object> document) {
         IndexQuery query = new IndexQuery();
         query.setId(id);
         query.setObject(document);
@@ -31,7 +35,7 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected void doBulkIndex(String index, List<Map.Entry<String, Map<String, Object>>> documents) {
+    public void bulkIndex(String index, List<Map.Entry<String, Map<String, Object>>> documents) {
         List<IndexQuery> queries = documents.stream()
             .map(entry -> {
                 IndexQuery query = new IndexQuery();
@@ -45,12 +49,12 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected void doDelete(String index, String id) {
+    public void delete(String index, String id) {
         operations.delete(id, IndexCoordinates.of(index));
     }
 
     @Override
-    protected void doBulkDelete(String index, List<String> ids) {
+    public void bulkDelete(String index, List<String> ids) {
         for (String id : ids) {
             delete(index, id);
         }
@@ -58,13 +62,13 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected Map<String, Object> doGet(String index, String id) {
+    public Map<String, Object> get(String index, String id) {
         Map<String, Object> result = operations.get(id, Map.class, IndexCoordinates.of(index));
         return result != null ? new HashMap<>(result) : null;
     }
 
     @Override
-    protected Map<String, Map<String, Object>> doBulkGet(String index, List<String> ids) {
+    public Map<String, Map<String, Object>> bulkGet(String index, List<String> ids) {
         Map<String, Map<String, Object>> results = new HashMap<>();
         for (String id : ids) {
             Map<String, Object> doc = get(index, id);
@@ -76,7 +80,12 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected Map<String, Object> doSearch(String index, String query, int from, int size) {
+    public Map<String, Object> search(String index, String query) {
+        return search(index, query, 0, 10);
+    }
+
+    @Override
+    public Map<String, Object> search(String index, String query, int from, int size) {
         Query searchQuery = Query.findAll();
         searchQuery.setPageable(org.springframework.data.domain.PageRequest.of(from / size, size));
 
@@ -110,19 +119,19 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected Map<String, Object> doAggregate(String index, String query) {
+    public Map<String, Object> aggregate(String index, String query) {
         return search(index, query, 0, 0);
     }
 
     @Override
-    protected boolean doExistsIndex(String index) {
+    public boolean existsIndex(String index) {
         IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
         return indexOps.exists();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void doCreateIndex(String index, String mapping) {
+    public void createIndex(String index, String mapping) {
         IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
         indexOps.create();
         Document mappingDoc = Document.parse(mapping);
@@ -138,24 +147,24 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected void doDeleteIndex(String index) {
+    public void deleteIndex(String index) {
         IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
         indexOps.delete();
     }
 
     @Override
-    protected void doRefresh(String index) {
+    public void refresh(String index) {
         IndexOperations indexOps = operations.indexOps(IndexCoordinates.of(index));
         indexOps.refresh();
     }
 
     @Override
-    protected Map<String, Object> doVectorSearch(String index, String query) {
+    public Map<String, Object> vectorSearch(String index, String query) {
         return search(index, query, 0, 10);
     }
 
     @Override
-    protected void doCreateVectorIndex(String index, String vectorField, int dimension, String indexType, String distanceType) {
+    public void createVectorIndex(String index, String vectorField, int dimension, String indexType, String distanceType) {
         Map<String, Object> denseVectorProps = new HashMap<>();
         denseVectorProps.put("type", "dense_vector");
         denseVectorProps.put("dims", dimension);
@@ -177,7 +186,7 @@ public class ElasticsearchClientImpl extends AbstractSearchClient {
     }
 
     @Override
-    protected List<Map<String, Object>> doBulkVectorSearch(String index, List<String> queries) {
+    public List<Map<String, Object>> bulkVectorSearch(String index, List<String> queries) {
         List<Map<String, Object>> results = new ArrayList<>();
         for (String query : queries) {
             Map<String, Object> result = vectorSearch(index, query);
