@@ -1,5 +1,6 @@
 package org.smm.archetype.infrastructure.bizshared.client.cache;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.CacheClient;
 
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
  * 抽象缓存服务，提供通用流程模板和异常处理。
  */
 @Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractCacheClient implements CacheClient {
 
     @Override

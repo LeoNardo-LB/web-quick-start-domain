@@ -2,6 +2,8 @@ package org.smm.archetype.infrastructure.bizshared.client.search;
 
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.SearchClient;
+import org.smm.archetype.domain.bizshared.exception.ClientException;
+import org.smm.archetype.domain.bizshared.exception.ClientErrorCode;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             log.debug("Document indexed: index={}, id={}", index, id);
         } catch (Exception e) {
             log.error("Failed to index document: index={}, id={}", index, id, e);
-            throw new RuntimeException("Failed to index document", e);
+            throw new ClientException("Failed to index document", e, ClientErrorCode.SEARCH_INDEX_FAILED);
         }
     }
 
@@ -32,7 +34,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             log.debug("Bulk indexed: index={}, count={}", index, documents.size());
         } catch (Exception e) {
             log.error("Failed to bulk index: index={}, count={}", index, documents.size(), e);
-            throw new RuntimeException("Failed to bulk index", e);
+            throw new ClientException("Failed to bulk index", e, ClientErrorCode.SEARCH_INDEX_FAILED);
         }
     }
 
@@ -43,7 +45,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             log.debug("Document deleted: index={}, id={}", index, id);
         } catch (Exception e) {
             log.error("Failed to delete document: index={}, id={}", index, id, e);
-            throw new RuntimeException("Failed to delete document", e);
+            throw new ClientException("Failed to delete document", e, ClientErrorCode.OPERATION_FAILED);
         }
     }
 
@@ -54,7 +56,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             log.debug("Bulk deleted: index={}, count={}", index, ids.size());
         } catch (Exception e) {
             log.error("Failed to bulk delete: index={}, count={}", index, ids.size(), e);
-            throw new RuntimeException("Failed to bulk delete", e);
+            throw new ClientException("Failed to bulk delete", e, ClientErrorCode.OPERATION_FAILED);
         }
     }
 
@@ -92,7 +94,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             return result;
         } catch (Exception e) {
             log.error("Failed to search: index={}, query={}", index, query, e);
-            throw new RuntimeException("Failed to search", e);
+            throw new ClientException("Failed to search", e, ClientErrorCode.NETWORK_ERROR);
         }
     }
 
@@ -104,7 +106,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             return result;
         } catch (Exception e) {
             log.error("Failed to aggregate: index={}, query={}", index, query, e);
-            throw new RuntimeException("Failed to aggregate", e);
+            throw new ClientException("Failed to aggregate", e, ClientErrorCode.OPERATION_FAILED);
         }
     }
 
@@ -125,7 +127,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             log.info("Index created: index={}", index);
         } catch (Exception e) {
             log.error("Failed to create index: index={}", index, e);
-            throw new RuntimeException("Failed to create index", e);
+            throw new ClientException("Failed to create index", e, ClientErrorCode.SEARCH_INDEX_FAILED);
         }
     }
 
@@ -136,7 +138,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             log.info("Index deleted: index={}", index);
         } catch (Exception e) {
             log.error("Failed to delete index: index={}", index, e);
-            throw new RuntimeException("Failed to delete index", e);
+            throw new ClientException("Failed to delete index", e, ClientErrorCode.OPERATION_FAILED);
         }
     }
 
@@ -147,7 +149,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             log.debug("Index refreshed: index={}", index);
         } catch (Exception e) {
             log.error("Failed to refresh index: index={}", index, e);
-            throw new RuntimeException("Failed to refresh index", e);
+            throw new ClientException("Failed to refresh index", e, ClientErrorCode.OPERATION_FAILED);
         }
     }
 
@@ -160,7 +162,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             return result;
         } catch (Exception e) {
             log.error("Failed to execute vector search: index={}, query={}", index, query, e);
-            throw new RuntimeException("Failed to execute vector search", e);
+            throw new ClientException("Failed to execute vector search", e, ClientErrorCode.NETWORK_ERROR);
         }
     }
 
@@ -172,7 +174,7 @@ public abstract class AbstractSearchClient implements SearchClient {
                 index, vectorField, dimension, indexType, distanceType);
         } catch (Exception e) {
             log.error("Failed to create vector index: index={}, field={}", index, vectorField, e);
-            throw new RuntimeException("Failed to create vector index", e);
+            throw new ClientException("Failed to create vector index", e, ClientErrorCode.SEARCH_INDEX_FAILED);
         }
     }
 
@@ -184,7 +186,7 @@ public abstract class AbstractSearchClient implements SearchClient {
             return results;
         } catch (Exception e) {
             log.error("Failed to execute bulk vector search: index={}, count={}", index, queries.size(), e);
-            throw new RuntimeException("Failed to execute bulk vector search", e);
+            throw new ClientException("Failed to execute bulk vector search", e, ClientErrorCode.NETWORK_ERROR);
         }
     }
 
