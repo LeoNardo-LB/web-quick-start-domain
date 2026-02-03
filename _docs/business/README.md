@@ -1112,7 +1112,8 @@ curl -X POST "https://api.example.com/api/v1/user/login" \
 - ✅ 支持Kafka消息队列
 
 **技术亮点**:
-- ✅ 采用Spring Boot 3.5.9 + MyBatis-Flex技术栈
+
+- ✅ 采用Spring Boot 4.0.2 + MyBatis-Flex技术栈
 - ✅ 四层架构设计（DDD最佳实践）
 - ✅ JWT Token认证机制
 - ✅ 数据库乐观锁防止超卖

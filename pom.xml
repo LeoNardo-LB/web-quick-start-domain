@@ -12,6 +12,7 @@
     <artifactId>web-quick-start-domain</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
+    <description>Web Quick Start Domain</description>
     <modules>
         <module>adapter</module>
         <module>app</module>
@@ -146,13 +147,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-                <dependency>
-                    <groupId>com.mybatis-flex</groupId>
-                    <artifactId>mybatis-flex-dependencies</artifactId>
-                    <version>${mybatis-flex.version}</version>
-                    <type>pom</type>
-                    <scope>import</scope>
-                </dependency>
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-dependencies</artifactId>
+                <version>${mybatis-flex.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!--bomEnd-->
             <!--基础依赖Start-->
             <dependency>
@@ -264,7 +265,7 @@
                 <version>4.0.2</version>
             </dependency>
 
-             <!-- JSON序列化 -->
+            <!-- JSON序列化 -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>

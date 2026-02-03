@@ -100,7 +100,8 @@ mvn archetype:generate -DarchetypeGroupId=org.smm.archetype -DarchetypeArtifactI
 ## NOTES
 
 **Deviation warnings** (documented in `_docs/specification/业务代码编写规范.md`):
-- Spring Boot version mismatch: pom.xml shows 4.0.2, README mentions 3.5.9
+
+- Spring Boot version mismatch: pom.xml shows 4.0.2, README mentions 4.0.2
 - MyBatis-Flex: Manual dependency management instead of spring-boot-starter
 - Test structure: Isolated `test/` module (not co-located with production)
 

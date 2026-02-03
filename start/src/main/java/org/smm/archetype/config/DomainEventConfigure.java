@@ -30,15 +30,13 @@ import java.util.List;
 
 /**
  * 领域事件配置类，负责创建事件发布和消费相关的Bean。
- */
+ *
  *   <li><b>Kafka 场景</b>：当 KafkaTemplate Bean 存在时，
  *       kafkaEventPublisher 会被创建（见 KafkaEventConfigure）。</li>
  *   <li><b>本地场景</b>：当 KafkaTemplate Bean 不存在时，
  *       springEventPublisher 会被创建，作为默认的本地事件发布器。</li>
  * </ul>
-
  * @see KafkaEventConfigure
-
  */
 @Configuration
 @EnableAsync
