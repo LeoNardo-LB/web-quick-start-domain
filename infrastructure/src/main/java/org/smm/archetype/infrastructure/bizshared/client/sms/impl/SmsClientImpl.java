@@ -1,9 +1,10 @@
-package org.smm.archetype.infrastructure.bizshared.client.sms;
+package org.smm.archetype.infrastructure.bizshared.client.sms.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
 import org.smm.archetype.domain.bizshared.client.dto.SmsRequest;
 import org.smm.archetype.domain.bizshared.client.dto.SmsResult;
+import org.smm.archetype.infrastructure.bizshared.client.sms.AbstractSmsClient;
 
 import java.util.UUID;
 

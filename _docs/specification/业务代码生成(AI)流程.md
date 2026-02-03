@@ -1,4 +1,4 @@
-# 业务代码生成(AI)流程（TDD版）
+# 业务代码生成(AI)流程
 
 > **目标**：确保每次代码修改都能正常运行，不破坏现有功能，采用TDD（测试驱动开发）模式
 
@@ -7,7 +7,8 @@
 1. **TDD模式**：先写测试，再写代码，最后重构
 2. **需求优先**：每次开发前必须反复询问用户，明确所有细节
 3. **用例通过**：每个生成的测试用例必须通过才能继续
-4. **强制验证**：4步验证流程，每步必须通过才能进入下一步
+4. **强制验证**：5步验证流程，每步必须通过才能进入下一步
+5. **文档对齐**：代码修改后，必须同步更新相关文档，保持文档与代码一致性
 
 ---
 
@@ -40,11 +41,18 @@ Phase 4: 启动验证（最关键）⭐
     │
     ├─ Spring上下文启动成功
     └─ 无循环依赖
+    │
+Phase 5: 代码与文档对齐（文档同步）⭐
+    │
+    ├─ 识别改动的代码范围
+    ├─ 识别涉及的文档
+    ├─ 更新相关文档
+    └─ 验证文档与代码一致性
 ```
 
 ---
 
-## Phase 0：需求确认与TDD规划（新增）⭐
+## Phase 0：需求确认与TDD规划⭐
 
 ### 0.1 反复询问用户，明确需求细节
 
@@ -474,6 +482,258 @@ The dependencies of some of the beans in the application context form a cycle
 
 ---
 
+## Phase 5：代码与文档对齐（文档同步）⭐
+
+### 5.1 识别改动的代码范围
+
+**目标**：明确本次改动了哪些代码文件
+
+**方法**：
+
+- 使用 Git 查看改动的文件列表
+- 识别新增、修改、删除的文件
+
+**命令**：
+
+```bash
+# 查看改动的文件
+git status
+
+# 查看具体的改动
+git diff --name-only
+
+# 查看新增的文件
+git diff --name-only --diff-filter=A
+
+# 查看修改的文件
+git diff --name-only --diff-filter=M
+```
+
+**输出示例**：
+
+```
+修改的文件：
+M domain/src/main/java/org/smm/archetype/domain/_example/order/model/aggregateroot/OrderAggr.java
+M app/src/main/java/org/smm/archetype/app/_example/order/OrderAppService.java
+
+新增的文件：
+A domain/src/main/java/org/smm/archetype/domain/_example/order/model/valueobject/OrderId.java
+A adapter/src/main/java/org/smm/archetype/adapter/_example/order/web/api/OrderController.java
+```
+
+### 5.2 识别涉及的文档
+
+**目标**：找到与改动代码相关的文档
+
+**对齐规则**：
+
+| 代码改动类型                          | 需要更新的文档                   | 更新内容           |
+|---------------------------------|---------------------------|----------------|
+| **新增实体/值对象/聚合根**                | `业务代码编写规范.md`（第3章：领域建模规范） | 添加新的实体/值对象说明   |
+| **新增/修改接口（Controller/Service）** | `_docs/business/接口文档.md`  | 添加/更新 API 接口定义 |
+| **新增/修改数据库表结构**                 | `_docs/business/数据设计.md`  | 添加/更新表结构、索引    |
+| **新增/修改配置类（*Configure）**        | 相关架构文档                    | 添加配置说明、依赖关系    |
+| **新增领域事件**                      | `_docs/business/实现方案.md`  | 添加事件定义、处理逻辑    |
+| **新增/修改业务流程**                   | `_docs/business/实现方案.md`  | 添加流程图、关键点说明    |
+| **新增/修改测试**                     | `测试代码编写与示例指南.md`          | 添加测试示例、场景说明    |
+
+**检查清单**：
+
+- [ ] 是否新增了领域模型（实体/值对象/聚合根）？
+- [ ] 是否新增/修改了 API 接口？
+- [ ] 是否新增/修改了数据库表结构？
+- [ ] 是否新增/修改了配置类？
+- [ ] 是否新增了领域事件？
+- [ ] 是否有新的业务流程？
+- [ ] 是否有新的测试用例/场景？
+
+### 5.3 更新相关文档
+
+**目标**：确保文档与代码保持一致
+
+**更新流程**：
+
+1. **定位文档章节**
+    - 找到需要更新的文档
+    - 找到对应的章节
+
+2. **更新文档内容**
+    - 根据代码改动更新文档
+    - 保持文档格式一致
+    - 更新版本号和更新时间
+
+3. **验证文档完整性**
+    - 检查描述是否准确
+    - 检查示例代码是否正确
+    - 检查链接是否有效
+
+**更新示例**：
+
+#### 示例1：新增领域模型
+
+**代码改动**：新增 `OrderAggr.java`
+
+**文档更新**：`业务代码编写规范.md` - 第3章：领域建模规范
+
+```markdown
+### 订单聚合根（OrderAggr）
+
+**职责**：订单聚合根，管理订单生命周期
+
+**字段**：
+- `orderId` - 订单ID
+- `customerId` - 客户ID
+- `status` - 订单状态
+- `totalAmount` - 订单总金额
+- `items` - 订单项列表
+
+**方法**：
+- `create()` - 创建订单
+- `pay()` - 支付订单
+- `cancel()` - 取消订单
+
+**示例**：
+```java
+OrderAggr order = OrderAggr.create("CUST001", new Money(100.00, "CNY"));
+order.pay();
+```
+
+```
+
+#### 示例2：新增 API 接口
+
+**代码改动**：新增 `OrderController.createOrder()`
+
+**文档更新**：`_docs/business/接口文档.md`
+
+```markdown
+### 创建订单
+
+**接口**：POST /api/v1/order/create
+
+**请求头**：
+- `Authorization: Bearer {token}`
+
+**请求体**：
+```json
+{
+  "customerId": "CUST001",
+  "items": [
+    {
+      "productId": "PROD001",
+      "quantity": 2,
+      "price": 100.00
+    }
+  ]
+}
+```
+
+**响应**：
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "orderId": "ORD-20260121-0001",
+    "orderNo": "2026012100001"
+  }
+}
+```
+
+**错误码**：
+
+- 400: 参数错误
+- 401: 未登录
+- 404: 客户不存在
+
+```
+
+#### 示例3：新增数据库表
+
+**代码改动**：新增 `order` 表
+
+**文档更新**：`_docs/business/数据设计.md`
+
+```sql
+CREATE TABLE `order` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '订单ID',
+  `order_no` VARCHAR(50) NOT NULL UNIQUE COMMENT '订单号',
+  `customer_id` BIGINT NOT NULL COMMENT '客户ID',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态：1-待支付，2-已支付，3-已取消',
+  `total_amount` DECIMAL(10,2) NOT NULL COMMENT '订单总额',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  INDEX `idx_customer_id` (`customer_id`),
+  INDEX `idx_order_no` (`order_no`),
+  INDEX `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='订单表';
+```
+
+**版本更新**：
+
+- 文档版本：v1.1 → v1.2
+- 最后更新：2026-02-03
+- 变更记录：新增订单聚合根、创建订单接口、订单表
+
+### 5.4 验证文档与代码一致性
+
+**目标**：确保文档准确反映代码实现
+
+**验证方法**：
+
+1. **完整性检查**
+    - 文档是否覆盖所有新增/修改的代码？
+    - 示例代码是否能正常运行？
+    - 参数、返回值是否与代码一致？
+
+2. **准确性检查**
+    - 描述是否准确？
+    - 字段类型、约束是否正确？
+    - 业务规则是否一致？
+
+3. **可用性检查**
+    - 文档是否易于理解？
+    - 示例是否清晰？
+    - 链接是否有效？
+
+**验证清单**：
+
+- [ ] 所有改动的代码都已在文档中体现
+- [ ] 示例代码能够正常运行
+- [ ] 参数、返回值与代码实现一致
+- [ ] 文档描述清晰、准确
+- [ ] 文档版本号已更新
+
+**验证命令**：
+
+```bash
+# 检查文档中的代码示例是否有语法错误
+# （需要手动执行）
+
+# 检查文档中的链接是否有效
+# （需要手动执行）
+
+# 检查文档格式是否正确
+# （需要手动执行）
+```
+
+**常见问题**：
+
+**Q1: 文档更新很麻烦，可以跳过吗？**
+**A**: **绝对不可以**。文档是项目的知识资产，必须保持与代码同步。
+
+**Q2: 只改了一个文件，也需要更新文档吗？**
+**A**: 如果这个改动涉及公开接口或业务逻辑，必须更新文档。如果是内部实现细节，可以不更新。
+
+**Q3: 如何确保不遗漏文档更新？**
+**A**: 使用 5.1 和 5.2 的检查清单，逐项确认。
+
+**Q4: 文档更新后需要验证吗？**
+**A**: 必须验证。使用 5.4 的验证方法，确保文档准确。
+
+---
+
 ## 完整验证命令（一键执行）
 
 ```bash
@@ -493,8 +753,14 @@ mvn test
 # Phase 4: 启动验证（最关键）
 mvn test -Dtest=ApplicationStartupTests -pl test
 
+# Phase 5: 代码与文档对齐（文档同步）⭐
+# 1. 识别改动的代码范围：git status
+# 2. 识别涉及的文档：根据改动类型
+# 3. 更新相关文档：保持同步
+# 4. 验证文档一致性：检查准确性和完整性
+
 # 或者一键执行（推荐）
-mvn clean compile test && mvn test -Dtest=ApplicationStartupTests -pl test
+mvn clean compile test && mvn test -Dtest=ApplicationStartupTests -pl test && git status
 ```
 
 ---
@@ -536,10 +802,23 @@ mvn clean compile test && mvn test -Dtest=ApplicationStartupTests -pl test
     │   │   │   └─ 不达标 → 补充测试用例 → 重新测试
     │   │   └─ 否 → 修复业务逻辑 → 重新测试
     │
-    └─ Phase 4: 启动验证 ⭐
-        ├─ mvn test -Dtest=ApplicationStartupTests -pl test
-        ├─ 成功 → ✅ 完整流程通过
-        └─ 失败 → 修复启动错误 → 重新验证
+    ├─ Phase 4: 启动验证 ⭐
+    │   ├─ mvn test -Dtest=ApplicationStartupTests -pl test
+    │   ├─ 成功 → 进入Phase 5
+    │   └─ 失败 → 修复启动错误 → 重新验证
+    │
+    └─ Phase 5: 代码与文档对齐 ⭐
+        ├─ 识别改动的代码范围：git status
+        ├─ 识别涉及的文档：根据改动类型
+        ├─ 更新相关文档
+        │   ├─ 需要更新？
+        │   │   ├─ 是 → 更新文档 → 继续验证
+        │   │   └─ 否 → 跳过 → 继续
+        │   └─ 文档更新成功？
+        │       ├─ 是 → 验证一致性
+        │       └─ 否 → 重新更新
+        ├─ 验证文档一致性
+        └─ ✅ 完整流程通过
 ```
 
 ---
@@ -574,6 +853,14 @@ mvn clean compile test && mvn test -Dtest=ApplicationStartupTests -pl test
 - [ ] ✅ 无循环依赖
 - [ ] ✅ 无编译警告（忽略JDK警告）
 - [ ] ✅ 符合编码规范：参考[业务代码编写规范.md](业务代码编写规范.md)
+
+### Phase 5 检查清单
+
+- [ ] ✅ 改动的代码范围已识别（git status）
+- [ ] ✅ 涉及的文档已识别（根据代码改动类型）
+- [ ] ✅ 相关文档已更新
+- [ ] ✅ 文档版本号已更新
+- [ ] ✅ 文档与代码一致性已验证
 
 ---
 
@@ -658,17 +945,56 @@ mvn test -Dtest=OrderAppServiceTest#testCreateOrder
 **A**: 反复询问，直到明确。
 
 **询问策略**：
-
 1. 分阶段询问：先问大方向，再问细节
 2. 举例说明：用具体例子引导用户思考
 3. 重复确认：确认后再重复一遍
 4. 提供选项：给出几个可能的方案供用户选择
 
 **重要提醒**：
-
 - ✅ 宁可多花时间确认，也不要假设
 - ❌ 不要猜测用户的需求
 - ✅ 确认后记录下来，作为参考
+
+### Q9: Phase 5 文档对齐需要多长时间？
+
+**A**:
+
+- 简单改动（1-3个文件）：5-10分钟
+- 中等改动（4-10个文件）：15-30分钟
+- 复杂改动（10+个文件）：30-60分钟
+
+**时间分布**：
+
+- 5.1 识别改动范围：1-2分钟
+- 5.2 识别涉及的文档：2-5分钟
+- 5.3 更新相关文档：2-50分钟（取决于改动量）
+- 5.4 验证文档一致性：5-10分钟
+
+**重要性**：文档是项目的知识资产，必须保持与代码同步。
+
+### Q10: 文档更新很麻烦，可以跳过吗？
+
+**A**: **绝对不可以**。
+
+**原因**：
+
+1. 文档是项目的知识资产，后续开发依赖文档
+2. 文档与代码不同步会导致：
+    - 新成员上手困难
+    - 重复沟通成本
+    - 潜在的开发错误
+3. 文档更新是开发流程的一部分，不是可选项
+
+**例外**：
+
+- ❌ 仅修改内部实现细节，不影响公开接口或业务逻辑
+- ✅ 即使是内部实现，也应该考虑是否需要更新架构文档
+
+**提示**：
+
+- 使用 5.1 和 5.2 的检查清单，确保不遗漏
+- 批量更新多个相关文档，提高效率
+- 保持文档格式一致，减少更新时间
 
 ---
 
@@ -685,6 +1011,9 @@ mvn test
 
 # Phase 4: 启动测试
 mvn test -Dtest=ApplicationStartupTests -pl test
+
+# Phase 5: 查看改动的文件
+git status
 
 # 查看覆盖率报告
 mvn verify -pl test
@@ -706,6 +1035,7 @@ mvn clean package
 | 测试失败       | Phase 3 | `mvn test -Dtest=xxx`                                 | 检查业务逻辑、Mock配置                           |
 | 覆盖率不足      | Phase 3 | `mvn verify -pl test`                                 | 查看报告：test/target/site/jacoco/index.html |
 | 启动失败       | Phase 4 | `mvn test -Dtest=ApplicationStartupTests -pl test -X` | 检查Bean配置、循环依赖                           |
+| 文档与代码不一致   | Phase 5 | `git status` + 手动检查                                   | 识别改动 → 更新文档 → 验证一致性                     |
 
 ### TDD红-绿-重构循环
 
@@ -730,6 +1060,6 @@ mvn clean package
 
 ---
 
-**文档版本**: v2.0.0（TDD版）
+**文档版本**: v2.1（TDD版 + 文档对齐）
 **最后更新**: 2026-02-03
 **维护者**: Leonardo

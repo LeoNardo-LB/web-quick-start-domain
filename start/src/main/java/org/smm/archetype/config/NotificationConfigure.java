@@ -2,8 +2,8 @@ package org.smm.archetype.config;
 
 import org.smm.archetype.config.properties.EmailProperties;
 import org.smm.archetype.config.properties.SmsProperties;
-import org.smm.archetype.infrastructure.bizshared.client.email.AliyunEmailClientImpl;
-import org.smm.archetype.infrastructure.bizshared.client.sms.AliyunSmsClientImpl;
+import org.smm.archetype.infrastructure.bizshared.client.email.impl.AliyunEmailClientImpl;
+import org.smm.archetype.infrastructure.bizshared.client.sms.impl.AliyunSmsClientImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

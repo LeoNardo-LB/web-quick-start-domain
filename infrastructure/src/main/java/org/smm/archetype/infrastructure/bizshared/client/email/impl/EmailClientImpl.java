@@ -1,9 +1,10 @@
-package org.smm.archetype.infrastructure.bizshared.client.email;
+package org.smm.archetype.infrastructure.bizshared.client.email.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.dto.EmailRequest;
 import org.smm.archetype.domain.bizshared.client.dto.EmailResult;
 import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
+import org.smm.archetype.infrastructure.bizshared.client.email.AbstractEmailClient;
 
 import java.util.UUID;
 
