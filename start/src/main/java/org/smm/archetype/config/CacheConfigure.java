@@ -2,8 +2,8 @@ package org.smm.archetype.config;
 
 import org.smm.archetype.config.properties.CacheProperties;
 import org.smm.archetype.domain.bizshared.client.CacheClient;
-import org.smm.archetype.infrastructure.bizshared.client.cache.impl.CaffeineCacheClientImpl;
-import org.smm.archetype.infrastructure.bizshared.client.cache.impl.RedisCacheClientImpl;
+import org.smm.archetype.infrastructure.bizshared.client.cache.CaffeineCacheClientImpl;
+import org.smm.archetype.infrastructure.bizshared.client.cache.RedisCacheClientImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

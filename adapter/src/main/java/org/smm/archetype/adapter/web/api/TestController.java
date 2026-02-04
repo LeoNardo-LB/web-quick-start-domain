@@ -1,7 +1,7 @@
 package org.smm.archetype.adapter.web.api;
 
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.infrastructure.common.log.MyLog;
+import org.smm.archetype.infrastructure.bizshared.log.MyLog;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

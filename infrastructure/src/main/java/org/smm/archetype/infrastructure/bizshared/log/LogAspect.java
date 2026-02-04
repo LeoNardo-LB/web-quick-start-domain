@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure.common.log;
+package org.smm.archetype.infrastructure.bizshared.log;
 
 import com.alibaba.fastjson2.JSON;
 import io.micrometer.core.instrument.Counter;
@@ -86,12 +86,13 @@ public class LogAspect {
                                      Object[] args, Object result, Throwable error) {
         Logger logger = LOGGER_MAP.computeIfAbsent(declaringType, k -> LoggerFactory.getLogger(declaringType));
 
+        businessDesc = businessDesc != null && !businessDesc.isEmpty() ? businessDesc : "-";
         if (error == null) {
             logger.info("[{}] {}#{} | {} | {}ms | {} | {} | {}",
                     logType,
                     declaringType.getSimpleName(),
                     methodName,
-                    businessDesc != null && !businessDesc.isEmpty() ? businessDesc : "-",
+                    businessDesc,
                     durationMs,
                     threadName,
                     toSafeJson(args),
@@ -101,7 +102,7 @@ public class LogAspect {
                     logType,
                     declaringType.getSimpleName(),
                     methodName,
-                    businessDesc != null && !businessDesc.isEmpty() ? businessDesc : "-",
+                    businessDesc,
                     durationMs,
                     threadName,
                     toSafeJson(args),
@@ -157,7 +158,7 @@ public class LogAspect {
      *
      * 定义切入点，拦截标记了@Log注解的方法。
      */
-    @Pointcut("@annotation(org.smm.archetype.infrastructure.common.log.MyLog)")
+    @Pointcut("@annotation(org.smm.archetype.infrastructure.bizshared.log.MyLog)")
     public void logCut() {
     }
 

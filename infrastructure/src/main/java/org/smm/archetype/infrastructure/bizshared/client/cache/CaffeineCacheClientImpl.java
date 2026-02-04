@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure.bizshared.client.cache.impl;
+package org.smm.archetype.infrastructure.bizshared.client.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

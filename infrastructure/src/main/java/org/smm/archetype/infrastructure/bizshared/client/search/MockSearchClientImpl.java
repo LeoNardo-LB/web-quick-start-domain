@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure.bizshared.client.search.impl;
+package org.smm.archetype.infrastructure.bizshared.client.search;
 
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.SearchClient;

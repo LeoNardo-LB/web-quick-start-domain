@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.smm.archetype.domain.bizshared.client.SearchClient;
 import org.smm.archetype.domain.common.search.SearchService;
-import org.smm.archetype.infrastructure.common.log.LogAspect;
+import org.smm.archetype.infrastructure.bizshared.log.LogAspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;

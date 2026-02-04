@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure.bizshared.client.sms.impl;
+package org.smm.archetype.infrastructure.bizshared.client.sms;
 
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.dysmsapi20170525.Client;
@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
 import org.smm.archetype.domain.bizshared.client.dto.SmsRequest;
 import org.smm.archetype.domain.bizshared.client.dto.SmsResult;
-import org.smm.archetype.infrastructure.bizshared.client.sms.AbstractSmsClient;
 
 /**
  * 阿里云短信服务实现

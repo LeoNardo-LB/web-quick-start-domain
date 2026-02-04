@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure.bizshared.client.cache.impl;
+package org.smm.archetype.infrastructure.bizshared.client.cache;
 
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.CacheClient;

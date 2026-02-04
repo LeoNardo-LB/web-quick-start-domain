@@ -1,7 +1,7 @@
 package org.smm.archetype.config;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import org.smm.archetype.infrastructure.common.log.LogAspect;
+import org.smm.archetype.infrastructure.bizshared.log.LogAspect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;

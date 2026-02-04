@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure.common.log;
+package org.smm.archetype.infrastructure.bizshared.log;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;

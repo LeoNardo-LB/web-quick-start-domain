@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure.bizshared.client.search.impl;
+package org.smm.archetype.infrastructure.bizshared.client.search;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package org.smm.archetype.infrastructure.bizshared.client.email.impl;
+package org.smm.archetype.infrastructure.bizshared.client.email;
 
 import com.aliyun.dm20151123.Client;
 import com.aliyun.dm20151123.models.SingleSendMailRequest;
@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.dto.EmailRequest;
 import org.smm.archetype.domain.bizshared.client.dto.EmailResult;
 import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
-import org.smm.archetype.infrastructure.bizshared.client.email.AbstractEmailClient;
 
 /**
  * 阿里云邮件实现，基于DirectMail推送。

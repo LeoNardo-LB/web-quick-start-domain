@@ -1,10 +1,9 @@
-package org.smm.archetype.infrastructure.bizshared.client.oss.impl;
+package org.smm.archetype.infrastructure.bizshared.client.oss;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.common.file.FileMetadata;
 import org.smm.archetype.domain.common.file.FileMetadata.Status;
-import org.smm.archetype.infrastructure.bizshared.client.oss.AbstractOssClient;
 import org.smm.archetype.infrastructure.bizshared.dal.generated.entity.FileMetadataDO;
 import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.FileMetadataMapper;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
