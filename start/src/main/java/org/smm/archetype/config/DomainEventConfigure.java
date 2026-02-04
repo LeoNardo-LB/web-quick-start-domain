@@ -4,24 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.smm.archetype.adapter.event.EventDispatcher;
 import org.smm.archetype.adapter.event.EventHandler;
 import org.smm.archetype.adapter.event.FailureHandler;
-import org.smm.archetype.adapter.listener.KafkaDomainEventListener;
 import org.smm.archetype.adapter.listener.SpringDomainEventListener;
 import org.smm.archetype.adapter.schedule.RetryStrategy;
 import org.smm.archetype.config.properties.EventProperties;
-import org.smm.archetype.domain.bizshared.event.Event;
+import org.smm.archetype.domain.bizshared.event.DomainEventPublisher;
 import org.smm.archetype.infrastructure.bizshared.dal.generated.mapper.EventMapper;
 import org.smm.archetype.infrastructure.bizshared.event.EventRecordConverter;
-import org.smm.archetype.infrastructure.bizshared.event.publisher.KafkaDomainEventPublisher;
+import org.smm.archetype.infrastructure.bizshared.event.publisher.DomainEventCollectAspectJ;
 import org.smm.archetype.infrastructure.bizshared.event.publisher.SpringDomainEventPublisher;
 import org.smm.archetype.infrastructure.bizshared.event.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -108,7 +105,7 @@ public class DomainEventConfigure implements AsyncConfigurer {
     }
 
     /**
-     * Spring 事件监听器
+     * Spring事件监听器
      * @param eventDispatcher 事件分发器
      * @return Spring 事件监听器
      */
@@ -118,30 +115,16 @@ public class DomainEventConfigure implements AsyncConfigurer {
     }
 
     /**
-     * Kafka 事件发布器
-     * @param kafkaTemplate Kafka 模板
-     * @param mapper        事件 Mapper
-     * @return Kafka 事件发布器
+     * 领域事件收集切面
+     *
+     * 拦截Application层方法调用，自动收集和发布领域事件。
+     * @param domainEventPublisher 领域事件发布器
+     * @return 领域事件收集切面
      */
     @Bean
-    @Primary
-    @ConditionalOnBean(KafkaTemplate.class)
-    public KafkaDomainEventPublisher kafkaEventPublisher(
-            KafkaTemplate<String, Event<?>> kafkaTemplate,
-            EventMapper mapper) {
-        return new KafkaDomainEventPublisher(kafkaTemplate, mapper);
-    }
-
-    /**
-     * Kafka 事件监听器
-     * @param eventDispatcher 事件分发器
-     * @return Kafka 事件监听器
-     */
-    @Bean
-    @Primary
-    @ConditionalOnBean(KafkaTemplate.class)
-    public KafkaDomainEventListener kafkaEventListener(EventDispatcher eventDispatcher) {
-        return new KafkaDomainEventListener(eventDispatcher);
+    @Order(2)
+    public DomainEventCollectAspectJ domainEventCollectAspectJ(DomainEventPublisher domainEventPublisher) {
+        return new DomainEventCollectAspectJ(domainEventPublisher);
     }
 
 }

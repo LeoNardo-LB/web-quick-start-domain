@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @EnableAsync
 @EnableScheduling
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 @RestController
 @SpringBootApplication
 @MapperScan("org.smm.archetype.infrastructure.**.mapper")

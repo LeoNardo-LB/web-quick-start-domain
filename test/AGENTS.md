@@ -2,6 +2,31 @@
 
 独立测试模块 - 启动验证、单元测试、集成测试。
 
+## 文档导航
+
+### 🔗 相关文档
+
+| 文档                                             | 用途                | 读者      |
+|------------------------------------------------|-------------------|---------|
+| **[项目知识库](../AGENTS.md)**                      | 项目架构概览和架构偏差分析     | 开发者、架构师 |
+| **[AI 开发指南](../CLAUDE.md)**                    | AI 开发元指南          | 开发者、AI  |
+| **[项目 README](../README.md)**                  | 项目概览和快速开始         | 开发者、架构师 |
+| [Domain 层指南](domain/AGENTS.md)                 | 领域层核心业务逻辑和约定      | 后端开发者   |
+| [Infrastructure 层指南](infrastructure/AGENTS.md) | 基础设施层技术实现和约定      | 后端开发者   |
+| [Application 层指南](app/AGENTS.md)               | 应用层 CQRS 和用例编排    | 后端开发者   |
+| [Adapter 层指南](adapter/AGENTS.md)               | 接口层 REST 控制器和事件监听 | 后端开发者   |
+| [Start 模块指南](start/AGENTS.md)                  | 启动模块 Bean 装配和配置   | 后端开发者   |
+
+### 🔗 规格文档
+
+- [验证流程指南](_docs/specification/业务代码生成(AI)流程.md)
+- [业务代码编写规范](_docs/specification/业务代码编写规范.md)
+- [测试代码编写与示例指南](_docs/specification/测试代码编写与示例指南.md)
+
+### 🔗 业务文档
+
+- [业务文档索引](_docs/business/README.md)
+
 ## 概述
 
 职责：独立测试模块，所有测试代码必须在此。

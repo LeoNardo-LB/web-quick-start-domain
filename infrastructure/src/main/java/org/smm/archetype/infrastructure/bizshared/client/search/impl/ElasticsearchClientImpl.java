@@ -1,5 +1,6 @@
 package org.smm.archetype.infrastructure.bizshared.client.search.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.SearchClient;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -17,13 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Elasticsearch搜索实现，基于Spring Data Elasticsearch，支持条件查询和分页。
+ */
 @Slf4j
 public class ElasticsearchClientImpl implements SearchClient {
 
     private final ElasticsearchOperations operations;
+    private final ObjectMapper objectMapper;
 
     public ElasticsearchClientImpl(ElasticsearchOperations operations) {
         this.operations = operations;
+        this.objectMapper = new ObjectMapper();
+        log.info("Elasticsearch客户端初始化成功: operations={}", operations);
     }
 
     @Override

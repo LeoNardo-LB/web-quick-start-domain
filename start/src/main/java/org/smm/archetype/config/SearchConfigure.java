@@ -8,8 +8,7 @@ import org.smm.archetype.domain.common.search.SearchService;
 import org.smm.archetype.infrastructure.bizshared.client.search.impl.DisabledSearchClientImpl;
 import org.smm.archetype.infrastructure.bizshared.client.search.impl.ElasticsearchClientImpl;
 import org.smm.archetype.infrastructure.common.search.SearchServiceImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -30,16 +29,19 @@ public class SearchConfigure {
 
     @Bean
     @Primary
-    @ConditionalOnBean(ElasticsearchOperations.class)
+    @ConditionalOnBooleanProperty("spring.elasticsearch")
     public SearchClient esClient(ElasticsearchOperations operations) {
         log.info("Elasticsearch client initialized with ElasticsearchOperations");
         return new ElasticsearchClientImpl(operations);
     }
 
+    /**
+     * 禁用的ES客户端Bean
+     */
     @Bean
-    @ConditionalOnMissingBean(SearchClient.class)
+    @Primary
     public SearchClient disabledEsClient() {
-        log.info("Elasticsearch is disabled (ElasticsearchOperations bean not found)");
+        log.info("Creating DisabledSearchClientImpl bean");
         return new DisabledSearchClientImpl();
     }
 

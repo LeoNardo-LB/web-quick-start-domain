@@ -1,32 +1,27 @@
 package org.smm.archetype.infrastructure.bizshared.client.search.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.smm.archetype.domain.bizshared.client.SearchClient;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * ES客户端禁用实现（Disabled Implementation）
- *
-当搜索功能禁用时（middleware.search.enabled=false），使用此实现。
- *
-行为特性：
- * <ul>
- *   <li>所有操作抛出 {@link IllegalStateException}</li>
- *   <li>异常消息明确提示 "Elasticsearch is disabled"</li>
- *   <li>记录ERROR级别日志</li>
- * </ul>
- *
-
-
+ * 禁用的ES客户端实现
  */
-@Slf4j
 public class DisabledSearchClientImpl implements SearchClient {
 
-    private static final String ES_DISABLED_MESSAGE =
-        "Elasticsearch is disabled (middleware.search.enabled=false). " +
-        "Please enable it in configuration or remove search-related functionality.";
+    private static final Logger log                 = LoggerFactory.getLogger(DisabledSearchClientImpl.class);
+    private static final String ES_DISABLED_MESSAGE = "Elasticsearch is disabled. Enable it via configuration.";
+
+    @Override
+    public Map<String, Object> get(String index, String id) {
+        log.info("[Client调用] DisabledSearchClientImpl#get | Elasticsearch禁用 | 0ms | {} | {}",
+                Thread.currentThread().getName(),
+                index);
+        throw new IllegalStateException(ES_DISABLED_MESSAGE);
+    }
 
     @Override
     public void index(String index, String id, Map<String, Object> document) {
@@ -45,11 +40,6 @@ public class DisabledSearchClientImpl implements SearchClient {
 
     @Override
     public void bulkDelete(String index, List<String> ids) {
-        throw new IllegalStateException(ES_DISABLED_MESSAGE);
-    }
-
-    @Override
-    public Map<String, Object> get(String index, String id) {
         throw new IllegalStateException(ES_DISABLED_MESSAGE);
     }
 

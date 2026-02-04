@@ -39,9 +39,7 @@ public class CaffeineCacheClientImpl implements CacheClient {
                              .build();
 
         log.info("Caffeine缓存初始化成功（自定义过期时间）: 初始容量={}, 最大大小={}, 默认写入过期时间={}",
-                initialCapacity,
-                maximumSize,
-                expireAfterWrite);
+                initialCapacity, maximumSize, expireAfterWrite);
     }
 
     @Override

@@ -19,6 +19,7 @@ public class RedisCacheClientImpl implements CacheClient {
 
     public RedisCacheClientImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
+        log.info("Redis缓存初始化成功（分布式缓存）: RedisTemplate={}", redisTemplate);
     }
 
     @Override
