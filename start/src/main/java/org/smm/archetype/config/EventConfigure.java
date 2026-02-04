@@ -39,7 +39,7 @@ import java.util.List;
 @EnableAsync
 @RequiredArgsConstructor
 @EnableConfigurationProperties(EventProperties.class)
-public class DomainEventConfigure implements AsyncConfigurer {
+public class EventConfigure implements AsyncConfigurer {
 
     @Value("${middleware.kafka.consumer.group-id}")
     private String executorGroup;

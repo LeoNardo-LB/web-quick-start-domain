@@ -1,6 +1,6 @@
 # PROJECT KNOWLEDGE BASE
 
-**生成时间**: 2026-02-03
+**生成时间**: 2026-02-04
 **Commit**: e24817a
 **Branch**: main
 
@@ -61,7 +61,14 @@ web-quick-start-domain/
 
 ## 代码映射
 
-(暂无 - LSP 符号未查询)
+| Symbol                  | Type                 | Location                                                                                                       | Refs       | Role |
+|-------------------------|----------------------|----------------------------------------------------------------------------------------------------------------|------------|------|
+| OrderAggr               | Aggregate Root       | domain/src/main/java/org/smm/archetype/domain/example/model/OrderAggr.java                                     | 聚合根，订单业务规则 |
+| OrderAppService         | Application Service  | app/src/main/java/org/smm/archetype/app/example/OrderAppService.java                                           | 用例编排，CQRS  |
+| OrderController         | REST Controller      | adapter/src/main/java/org/smm/archetype/adapter/example/web/api/OrderController.java                           | REST 端点    |
+| OrderAggrRepository     | Repository Interface | domain/src/main/java/org/smm/archetype/domain/example/repository/OrderAggrRepository.java                      | 仓储接口       |
+| OrderAggrRepositoryImpl | Repository Impl      | infrastructure/src/main/java/org/smm/archetype/infrastructure/example/persistence/OrderAggrRepositoryImpl.java | 仓储实现       |
+| OrderConfigure          | Configuration        | start/src/main/java/org/smm/archetype/exampleorder/OrderConfigure.java                                         | Bean 配置    |
 
 ## 约定（非标准）
 
@@ -97,6 +104,12 @@ web-quick-start-domain/
 3. 配置类在 `start/` 模块外 - 仅 `start/config/` 允许
 4. 测试在生产模块中 - 必须使用独立的 `test/` 模块
 5. Domain 层的外部依赖 - Domain 必须保持纯净
+6. Domain 层使用 Spring 框架工具（BeanUtils, FastJSON 等）
+
+**发现的违规实例**：
+
+- ⚠️ `domain/bizshared/util/MyBeanUtil.java` - 使用了 Spring BeanUtils，违反 Domain 层零外部依赖规则
+- ⚠️ `domain/bizshared/event/Type.java` - 使用了 FastJSON 进行序列化，违反 Domain 层零外部依赖规则
 
 ## 独特风格
 
@@ -155,3 +168,4 @@ mvn archetype:generate -DarchetypeGroupId=org.smm.archetype -DarchetypeArtifactI
 - 中间件可选：Kafka、Redis、Elasticsearch - 全部通过 `@ConditionalOnBean` 自动检测
 - 示例代码（`_example/`）是生产模块的一部分，而非独立模块
 - 启动验证测试是 Spring 上下文健康的守门员
+- ⚠️ Domain 层发现违规：需要修复 MyBeanUtil 和 Type 的外部依赖问题
