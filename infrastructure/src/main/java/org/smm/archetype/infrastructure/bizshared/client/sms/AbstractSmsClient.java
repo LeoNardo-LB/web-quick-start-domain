@@ -1,5 +1,6 @@
 package org.smm.archetype.infrastructure.bizshared.client.sms;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.bizshared.client.SmsClient;
 import org.smm.archetype.domain.bizshared.client.dto.ServiceProvider;
@@ -12,6 +13,7 @@ import java.util.List;
  * 短信服务抽象基类，提供通用发送流程模板。
  */
 @Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractSmsClient implements SmsClient {
 
     /**

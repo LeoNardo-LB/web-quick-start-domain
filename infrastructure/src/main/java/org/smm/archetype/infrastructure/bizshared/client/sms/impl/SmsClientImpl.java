@@ -87,13 +87,11 @@ public class SmsClientImpl extends AbstractSmsClient {
      */
     @Override
     protected SmsResult doSendSms(SmsRequest request, ServiceProvider provider) {
-        log.info("========== SMS Service (Mock) ==========");
         log.info("Provider: {}", provider);
         log.info("Phone Number: {}", request.getPhoneNumber());
         log.info("Sign Name: {}", request.getSignName());
         log.info("Template Code: {}", request.getTemplateCode());
         log.info("Template Param: {}", request.getTemplateParam());
-        log.info("========================================");
 
         // 模拟发送短信（实际生产环境需要调用真实API）
         String messageId = "MOCK_SMS_" + UUID.randomUUID();
