@@ -1,0 +1,64 @@
+# ===========================================
+# DDD Web Quick Start Domain - Git Attributes
+# ===========================================
+# 统一换行符处理，避免跨平台问题
+
+# ===================
+# 默认行为
+# ===================
+* text=auto
+
+# ===================
+# Java 源代码 - LF
+# ===================
+*.java text eol=lf
+*.kt text eol=lf
+*.kts text eol=lf
+
+# ===================
+# 配置文件 - LF
+# ===================
+*.xml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.properties text eol=lf
+*.json text eol=lf
+
+# ===================
+# 脚本文件 - LF
+# ===================
+*.sh text eol=lf
+*.py text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# ===================
+# 文档文件 - LF
+# ===================
+*.md text eol=lf
+*.txt text eol=lf
+
+# ===================
+# Web 文件 - LF
+# ===================
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+
+# ===================
+# 二进制文件（不转换）
+# ===================
+*.jar binary
+*.class binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

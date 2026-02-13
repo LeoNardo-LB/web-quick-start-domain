@@ -1,55 +1,91 @@
+# ===========================================
+# DDD Web Quick Start Domain - Git Ignore
+# ===========================================
+
+# ===================
+# 构建产物
+# ===================
 target/
-!.mvn/wrapper/maven-wrapper.jar
+build/
+out/
+dist/
+*.class
+*.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-.kotlin
-
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
-*.iml
-*.ipr
-
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# ===================
+# IDE 配置
+# ===================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.project
+.classpath
+.settings/
+.apt_generated
+.factorypath
+.springBeans
+.sts4-cache
+
+# VS Code
 .vscode/
 
-### Mac OS ###
+# NetBeans
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ===================
+# Kotlin 编译缓存
+# ===================
+.kotlin/
+
+# ===================
+# 日志文件
+# ===================
+.logs/
+_logs/
+*.log
+*.log.*
+
+# ===================
+# 系统文件
+# ===================
 .DS_Store
-/.idea/
+Thumbs.db
+*.swp
+*.swo
+*~
+nul
 
-### 日志目录（隐藏目录） ###
-**/.logs/
-**/_logs/
+# ===================
+# 依赖目录
+# ===================
+node_modules/
 
-
-### 不需要的ai文件 ###
-**/.sisyphus/
-**/node_modules
-**/nul
-
-### Python ###
+# ===================
+# Python 缓存
+# ===================
 __pycache__/
 *.py[cod]
 *$py.class
+.ruff_cache/
+
+# ===================
+# AI 工具目录（本地）
+# ===================
+.sisyphus/
+
+# ===================
+# 测试缓存
+# ===================
+scripts/.test-cache/
