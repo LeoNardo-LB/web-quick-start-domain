@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.2</version>
+    </parent>
+    <groupId>org.smm.archetype</groupId>
+    <artifactId>web-quick-start-domain</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <description>Web Quick Start Domain</description>
+    <modules>
+        <module>adapter</module>
+        <module>app</module>
+        <module>domain</module>
+        <module>infrastructure</module>
+        <module>start</module>
+        <module>test</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.type>25</maven.compiler.type>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
+        <java.version>25</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <!--springboot3 使用 2.x；springboot4 使用 3.0.0-->
+        <spring-doc.version>3.0.1</spring-doc.version>
+        <mybatis-flex.version>1.11.5</mybatis-flex.version>
+        <lombok.version>1.18.42</lombok.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <caffeine.version>3.1.8</caffeine.version>
+        <aliyun.dm.version>1.3.0</aliyun.dm.version>
+        <!-- Logback JSON encoder -->
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <!-- 测试框架版本 - 兼容 JDK 25 -->
+        <mockito.version>5.14.2</mockito.version>
+        <assertj.version>3.27.7</assertj.version>
+        <!-- JaCoCo 代码覆盖率工具（支持 JDK 25） -->
+        <jacoco.version>0.8.14</jacoco.version>
+    </properties>
+
+    <dependencies>
+        <!-- 开发工具 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 核心框架 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <version>4.0.0-M2</version>
+        </dependency>
+
+        <!-- 代码生成 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 工具库 -->
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+        </dependency>
+    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <!--系统依赖Start-->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>adapter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>app</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>domain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>infrastructure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>start</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>test</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!--系统依赖End-->
+            <!--bom Start-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-bom</artifactId>
+                <version>5.8.41</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-dependencies</artifactId>
+                <version>${mybatis-flex.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--bom End-->
+            <!--基础依赖Start-->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${spring-doc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <version>${spring-doc.version}</version>
+            </dependency>
+            <!--mybatis-flex-->
+            <!--<dependency>-->
+            <!--    <groupId>com.mybatis-flex</groupId>-->
+            <!--    <artifactId>mybatis-flex-spring-boot4-starter</artifactId>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+            <!--    <groupId>com.mybatis-flex</groupId>-->
+            <!--    <artifactId>mybatis-flex-codegen</artifactId>-->
+            <!--</dependency>-->
+
+            <!-- Caffeine本地缓存 -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
+
+            <!-- 阿里云SDK -->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dysmsapi20170525</artifactId>
+                <version>4.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dm20151123</artifactId>
+                <version>${aliyun.dm.version}</version>
+            </dependency>
+
+            <!--rustfs支持的s3协议-->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>s3</artifactId>
+                <version>2.41.4</version>
+            </dependency>
+
+            <!-- 依赖冲突解决：统一版本管理 -->
+            <!-- objenesis：Kryo需要3.4，Mockito需要3.3，统一使用3.4 -->
+            <dependency>
+                <groupId>org.objenesis</groupId>
+                <artifactId>objenesis</artifactId>
+                <version>3.4</version>
+            </dependency>
+            <!-- error_prone_annotations：AssertJ需要2.41.0，Guava传递依赖2.21.1，统一使用2.41.0 -->
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>2.41.0</version>
+            </dependency>
+            <!-- byte-buddy：Mockito需要1.17.8，统一使用1.17.8 -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.17.8</version>
+            </dependency>
+            <!-- byte-buddy-agent：测试框架需要，统一使用1.17.8 -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>1.17.8</version>
+            </dependency>
+
+            <!-- 测试框架版本管理 - 兼容 JDK 25 -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+            </dependency>
+
+            <!-- Spring Boot管理依赖（显式声明以便于版本控制）-->
+            <!-- 数据库相关 -->
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>7.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>9.5.0</version>
+            </dependency>
+
+            <!-- 消息队列（可选，用于分布式事件驱动） -->
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>4.0.2</version>
+            </dependency>
+
+            <!-- JSON序列化 -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.19.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>2.19.4</version>
+            </dependency>
+            <!-- Logback JSON encoder -->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback-encoder.version}</version>
+            </dependency>
+
+            <!-- Spring Boot Web相关（由Spring Boot parent 4.0.2管理版本） -->
+
+            <!-- 根POM全局依赖（显式声明以便于版本控制）-->
+            <!-- 工具库 -->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>2.0.56</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>33.5.0-jre</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.20.0</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.20.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo</artifactId>
+                <version>5.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>2.13.0</version>
+            </dependency>
+
+            <!-- MapStruct 对象转换 -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+
+            <!--基础依赖End-->
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>25</source>
+                    <target>25</target>
+                    <release>25</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </path>
+                        <path>
+                            <groupId>com.mybatis-flex</groupId>
+                            <artifactId>mybatis-flex-processor</artifactId>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok-mapstruct-binding.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jacoco.destFile>${maven.multiModuleProjectDirectory}/target/jacoco.exec</jacoco.destFile>
+                    </systemPropertyVariables>
+                    <argLine>
+                        @{argLine}
+                        -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+                        <!-- JVM 内存配置（解决 Windows G1 GC Native Memory 问题） -->
+                        -Xmx512m
+                        -Xms128m
+                        -XX:MaxMetaspaceSize=256m
+                        -XX:+UseSerialGC
+                        -XX:MaxDirectMemorySize=256m
+                    </argLine>
+                </configuration>
+            </plugin>
+            <!-- JaCoCo 代码覆盖率工具（支持 JDK 25） -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.14</version>
+                <configuration>
+                    <dataFile>${basedir}/target/jacoco.exec</dataFile>
+                    <outputDirectory>${basedir}/target/site/jacoco</outputDirectory>
+                    <excludes>
+                        <exclude>**/generated/**</exclude>
+                        <exclude>**/test/**</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report-aggregate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-archetype-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <outputDirectory>_output/archetype</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

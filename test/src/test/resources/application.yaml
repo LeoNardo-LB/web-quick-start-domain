@@ -1,0 +1,41 @@
+# 测试环境配置
+server:
+  port: 0  # 随机端口
+  servlet:
+    context-path: /web-quick-start-test
+
+spring:
+  application:
+    name: web-quick-start-test
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/testdb?characterEncoding=utf-8&useInformationSchema=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: leonardo123
+
+springdoc:
+  swagger-ui:
+    path: /openapi-doc.html
+
+# 中间件配置
+middleware:
+  domain-event:
+    retry:
+      cron: "0 * * * * ?"  # 定时任务 Cron 表达式
+
+logging:
+  level:
+    root: INFO
+    org.smm.archetype.domain: DEBUG
+    org.smm.archetype.app: DEBUG
+    org.smm.archetype.infrastructure: INFO
+    org.smm.archetype.adapter: INFO
+    org.springframework: INFO
+    org.mybatis: INFO
+    com.mysql.cj: WARN
+    org.apache.kafka: WARN
+  # 日志统一输出到项目根目录的隐藏目录 .logs
+  # 测试时通过 Maven surefire 的工作目录配置确保正确性
+  file:
+    path: .logs

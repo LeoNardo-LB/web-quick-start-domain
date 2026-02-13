@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <!-- 引入Spring Boot默认配置 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- 敏感信息脱敏转换器 -->
+    <conversionRule conversionWord="msg"
+                    converterClass="org.smm.archetype.config.logging.DesensitizingConverter"/>
+
+    <!-- CONSOLE Appender with traceId/spanId pattern -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} | %thread | %X{traceId:--} | %X{spanId:--} | %-5level | %logger{36} | %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- 多环境配置（通过Spring Profile区分） -->
+    <!-- 日志路径：优先使用 application.yaml 中的 logging.file.path 配置 -->
+    <!-- 默认值使用隐藏目录 .logs，由 Maven/IDE 控制工作目录 -->
+    <springProperty scope="context" name="LOG_PATH" source="logging.file.path" defaultValue=".logs"/>
+    <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root" defaultValue="INFO"/>
+
+    <!-- 文件滚动策略（按日期和大小分割） -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/app-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize> <!-- 单文件最大 -->
+            <maxHistory>30</maxHistory>      <!-- 保留30天 -->
+            <totalSizeCap>5GB</totalSizeCap> <!-- 总日志上限 -->
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} | %thread | %X{traceId:--} | %X{spanId:--} | %-5level | %logger{36} | %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- 异步日志提升性能 - 增大队列大小以提升高并发场景性能 -->
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>2048</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="FILE"/>
+    </appender>
+
+    <!-- 当前会话日志（追加模式，保留历史记录） -->
+    <appender name="CURRENT" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_PATH}/current.log</file>
+        <append>true</append> <!-- 追加模式，保留历史记录 -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} | %thread | %X{traceId:--} | %X{spanId:--} | %-5level | %logger{36} | %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- 异步包装当前会话日志 - 增大队列大小 -->
+    <appender name="ASYNC_CURRENT" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>2048</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="CURRENT"/>
+    </appender>
+
+    <!-- 错误日志单独记录 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/error-%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} | %thread | %X{traceId:--} | %X{spanId:--} | %-5level | %logger{36} | %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- 审计日志单独记录（180天保留） -->
+    <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/audit.log</file>
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/audit-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>180</maxHistory> <!-- 保留180天，满足合规要求 -->
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} | %thread | %-5level | %logger{36} | %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 开发环境配置 -->
+    <springProfile name="dev">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="CURRENT"/>
+            <appender-ref ref="AUDIT_FILE"/>
+        </root>
+
+        <!-- 领域层和应用层使用 DEBUG 级别 -->
+        <logger name="org.smm.archetype.domain" level="DEBUG"/>
+        <logger name="org.smm.archetype.app" level="DEBUG"/>
+    </springProfile>
+
+    <!-- 生产环境配置 -->
+    <springProfile name="production">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="CURRENT"/>
+            <appender-ref ref="AUDIT_FILE"/>
+        </root>
+
+        <!-- 生产环境使用 WARN 级别，减少日志量 -->
+        <logger name="org.smm.archetype.domain" level="WARN"/>
+        <logger name="org.smm.archetype.app" level="WARN"/>
+    </springProfile>
+
+    <!-- 默认/测试环境配置 -->
+    <springProfile name="default,test">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ERROR_FILE"/>
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="CURRENT"/>
+            <appender-ref ref="AUDIT_FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- 默认root配置（无profile时） -->
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="CURRENT"/>
+        <appender-ref ref="AUDIT_FILE"/>
+    </root>
+</configuration>

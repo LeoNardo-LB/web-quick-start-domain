@@ -1,0 +1,16 @@
+schema: spec-driven
+
+# Project context - 注入到创建 artifacts 时的 AI 提示中
+
+context: |
+  Tech stack: Java 25, Spring Boot 4.0.2, MyBatis-Flex 1.11.5
+  Architecture: DDD 4-layer (Domain → Application → Infrastructure → Adapter)
+  
+  详细规范请参考: AGENTS.md
+
+# Per-artifact rules - 注入到创建对应 artifact 时的额外规则
+rules:
+  tasks:
+    - 在 tasks.md 开头添加「## 0. 前置准备」章节
+    - 包含任务 "- [ ] 0.1 阅读 AGENTS.md 了解技能加载要求"
+    - 包含任务 "- [ ] 0.2 使用 `/tdd-workflow` 命令加载 TDD 流程"

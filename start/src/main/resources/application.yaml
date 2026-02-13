@@ -1,0 +1,190 @@
+spring:
+  application:
+    name: quickstart
+  threads:
+    virtual:
+      enabled: true
+
+  # Elasticsearch配置
+    # elasticsearch:
+    # 连接地址（逗号分隔多个地址）
+    # uris: http://localhost:9200
+    # 如果ES启用了安全认证，需要配置用户名和密码
+    # username: elastic
+    # password: your-password
+    # 连接超时（默认：10s）
+    # connection-timeout: 10s
+    ## 读取超时（默认：30s）
+    # socket-timeout: 30s
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/testdb?characterEncoding=utf-8&useInformationSchema=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: leonardo123
+
+  # Redis配置（外部中间件，可选）
+  # data:
+  #   redis:
+  #     host: 127.0.0.1
+  #     port: 6379
+  #     password: leonardo123
+  #     database: 0
+  #     lettuce:
+  #       pool:
+  #         max-active: 8
+  #         max-idle: 8
+  #         min-idle: 0
+  #         max-wait: -1ms
+  #     timeout: 3000ms
+
+# 中间件配置
+middleware:
+  # Kafka消费者配置
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: kfk-${spring.application.name}-group
+      trusted-packages: "*"
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      max-poll-records: 500
+      max-poll-interval-ms: 300000
+
+    # 线程池配置
+  thread-pool:
+    # IO密集型线程池配置
+    io:
+      core-size: ${CPU_COUNT:8}
+      max-size: ${CPU_COUNT_TIMES_2:16}
+      queue-capacity: 1000
+      thread-name-prefix: io-task-
+      rejection-policy: CallerRunsPolicy
+    # CPU密集型线程池配置
+    cpu:
+      core-size: ${CPU_COUNT:8}
+      max-size: ${CPU_COUNT_PLUS_1:9}
+      queue-capacity: 100
+      thread-name-prefix: cpu-task-
+      rejection-policy: AbortPolicy
+    # 守护线程池配置
+    daemon:
+      core-size: ${CPU_COUNT_HALF:4}
+      max-size: ${CPU_COUNT:8}
+      queue-capacity: 1000
+      thread-name-prefix: daemon-task-
+      thread-priority: 1
+    # 任务调度线程池配置
+    scheduler:
+      pool-size: ${CPU_COUNT:8}
+      thread-name-prefix: scheduled-task-
+      remove-on-cancel-policy: true
+      await-termination-seconds: 60
+
+  # 对象存储配置
+  object-storage:
+    # 基于 AWS S3 SDK v2 实现，RustFS 100% 兼容 S3 协议
+    rustfs:
+      endpoint: http://localhost:9000
+      access-key: leonardo123
+      secret-key: leonardo123
+      bucket: default
+      connect-timeout: 5s
+      read-timeout: 30s
+
+    # 本地存储配置（作为默认实现）
+    local:
+      base-path: ${user.home}/.project/${spring.application.name}/oss
+      zero-copy: true
+
+  # 缓存配置
+  cache:
+    initial-capacity: 100
+    maximum-size: 10000
+    expire-after-write: 30d
+    expire-after-access: 30d
+
+  # 事件发布配置
+  domain-event:
+    consumer:
+      kafka:
+        topic: domainEvent
+    # 事件消费配置（事件重试任务）
+    retry:
+      # Cron 表达式（默认：每分钟执行一次）
+      cron: "0 * * * * ?"
+      batch-size: 100
+      high-priority-ratio: 0.8
+      delays:
+        - 1   # 第1次重试：1分钟后
+        - 5   # 第2次重试：5分钟后
+        - 15  # 第3次重试：15分钟后
+        - 30  # 第4次重试：30分钟后
+        - 60  # 第5次重试：60分钟后
+      max-retry-times: 5
+
+  # 短信服务配置（可选）
+  # sms:
+  #   access-key-id: ${ALIYUN_SMS_ACCESS_KEY_ID:your-access-key-id}
+  #   access-key-secret: ${ALIYUN_SMS_ACCESS_KEY_SECRET:your-access-key-secret}
+  #   region-id: ${ALIYUN_SMS_REGION_ID:cn-hangzhou}
+  #   sign-name: ${ALIYUN_SMS_SIGN:你的签名}
+  #
+  # 邮件服务配置（可选）
+  # email:
+  #   access-key-id: ${ALIYUN_EMAIL_ACCESS_KEY_ID:your-access-key-id}
+  #   access-key-secret: ${ALIYUN_EMAIL_ACCESS_KEY_SECRET:your-access-key-secret}
+  #   region-id: ${ALIYUN_EMAIL_REGION_ID:cn-hangzhou}
+  #   from-address: ${ALIYUN_EMAIL_FROM:noreply@example.com}
+  #   from-alias: ${ALIYUN_EMAIL_ALIAS:系统通知}
+  #   account-name: ${ALIYUN_EMAIL_ACCOUNT:noreply@example.com}
+  #   reply-to-address: ${ALIYUN_EMAIL_REPLYTO:}
+
+server:
+  port: 9102
+  servlet:
+    context-path: /${spring.application.name}
+
+springdoc:
+  show-actuator: true
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /openapi-doc.html
+
+logging:
+  config: classpath:logback-spring.xml
+  # 日志文件路径配置 - 使用隐藏目录
+  file:
+    path: .logs
+  # 根日志级别
+  level:
+    root: INFO
+    # 领域层日志级别
+    org.smm.archetype.domain: DEBUG
+    # 应用层日志级别
+    org.smm.archetype.app: DEBUG
+    # 基础设施层日志级别
+    org.smm.archetype.infrastructure: INFO
+    # 接口层日志级别
+    org.smm.archetype.adapter: INFO
+    # 第三方框架日志级别
+    org.springframework: INFO
+    org.mybatis: DEBUG
+    com.mysql.cj: WARN
+    org.apache.kafka: WARN
+
+# Actuator管理端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,httpexchanges
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: ${spring.profiles.active:default}
