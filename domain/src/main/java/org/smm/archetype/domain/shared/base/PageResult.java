@@ -7,11 +7,10 @@ import lombok.experimental.SuperBuilder;
 import java.util.List;
 
 /**
- * 基础分页结果
-
-
+ * 基础分页结果。
+ *
+ * @param <T> 记录类型
  */
-
 @Getter
 @Setter
 @SuperBuilder(setterPrefix = "set")

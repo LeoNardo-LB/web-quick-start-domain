@@ -5,8 +5,8 @@ import java.util.concurrent.Callable;
 
 /**
  * 包含上下文的执行器（基于ScopedValue实现）
-
-
+ *
+ * @param <V> 返回值类型
  */
 public abstract class ContextCallable<V> implements Callable<V> {
 

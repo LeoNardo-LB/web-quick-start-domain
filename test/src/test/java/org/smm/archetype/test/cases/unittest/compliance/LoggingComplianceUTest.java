@@ -8,7 +8,6 @@ import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.LoggerFactory;
@@ -26,10 +25,15 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * 日志合规性测试
  *
- * <p>验证日志配置符合 GDPR 和等保要求
- * <p>注意：由于 infrastructure 模块有编译错误导致 Spring 上下文无法加载，
- * 此测试暂时跳过需要 Spring 上下文的配置验证测试。
- * 日志脱敏功能通过单元测试验证。
+ * <p>验证日志配置符合 GDPR 和等保要求，包括：
+ * <ul>
+ *   <li>敏感信息脱敏（密码、Token、手机号、身份证号、银行卡号、邮箱）</li>
+ *   <li>审计日志独立存储（AUDIT_FILE appender，180天保留）</li>
+ *   <li>异步日志配置（ASYNC_FILE、ASYNC_CURRENT appender）</li>
+ *   <li>日志格式规范（包含时间戳、线程、traceId、spanId、级别、logger、消息）</li>
+ * </ul>
+ *
+ * <p>注意：此测试使用 {@code logback-test.xml} 配置，不依赖 Spring Profile。
  */
 class LoggingComplianceUTest {
 
@@ -139,7 +143,6 @@ class LoggingComplianceUTest {
      *
      * <p>验证审计日志有独立的 appender 和文件
      */
-    @Disabled("Infrastructure模块编译错误导致Spring上下文无法加载")
     @Test
     void testAuditLogIsolation() {
         // 检查是否有 AUDIT_FILE appender
@@ -160,7 +163,6 @@ class LoggingComplianceUTest {
      *
      * <p>验证审计日志保留期限至少为 180 天（满足 GDPR 和等保要求）
      */
-    @Disabled("Infrastructure模块编译错误导致Spring上下文无法加载")
     @Test
     void testAuditLogRetentionPeriod() {
         List<Appender<ILoggingEvent>> appenders = new ArrayList<>();
@@ -241,7 +243,6 @@ class LoggingComplianceUTest {
      *
      * <p>验证日志格式符合规范，包含时间戳、线程、日志级别等
      */
-    @Disabled("Infrastructure模块编译错误导致Spring上下文无法加载")
     @Test
     void testLogFormatCompliance() {
         // 检查日志格式是否符合规范
@@ -258,7 +259,6 @@ class LoggingComplianceUTest {
      *
      * <p>验证日志文件输出到项目内部目录，避免数据泄露
      */
-    @Disabled("Infrastructure模块编译错误导致Spring上下文无法加载")
     @Test
     void testLogOutputPathSecurity() {
         List<Appender<ILoggingEvent>> appenders = new ArrayList<>();
@@ -286,7 +286,6 @@ class LoggingComplianceUTest {
      *
      * <p>验证不同环境使用适当的日志级别
      */
-    @Disabled("Infrastructure模块编译错误导致Spring上下文无法加载")
     @Test
     void testLogLevelConfiguration() {
         // 验证根日志级别已配置
@@ -306,7 +305,6 @@ class LoggingComplianceUTest {
      *
      * <p>验证异步日志队列大小符合性能要求（2048）
      */
-    @Disabled("Infrastructure模块编译错误导致Spring上下文无法加载")
     @Test
     void testAsyncQueueSize() {
         // 检查是否有 ASYNC_FILE 和 ASYNC_CURRENT appender
@@ -330,7 +328,6 @@ class LoggingComplianceUTest {
      *
      * <p>验证日志文件轮转策略符合要求（按日期和大小分割）
      */
-    @Disabled("Infrastructure模块编译错误导致Spring上下文无法加载")
     @Test
     void testLogRotationPolicy() {
         List<Appender<ILoggingEvent>> appenders = new ArrayList<>();
@@ -359,7 +356,6 @@ class LoggingComplianceUTest {
      *
      * <p>验证所有 GDPR 要求均已满足
      */
-    @Disabled("Infrastructure模块编译错误导致Spring上下文无法加载")
     @Test
     void testGDPRComplianceChecklist() {
         // GDPR 要求检查清单：
@@ -387,7 +383,6 @@ class LoggingComplianceUTest {
      *
      * <p>验证所有等保要求均已满足
      */
-    @Disabled("Infrastructure模块编译错误导致Spring上下文无法加载")
     @Test
     void testDengbaoComplianceChecklist() {
         // 等保要求检查清单：

@@ -32,6 +32,11 @@ public class SpringDomainEventPublisher extends DomainEventCollectPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * 构造函数
+     * @param applicationEventPublisher Spring事件发布器
+     * @param eventMapper               事件Mapper
+     */
     public SpringDomainEventPublisher(ApplicationEventPublisher applicationEventPublisher, EventMapper eventMapper) {
         super(eventMapper);
         this.applicationEventPublisher = applicationEventPublisher;

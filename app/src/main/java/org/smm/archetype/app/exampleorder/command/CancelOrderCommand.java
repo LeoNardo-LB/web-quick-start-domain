@@ -24,6 +24,11 @@ public class CancelOrderCommand implements Command {
     public CancelOrderCommand() {
     }
 
+    /**
+     * 全参数构造方法
+     * @param orderId 订单ID
+     * @param reason  取消原因
+     */
     public CancelOrderCommand(Long orderId, String reason) {
         this.orderId = orderId;
         this.reason = reason;

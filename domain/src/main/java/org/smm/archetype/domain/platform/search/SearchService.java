@@ -1,11 +1,11 @@
 package org.smm.archetype.domain.platform.search;
 
+import org.smm.archetype.domain.platform.search.enums.VectorDistanceType;
+import org.smm.archetype.domain.platform.search.enums.VectorIndexType;
 import org.smm.archetype.domain.platform.search.query.SearchQuery;
 import org.smm.archetype.domain.platform.search.query.VectorSearchQuery;
 import org.smm.archetype.domain.platform.search.result.SearchResult;
 import org.smm.archetype.domain.platform.search.result.VectorSearchResult;
-import org.smm.archetype.domain.platform.search.enums.VectorIndexType;
-import org.smm.archetype.domain.platform.search.enums.VectorDistanceType;
 
 import java.util.List;
 import java.util.Map;
@@ -146,9 +146,9 @@ public interface SearchService {
      * @return AI搜索结果
      */
     <T> org.smm.archetype.domain.platform.search.result.AiSearchResult<T> aiSearch(
-        String index,
-        org.smm.archetype.domain.platform.search.query.AiSearchQuery query,
-        Class<T> documentClass
+            String index,
+            org.smm.archetype.domain.platform.search.query.AiSearchQuery query,
+            Class<T> documentClass
     );
 
     /**
@@ -161,8 +161,8 @@ public interface SearchService {
      * @return 搜索结果
      */
     <T> SearchResult<T> hybridSearch(
-        String index,
-        org.smm.archetype.domain.platform.search.query.HybridSearchQuery query,
-        Class<T> documentClass
+            String index,
+            org.smm.archetype.domain.platform.search.query.HybridSearchQuery query,
+            Class<T> documentClass
     );
 }

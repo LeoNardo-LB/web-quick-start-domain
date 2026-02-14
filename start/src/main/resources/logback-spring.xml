@@ -99,8 +99,8 @@
         <root level="${LOG_LEVEL}">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="ERROR_FILE"/>
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="CURRENT"/>
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_CURRENT"/>
             <appender-ref ref="AUDIT_FILE"/>
         </root>
 
@@ -113,8 +113,8 @@
     <springProfile name="production">
         <root level="${LOG_LEVEL}">
             <appender-ref ref="ERROR_FILE"/>
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="CURRENT"/>
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_CURRENT"/>
             <appender-ref ref="AUDIT_FILE"/>
         </root>
 
@@ -128,8 +128,8 @@
         <root level="${LOG_LEVEL}">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="ERROR_FILE"/>
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="CURRENT"/>
+            <appender-ref ref="ASYNC_FILE"/>
+            <appender-ref ref="ASYNC_CURRENT"/>
             <appender-ref ref="AUDIT_FILE"/>
         </root>
     </springProfile>
@@ -137,8 +137,8 @@
     <!-- 默认root配置（无profile时） -->
     <root level="${LOG_LEVEL}">
         <appender-ref ref="ERROR_FILE"/>
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="CURRENT"/>
+        <appender-ref ref="ASYNC_FILE"/>
+        <appender-ref ref="ASYNC_CURRENT"/>
         <appender-ref ref="AUDIT_FILE"/>
     </root>
 </configuration>

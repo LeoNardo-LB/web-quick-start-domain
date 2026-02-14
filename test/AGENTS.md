@@ -33,6 +33,31 @@ test/src/test/java/org/smm/archetype/test/
 
 ## 核心规则
 
+### 测试环境配置（NON-NEGOTIABLE）
+
+| 规则               | 说明                                           |
+|------------------|----------------------------------------------|
+| 独立配置             | 测试环境使用独立的配置文件，与生产环境解耦                        |
+| H2 数据库           | 测试环境使用 H2 内存数据库，配置 MySQL 兼容模式                |
+| logback-test.xml | 单元测试使用 `logback-test.xml`，不依赖 Spring Profile |
+
+**H2 数据库配置** (`test/src/test/resources/application.yaml`)：
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+```
+
+**Logback 测试配置** (`test/src/test/resources/logback-test.xml`)：
+
+- 自动加载优先级高于 `logback-spring.xml`
+- 不依赖 Spring Profile，单元测试可直接使用
+- 包含所有必需 appender（CONSOLE、FILE、ASYNC_FILE、ASYNC_CURRENT、ERROR_FILE、AUDIT_FILE）
+
 ### 测试模块结构（NON-NEGOTIABLE）
 
 | 规则         | 说明                                              |

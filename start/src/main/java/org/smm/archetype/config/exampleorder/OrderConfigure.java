@@ -6,11 +6,11 @@ import org.smm.archetype.adapter.exampleorder.handler.OrderCreatedEventHandler;
 import org.smm.archetype.adapter.exampleorder.handler.OrderPaidEventHandler;
 import org.smm.archetype.app.exampleorder.OrderAppService;
 import org.smm.archetype.app.exampleorder.converter.OrderDtoConverter;
-import org.smm.archetype.domain.shared.event.DomainEventPublisher;
 import org.smm.archetype.domain.exampleorder.repository.OrderAggrRepository;
 import org.smm.archetype.domain.exampleorder.service.InventoryService;
 import org.smm.archetype.domain.exampleorder.service.OrderDomainService;
 import org.smm.archetype.domain.exampleorder.service.PaymentGateway;
+import org.smm.archetype.domain.shared.event.DomainEventPublisher;
 import org.smm.archetype.infrastructure.exampleorder.adapter.MockInventoryServiceAdapter;
 import org.smm.archetype.infrastructure.exampleorder.adapter.StripePaymentAdapter;
 import org.smm.archetype.infrastructure.exampleorder.persistence.OrderRepositoryImpl;
@@ -54,9 +54,11 @@ public class OrderConfigure {
      * @return OrderAggrRepository
      */
     @Bean
-    @ConditionalOnMissingBean(OrderAggrRepository.class)
     public OrderAggrRepository orderAggrRepository() {
-        return new OrderRepositoryImpl();
+        OrderRepositoryImpl repository = new OrderRepositoryImpl();
+        // 手动调用初始化方法，因为 @Bean 方法直接 new 不会触发 @PostConstruct
+        repository.initTestData();
+        return repository;
     }
 
     // ==================== 领域服务 ====================

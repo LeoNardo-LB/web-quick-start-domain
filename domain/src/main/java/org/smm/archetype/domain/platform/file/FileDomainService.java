@@ -18,7 +18,7 @@ public interface FileDomainService {
      */
     void uploadFile(InputStream inputStream, FileMetadata fileMetadata, FileBusiness fileBusiness);
 
-    /**5
+    /**
      * 列出业务文件
      * @param businessId 业务ID
      * @param type       业务实体类型

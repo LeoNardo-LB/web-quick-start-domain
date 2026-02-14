@@ -3,11 +3,8 @@ package org.smm.archetype.infrastructure.shared.client.cache;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.shared.client.CacheClient;
-import org.smm.archetype.infrastructure.shared.client.cache.AbstractCacheClient;
 
 import java.time.Duration;
 import java.util.List;

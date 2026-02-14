@@ -78,5 +78,4 @@ public abstract class UnitTestBase {
     protected void resetAllMocks() {
         // 默认空实现，子类可重写此方法来重置特定的Mock对象
     }
-
 }

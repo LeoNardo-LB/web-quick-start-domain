@@ -86,6 +86,13 @@
             <version>1.20.4</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- H2 内存数据库 - 用于不需要 Testcontainers 的集成测试 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

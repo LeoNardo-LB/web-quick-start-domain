@@ -8,6 +8,8 @@ import java.time.Instant;
 
 /**
  * 事件载体，通过type字段区分事件类型。
+ *
+ * @param <T> 载荷类型
  */
 @Getter
 @Builder(setterPrefix = "set")

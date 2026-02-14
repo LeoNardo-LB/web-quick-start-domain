@@ -593,9 +593,23 @@ mvn clean compile
 # 6.2 单元测试验证
 mvn test
 
-# 6.3 启动验证（最关键）⭐
+# 6.3 代码风格检查（Checkstyle）⭐
+mvn checkstyle:check -Dcheckstyle.config.location=config/checkstyle/checkstyle.xml
+
+# 6.4 启动验证（最关键）⭐
 mvn test -Dtest=ApplicationStartupTests -pl test
 ```
+
+**Checkstyle 代码风格检查**：
+
+项目使用 Checkstyle 统一代码风格，包括：
+
+- Javadoc 注释规范（类、方法必须有文档注释）
+- 行长度限制（120 字符）
+- 文件末尾换行
+- 日志格式规范
+
+配置文件位置：`config/checkstyle/checkstyle.xml`
 
 详细流程：使用 `/tdd-workflow` 命令加载 TDD 验证流程
 
@@ -677,7 +691,27 @@ mvn verify -pl test
 
 覆盖率要求：行≥95%，分支=100%
 
-### Q5: 如何学习DDD？
+### Q5: 测试环境配置说明？
+
+**A**: 测试环境使用独立配置，与生产环境解耦：
+
+| 配置文件               | 位置                         | 说明         |
+|--------------------|----------------------------|------------|
+| `application.yaml` | `test/src/test/resources/` | H2 内存数据库配置 |
+| `logback-test.xml` | `test/src/test/resources/` | 测试专用日志配置   |
+
+**H2 数据库配置要点**：
+
+- 使用 MySQL 兼容模式（`MODE=MySQL`）
+- 启用大小写不敏感（`CASE_INSENSITIVE_IDENTIFIERS=TRUE`）
+- 单元测试无需启动 Spring 上下文
+
+**日志配置要点**：
+
+- `logback-test.xml` 优先级高于 `logback-spring.xml`
+- 不依赖 Spring Profile，单元测试直接可用
+
+### Q6: 如何学习DDD？
 
 **A**: 推荐阅读顺序：
 1. [README.md](README.md) - 项目架构和快速开始部分

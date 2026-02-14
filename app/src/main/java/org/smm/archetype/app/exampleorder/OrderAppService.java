@@ -12,14 +12,14 @@ import org.smm.archetype.app.exampleorder.dto.OrderDTO;
 import org.smm.archetype.app.exampleorder.query.GetOrderByIdQuery;
 import org.smm.archetype.app.exampleorder.query.GetOrdersByCustomerQuery;
 import org.smm.archetype.app.exampleorder.query.OrderListQuery;
-import org.smm.archetype.domain.shared.base.PageResult;
-import org.smm.archetype.domain.shared.event.DomainEventPublisher;
 import org.smm.archetype.domain.exampleorder.model.OrderAggr;
 import org.smm.archetype.domain.exampleorder.model.OrderItem;
 import org.smm.archetype.domain.exampleorder.model.RefundType;
 import org.smm.archetype.domain.exampleorder.model.valueobject.Money;
 import org.smm.archetype.domain.exampleorder.repository.OrderAggrRepository;
 import org.smm.archetype.domain.exampleorder.service.OrderDomainService;
+import org.smm.archetype.domain.shared.base.PageResult;
+import org.smm.archetype.domain.shared.event.DomainEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class OrderAppService {
         try {
             orderDomainService.validateInventory(command.getItems());
         } catch (Exception e) {
-            log.error("验证库存失败: {}", e.getMessage());
+            log.error("验证库存失败", e);
             throw new RuntimeException("验证库存失败: " + e.getMessage());
         }
 
@@ -80,7 +80,7 @@ public class OrderAppService {
         try {
             orderDomainService.lockInventory(savedOrder.getId(), savedOrder.getOrderNo(), command.getItems());
         } catch (Exception e) {
-            log.error("锁定库存失败: {}", e.getMessage());
+            log.error("锁定库存失败", e);
             throw new RuntimeException("锁定库存失败: " + e.getMessage());
         }
 
@@ -135,7 +135,7 @@ public class OrderAppService {
         try {
             orderDomainService.releaseInventory(order.getId(), order.getOrderNo());
         } catch (Exception e) {
-            log.error("释放库存失败: {}", e.getMessage());
+            log.error("释放库存失败", e);
             // 释放库存失败不影响订单取消流程
         }
 
@@ -176,7 +176,7 @@ public class OrderAppService {
         try {
             orderDomainService.releaseInventory(order.getId(), order.getOrderNo());
         } catch (Exception e) {
-            log.error("释放库存失败: {}", e.getMessage());
+            log.error("释放库存失败", e);
             // 释放库存失败不影响退款流程
         }
 

@@ -29,7 +29,8 @@ public interface FileRepository {
      * @param usage      使用场景
      * @return 业务文件列表
      */
-    List<FileBusiness> findByBusinessIdAndTypeAndUsage(String businessId, FileBusiness.Type type, FileBusiness.Usage usage);
+    List<FileBusiness> findByBusinessIdAndTypeAndUsage(
+            String businessId, FileBusiness.Type type, FileBusiness.Usage usage);
 
     /**
      * 根据ID查询文件元数据

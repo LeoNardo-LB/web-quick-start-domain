@@ -5,6 +5,8 @@ import java.util.Optional;
 
 /**
  * 仓储接口，提供聚合根的持久化操作。
+ *
+ * @param <T> 聚合根类型
  */
 public interface BaseRepository<T extends AggregateRoot> {
 

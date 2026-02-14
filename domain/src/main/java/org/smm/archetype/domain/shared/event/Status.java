@@ -4,10 +4,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
+ * 事件状态枚举
  *
- *
-
-
+ * 用于表示领域事件的处理状态
  */
 @Getter
 @RequiredArgsConstructor

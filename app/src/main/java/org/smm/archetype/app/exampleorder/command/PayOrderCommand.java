@@ -2,9 +2,9 @@ package org.smm.archetype.app.exampleorder.command;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.smm.archetype.domain.shared.base.Command;
 import org.smm.archetype.domain.exampleorder.model.PaymentMethod;
 import org.smm.archetype.domain.exampleorder.model.valueobject.Money;
+import org.smm.archetype.domain.shared.base.Command;
 
 /**
  * 支付订单命令，包含订单ID和支付信息。
@@ -31,6 +31,12 @@ public class PayOrderCommand implements Command {
     public PayOrderCommand() {
     }
 
+    /**
+     * 全参数构造方法
+     * @param orderId       订单ID
+     * @param paymentMethod 支付方式
+     * @param paymentAmount 支付金额
+     */
     public PayOrderCommand(Long orderId, PaymentMethod paymentMethod, Money paymentAmount) {
         this.orderId = orderId;
         this.paymentMethod = paymentMethod;

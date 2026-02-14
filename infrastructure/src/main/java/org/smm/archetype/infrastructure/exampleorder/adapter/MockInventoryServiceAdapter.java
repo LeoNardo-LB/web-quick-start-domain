@@ -59,6 +59,9 @@ public class MockInventoryServiceAdapter implements InventoryService {
      */
     private final Map<String, Integer> inventoryData;
 
+    /**
+     * 构造函数，初始化库存数据
+     */
     public MockInventoryServiceAdapter() {
         log.info("MockInventoryServiceAdapter Constructor called");
         // Initialize inventory data from static defaults

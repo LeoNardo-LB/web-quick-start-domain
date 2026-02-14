@@ -1,7 +1,6 @@
 package org.smm.archetype.adapter.exampleorder.converter;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.smm.archetype.adapter.exampleorder.web.dto.request.CancelOrderRequest;
 import org.smm.archetype.adapter.exampleorder.web.dto.request.CreateOrderRequest;
@@ -13,7 +12,6 @@ import org.smm.archetype.app.exampleorder.command.PayOrderCommand;
 import org.smm.archetype.app.exampleorder.command.RefundOrderCommand;
 import org.smm.archetype.domain.exampleorder.model.valueobject.Address;
 import org.smm.archetype.domain.exampleorder.model.valueobject.ContactInfo;
-import org.smm.archetype.domain.exampleorder.model.valueobject.Money;
 import org.smm.archetype.domain.exampleorder.model.valueobject.OrderItemInfo;
 
 import java.util.List;

@@ -162,7 +162,8 @@ public final class KryoSerializer {
             // 类型安全检查
             if (!rawType.isInstance(result)) {
                 throw new ClassCastException(
-                        "Deserialized object is not of type " + rawType.getName() + ". Actual type: " + result.getClass().getName());
+                        "Deserialized object is not of type " + rawType.getName()
+                                + ". Actual type: " + result.getClass().getName());
             }
             return (T) result;
         } finally {
@@ -445,5 +446,4 @@ public final class KryoSerializer {
         }
 
     }
-
 }

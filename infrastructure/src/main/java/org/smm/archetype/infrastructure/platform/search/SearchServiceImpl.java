@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.shared.client.SearchClient;
 import org.smm.archetype.domain.platform.search.SearchErrorCode;
 import org.smm.archetype.domain.platform.search.SearchService;
 import org.smm.archetype.domain.platform.search.enums.RerankStrategyType;
@@ -25,6 +24,7 @@ import org.smm.archetype.domain.platform.search.result.SearchHit;
 import org.smm.archetype.domain.platform.search.result.SearchResult;
 import org.smm.archetype.domain.platform.search.result.VectorSearchHit;
 import org.smm.archetype.domain.platform.search.result.VectorSearchResult;
+import org.smm.archetype.domain.shared.client.SearchClient;
 import org.smm.archetype.domain.shared.exception.SysException;
 
 import java.util.ArrayList;
@@ -78,12 +78,14 @@ public class SearchServiceImpl implements SearchService {
     public <T> void bulkIndex(String index, Map<String, T> documents) {
         try {
             @SuppressWarnings("unchecked")
-            List<Map.Entry<String, Map<String, Object>>> documentsList = documents.entrySet().stream()
-                .map(entry -> Map.entry(
-                    entry.getKey(),
-                    (Map<String, Object>) objectMapper.convertValue(entry.getValue(), Map.class)
-                ))
-                .collect(Collectors.toList());
+            List<Map.Entry<String, Map<String, Object>>> documentsList =
+                    documents.entrySet().stream()
+                            .map(entry -> Map.entry(
+                                    entry.getKey(),
+                                    (Map<String, Object>) objectMapper.convertValue(
+                                            entry.getValue(), Map.class)
+                            ))
+                            .collect(Collectors.toList());
 
             searchClient.bulkIndex(index, documentsList);
         } catch (Exception e) {
@@ -186,7 +188,7 @@ public class SearchServiceImpl implements SearchService {
                     filterList.add(buildFilterCondition(filter));
                 }
                 queryNode.set("post_filter", objectMapper.createObjectNode().set("bool",
-                    objectMapper.createObjectNode().set("must", filterList)));
+                        objectMapper.createObjectNode().set("must", filterList)));
             }
 
             // 添加排序
@@ -350,7 +352,7 @@ public class SearchServiceImpl implements SearchService {
         var totalObj = (Map<String, Object>) hits.get("total");
         long totalHits = ((Number) totalObj.get("value")).longValue();
         float maxScore = hits.containsKey("max_score") ?
-            ((Number) hits.get("max_score")).floatValue() : 0.0f;
+                                 ((Number) hits.get("max_score")).floatValue() : 0.0f;
 
         var hitsList = (List<Map<String, Object>>) hits.get("hits");
         List<SearchHit<T>> searchHits = new ArrayList<>();
@@ -363,10 +365,10 @@ public class SearchServiceImpl implements SearchService {
             T document = objectMapper.convertValue(source, documentClass);
 
             SearchHit<T> searchHit = SearchHit.<T>builder()
-                .setId(id)
-                .setScore(score)
-                .setDocument(document)
-                .build();
+                                             .setId(id)
+                                             .setScore(score)
+                                             .setDocument(document)
+                                             .build();
             searchHits.add(searchHit);
         }
 
@@ -391,31 +393,31 @@ public class SearchServiceImpl implements SearchService {
                         long docCount = ((Number) bucketData.get("doc_count")).longValue();
 
                         AggregationBucket bucket = AggregationBucket.builder()
-                            .key(key)
-                            .docCount(docCount)
-                            .build();
+                                                           .key(key)
+                                                           .docCount(docCount)
+                                                           .build();
                         buckets.add(bucket);
                     }
 
                     SearchAggregationResult aggrResult = SearchAggregationResult.builder()
-                        .name(aggrName)
-                        .buckets(buckets)
-                        .build();
+                                                                 .name(aggrName)
+                                                                 .buckets(buckets)
+                                                                 .build();
                     aggregations.add(aggrResult);
                 } else if (aggrData.containsKey("value")) {
                     // 单值聚合（SUM, AVG, MAX, MIN）
                     Number value = (Number) aggrData.get("value");
                     SearchAggregationResult aggrResult = SearchAggregationResult.builder()
-                        .name(aggrName)
-                        .value(value != null ? value.doubleValue() : null)
-                        .build();
+                                                                 .name(aggrName)
+                                                                 .value(value != null ? value.doubleValue() : null)
+                                                                 .build();
                     aggregations.add(aggrResult);
                 }
             }
         }
 
         long took = response.containsKey("took") ?
-            ((Number) response.get("took")).longValue() : 0;
+                            ((Number) response.get("took")).longValue() : 0;
 
         return SearchResult.<T>builder()
             .totalHits(totalHits)
@@ -533,17 +535,17 @@ public class SearchServiceImpl implements SearchService {
             T document = objectMapper.convertValue(source, documentClass);
 
             VectorSearchHit<T> vectorHit = VectorSearchHit.<T>builder()
-                .id(id)
-                .score(score)
-                .document(document)
-                .distance(null) // ES返回的是score，不是原始距离
-                .extraInfo(null) // 简化实现，不包含额外信息
-                .build();
+                                                   .id(id)
+                                                   .score(score)
+                                                   .document(document)
+                                                   .distance(null) // ES返回的是score，不是原始距离
+                                                   .extraInfo(null) // 简化实现，不包含额外信息
+                                                   .build();
             vectorHits.add(vectorHit);
         }
 
         long took = response.containsKey("took") ?
-            ((Number) response.get("took")).longValue() : 0;
+                            ((Number) response.get("took")).longValue() : 0;
 
         return VectorSearchResult.<T>builder()
             .hits(vectorHits)
@@ -716,9 +718,9 @@ public class SearchServiceImpl implements SearchService {
             T document = objectMapper.convertValue(source, documentClass);
 
             var hitBuilder = AiSearchHit.<T>builder()
-                .id(id)
-                .score(score)
-                .document(document);
+                                     .id(id)
+                                     .score(score)
+                                     .document(document);
 
             // 根据策略填充额外字段
             if (rerankStrategy == RerankStrategyType.SCORE_WEIGHTED) {
@@ -733,7 +735,7 @@ public class SearchServiceImpl implements SearchService {
         }
 
         long took = response.containsKey("took") ?
-            ((Number) response.get("took")).longValue() : 0;
+                            ((Number) response.get("took")).longValue() : 0;
 
         return AiSearchResult.<T>builder()
             .hits(aiHits)

@@ -2,11 +2,11 @@ package org.smm.archetype.app.exampleorder.command;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.smm.archetype.domain.shared.base.Command;
 import org.smm.archetype.domain.exampleorder.model.valueobject.Address;
 import org.smm.archetype.domain.exampleorder.model.valueobject.ContactInfo;
 import org.smm.archetype.domain.exampleorder.model.valueobject.Money;
 import org.smm.archetype.domain.exampleorder.model.valueobject.OrderItemInfo;
+import org.smm.archetype.domain.shared.base.Command;
 
 import java.util.List;
 
@@ -55,6 +55,16 @@ public class CreateOrderCommand implements Command {
     public CreateOrderCommand() {
     }
 
+    /**
+     * 全参数构造方法
+     * @param customerId      客户ID
+     * @param customerName    客户名称
+     * @param items           订单项列表
+     * @param totalAmount     总金额
+     * @param shippingAddress 收货地址
+     * @param contactInfo     联系信息
+     * @param remark          备注
+     */
     public CreateOrderCommand(String customerId, String customerName, List<OrderItemInfo> items,
                               Money totalAmount, Address shippingAddress, ContactInfo contactInfo, String remark) {
         this.customerId = customerId;

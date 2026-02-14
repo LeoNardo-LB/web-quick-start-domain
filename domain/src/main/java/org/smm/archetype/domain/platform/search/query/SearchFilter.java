@@ -1,10 +1,9 @@
 package org.smm.archetype.domain.platform.search.query;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import org.smm.archetype.domain.shared.base.ValueObject;
 import org.smm.archetype.domain.platform.search.enums.FilterOperator;
+import org.smm.archetype.domain.shared.base.ValueObject;
 
 import java.util.List;
 

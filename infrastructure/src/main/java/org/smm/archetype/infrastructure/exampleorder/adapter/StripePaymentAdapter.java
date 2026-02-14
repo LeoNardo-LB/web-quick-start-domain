@@ -51,7 +51,7 @@ public class StripePaymentAdapter implements PaymentGateway {
             return transactionId;
 
         } catch (Exception e) {
-            log.error("Stripe支付失败: orderId={}, error={}", orderId, e.getMessage(), e);
+            log.error("Stripe支付失败: orderId={}", orderId, e);
             throw new PaymentException("Stripe支付失败: " + e.getMessage(), e);
         }
     }
@@ -83,7 +83,7 @@ public class StripePaymentAdapter implements PaymentGateway {
             return refundTransactionId;
 
         } catch (Exception e) {
-            log.error("Stripe退款失败: transactionId={}, error={}", transactionId, e.getMessage(), e);
+            log.error("Stripe退款失败: transactionId={}", transactionId, e);
             throw new PaymentException("Stripe退款失败: " + e.getMessage(), e);
         }
     }

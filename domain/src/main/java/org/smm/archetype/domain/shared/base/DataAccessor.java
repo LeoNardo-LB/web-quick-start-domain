@@ -5,6 +5,8 @@ import java.util.Optional;
 
 /**
  * 数据访问器接口，用于非聚合根实体的持久化。
+ *
+ * @param <T> 实体类型
  */
 public interface DataAccessor<T extends Entity> {
 

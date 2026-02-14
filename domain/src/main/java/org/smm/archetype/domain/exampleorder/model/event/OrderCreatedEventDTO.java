@@ -2,10 +2,10 @@ package org.smm.archetype.domain.exampleorder.model.event;
 
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
-import org.smm.archetype.domain.shared.event.dto.DomainEventDTO;
 import org.smm.archetype.domain.exampleorder.model.valueobject.Address;
 import org.smm.archetype.domain.exampleorder.model.valueobject.ContactInfo;
 import org.smm.archetype.domain.exampleorder.model.valueobject.Money;
+import org.smm.archetype.domain.shared.event.dto.DomainEventDTO;
 
 import java.util.List;
 
@@ -68,6 +68,10 @@ public class OrderCreatedEventDTO extends DomainEventDTO {
 
     /**
      * 订单项信息（简化版）
+     *
+     * @param productId 商品ID
+     * @param skuCode   SKU编码
+     * @param quantity  数量
      */
     public record OrderItemInfo(String productId, String skuCode, Integer quantity) {
 

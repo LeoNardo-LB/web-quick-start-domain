@@ -13,26 +13,49 @@ public abstract class BaseException extends RuntimeException {
      */
     private final ErrorCode errorCode;
 
+    /**
+     * 默认构造方法
+     */
     public BaseException() {
         super();
         this.errorCode = null;
     }
 
+    /**
+     * 带消息的构造方法
+     * @param message 异常消息
+     */
     public BaseException(String message) {
         super(message);
         this.errorCode = null;
     }
 
+    /**
+     * 带消息和原因的构造方法
+     * @param message 异常消息
+     * @param cause   异常原因
+     */
     public BaseException(String message, Throwable cause) {
         super(message, cause);
         this.errorCode = null;
     }
 
+    /**
+     * 带原因的构造方法
+     * @param cause 异常原因
+     */
     public BaseException(Throwable cause) {
         super(cause);
         this.errorCode = null;
     }
 
+    /**
+     * 完整参数的构造方法
+     * @param message            异常消息
+     * @param cause              异常原因
+     * @param enableSuppression  是否启用抑制
+     * @param writableStackTrace 是否可写堆栈跟踪
+     */
     protected BaseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.errorCode = null;

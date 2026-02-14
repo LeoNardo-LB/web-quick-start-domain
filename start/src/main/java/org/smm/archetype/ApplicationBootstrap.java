@@ -32,9 +32,9 @@ public class ApplicationBootstrap implements CommandLineRunner {
 
     /**
      * Servlet上下文路径
-     * 从配置文件中读取Servlet的上下文路径。
+     * 从配置文件中读取Servlet的上下文路径，默认为空字符串。
      */
-    @Value("${server.servlet.context-path}")
+    @Value("${server.servlet.context-path:}")
     public String contextPath;
 
     /**

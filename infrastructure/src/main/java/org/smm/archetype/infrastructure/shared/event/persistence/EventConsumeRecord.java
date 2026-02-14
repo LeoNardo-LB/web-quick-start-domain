@@ -57,7 +57,7 @@ public class EventConsumeRecord extends Entity {
     /**
      * 执行者组
      */
-    private final String executor_group;
+    private final String executorGroup;
 
     /**
      * 消息内容
@@ -101,7 +101,7 @@ public class EventConsumeRecord extends Entity {
      * @return 消费者组
      */
     public String getConsumerGroup() {
-        return this.executor_group;
+        return this.executorGroup;
     }
 
     /**

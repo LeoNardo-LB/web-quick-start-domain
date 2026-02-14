@@ -3,7 +3,6 @@ package org.smm.archetype.domain.exampleorder.model;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.shared.base.AggregateRoot;
 import org.smm.archetype.domain.exampleorder.OrderErrorCode;
 import org.smm.archetype.domain.exampleorder.model.event.OrderCancelledEventDTO;
 import org.smm.archetype.domain.exampleorder.model.event.OrderCreatedEventDTO;
@@ -14,6 +13,7 @@ import org.smm.archetype.domain.exampleorder.model.event.OrderShippedEventDTO;
 import org.smm.archetype.domain.exampleorder.model.valueobject.Address;
 import org.smm.archetype.domain.exampleorder.model.valueobject.ContactInfo;
 import org.smm.archetype.domain.exampleorder.model.valueobject.Money;
+import org.smm.archetype.domain.shared.base.AggregateRoot;
 import org.smm.archetype.domain.shared.exception.BizException;
 
 import java.time.Instant;
@@ -52,10 +52,13 @@ public class OrderAggr extends AggregateRoot {
     private Instant              refundedTime;
     private RefundType           refundType;
 
+    // ==================== 排序相关字段 ====================
+    private Integer sortOrder;
+
     // ==================== 工厂方法 ====================
 
     /**
-     * 创建订单
+     * 创建订单（使用默认排序值 0）
      * @param orderNo         订单编号
      * @param customerId      客户ID
      * @param customerName    客户名称
@@ -76,6 +79,34 @@ public class OrderAggr extends AggregateRoot {
             ContactInfo contactInfo,
             String remark
     ) {
+        return create(orderNo, customerId, customerName, items, totalAmount,
+                shippingAddress, contactInfo, remark, 0);
+    }
+
+    /**
+     * 创建订单
+     * @param orderNo         订单编号
+     * @param customerId      客户ID
+     * @param customerName    客户名称
+     * @param items           订单项列表
+     * @param totalAmount     总金额
+     * @param shippingAddress 收货地址
+     * @param contactInfo     联系信息
+     * @param remark          备注
+     * @param sortOrder       排序顺序（默认为 0）
+     * @return 订单聚合根
+     */
+    public static OrderAggr create(
+            String orderNo,
+            String customerId,
+            String customerName,
+            ArrayList<OrderItem> items,
+            Money totalAmount,
+            Address shippingAddress,
+            ContactInfo contactInfo,
+            String remark,
+            Integer sortOrder
+    ) {
         OrderAggrBuilder<?, ?> builder = OrderAggr.OABuilder();
         builder.orderNo = orderNo;
         builder.customerId = customerId;
@@ -86,13 +117,15 @@ public class OrderAggr extends AggregateRoot {
         builder.shippingAddress = shippingAddress;
         builder.contactInfo = contactInfo;
         builder.remark = remark;
+        builder.sortOrder = sortOrder != null ? sortOrder : 0;
         builder.status = OrderStatus.CREATED;
         OrderAggr orderAggr = builder.build();
 
         orderAggr.markAsCreated();
         orderAggr.publishCreatedEvent();
 
-        log.info("订单创建成功: orderNo={}, customerId={}, totalAmount={}", orderNo, customerId, totalAmount);
+        log.info("订单创建成功: orderNo={}, customerId={}, totalAmount={}, sortOrder={}",
+                orderNo, customerId, totalAmount, builder.sortOrder);
         return orderAggr;
     }
 
@@ -232,7 +265,9 @@ public class OrderAggr extends AggregateRoot {
         }
 
         // 计算剩余可退金额
-        Money alreadyRefunded = this.totalRefundedAmount != null ? this.totalRefundedAmount : Money.of(java.math.BigDecimal.ZERO, currency);
+        Money alreadyRefunded = this.totalRefundedAmount != null
+                                        ? this.totalRefundedAmount
+                                        : Money.of(java.math.BigDecimal.ZERO, currency);
         Money remainingRefundable = totalAmount.subtract(alreadyRefunded);
 
         // 验证退款金额
@@ -318,6 +353,23 @@ public class OrderAggr extends AggregateRoot {
         }
         this.contactInfo = contactInfo;
         markAsUpdated();
+    }
+
+    /**
+     * 更新排序顺序
+     * @param sortOrder 新的排序顺序
+     * @throws BizException 订单状态不允许修改排序顺序
+     */
+    public void updateSortOrder(Integer sortOrder) {
+        if (status != OrderStatus.CREATED) {
+            throw new BizException(
+                    String.format("订单状态不允许修改排序顺序: 当前状态=%s", status),
+                    OrderErrorCode.ORDER_STATUS_INVALID
+            );
+        }
+        this.sortOrder = sortOrder != null ? sortOrder : 0;
+        markAsUpdated();
+        log.info("订单排序顺序更新: orderNo={}, sortOrder={}", orderNo, this.sortOrder);
     }
 
     // ==================== 领域事件发布 ====================

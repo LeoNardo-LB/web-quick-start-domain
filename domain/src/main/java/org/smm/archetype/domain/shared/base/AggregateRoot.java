@@ -5,7 +5,6 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.shared.event.DomainEventPublisher;
 import org.smm.archetype.domain.shared.event.Event;
-import org.smm.archetype.domain.shared.event.Status;
 import org.smm.archetype.domain.shared.event.dto.DomainEventDTO;
 
 import java.util.UUID;
@@ -40,10 +39,14 @@ public abstract class AggregateRoot extends Entity {
                                               .setPayload(eventDTO)
                                               .build();
         domainEventPublisher.publish(event);
-        log.debug("Recorded domain event: {} to aggregate: {}", eventDTO.getClass().getSimpleName(), this.getClass().getSimpleName());
+        log.debug("Recorded domain event: {} to aggregate: {}",
+                eventDTO.getClass().getSimpleName(), this.getClass().getSimpleName());
     }
 
     /**
+     * 添加领域事件（已废弃）。
+     *
+     * @param eventDTO 领域事件DTO
      * @deprecated 使用 recordEvent() 替代此方法
      */
     @Deprecated
@@ -51,7 +54,7 @@ public abstract class AggregateRoot extends Entity {
         recordEvent(eventDTO);
     }
 
-/**
+    /**
      * 聚合根类型枚举。
      */
     @Getter

@@ -168,8 +168,11 @@ public class AuditEvent {
      * @return 日志消息
      */
     public String toLogMessage() {
-        return String.format("[AUDIT] type=%s | userId=%s | operation=%s | resource=%s | result=%s | timestamp=%s | ip=%s | device=%s",
-                auditType, userId, operation, resource, result, timestamp, clientIp, device);
+        return String.format(
+                "[AUDIT] type=%s | userId=%s | operation=%s | resource=%s | "
+                        + "result=%s | timestamp=%s | ip=%s | device=%s",
+                auditType, userId, operation, resource, result, timestamp,
+                clientIp, device);
     }
 
 }

@@ -4,6 +4,8 @@ import org.smm.archetype.domain.shared.event.Event;
 
 /**
  * 事件监听接口，消费领域事件。
+ *
+ * @param <T> 事件类型
  */
 public interface EventListener<T extends Event<?>> {
 

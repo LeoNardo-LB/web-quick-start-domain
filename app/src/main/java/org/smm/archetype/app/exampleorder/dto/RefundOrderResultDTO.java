@@ -1,6 +1,5 @@
 package org.smm.archetype.app.exampleorder.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 

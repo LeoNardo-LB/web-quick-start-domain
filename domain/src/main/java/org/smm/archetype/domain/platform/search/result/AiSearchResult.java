@@ -1,45 +1,23 @@
 package org.smm.archetype.domain.platform.search.result;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
 /**
- * AI增强搜索结果
+ * AI增强搜索结果。
  *
-
-
+ * @param <T>           文档类型
+ * @param hits          命中的文档列表
+ *
+ *                      按综合得分排序
+ * @param totalHits     总命中数
+ * @param took          搜索耗时（毫秒）
+ * @param expandedTerms 查询扩展词（可选）
+ *
+ *                      当启用查询扩展时，包含AI生成的扩展词
  */
-@Getter
 @Builder
-@AllArgsConstructor
-@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
-public class AiSearchResult<T> {
+public record AiSearchResult<T>(List<AiSearchHit<T>> hits, Long totalHits, Long took, List<String> expandedTerms) {
 
-    /**
-     * 命中的文档列表
-     *
-    按综合得分排序
-     */
-    private final List<AiSearchHit<T>> hits;
-
-    /**
-     * 总命中数
-     */
-    private final Long totalHits;
-
-    /**
-     * 搜索耗时（毫秒）
-     */
-    private final Long took;
-
-    /**
-     * 查询扩展词（可选）
-     *
-    当启用查询扩展时，包含AI生成的扩展词
-     */
-    private final List<String> expandedTerms;
 }

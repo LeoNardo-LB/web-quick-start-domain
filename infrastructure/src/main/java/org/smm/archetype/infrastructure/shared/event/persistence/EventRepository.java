@@ -106,9 +106,11 @@ public class EventRepository {
      * @return 消费记录列表
      */
     public List<EventDO> findPendingConsumeEvents(List<String> consumeStatus, int limit) {
+        String statusIn = String.join(",",
+                consumeStatus.stream().map(s -> "'" + s + "'").toList());
         return eventMapper.selectListByQuery(
                 QueryWrapper.create()
-                        .where("status IN (" + String.join(",", consumeStatus.stream().map(s -> "'" + s + "'").toList()) + ")")
+                        .where("status IN (" + statusIn + ")")
                         .and("action = 'CONSUME'")
                         .and("(next_retry_time IS NULL OR next_retry_time <= ?)", Instant.now())
                         .orderBy("retry_times", false)
@@ -179,7 +181,7 @@ public class EventRepository {
                        .setStatus(Status.valueOf(eventDO.getStatus()))
                        .setPayload(payload)
                        .setExecutor(eventDO.getExecutor())
-                       .setExecutor_group(eventDO.getExecutorGroup())
+                       .setExecutorGroup(eventDO.getExecutorGroup())
                        .setMessage(eventDO.getMessage())
                        .setTraceId(eventDO.getTraceId())
                        .setRetryTimes(eventDO.getRetryTimes())

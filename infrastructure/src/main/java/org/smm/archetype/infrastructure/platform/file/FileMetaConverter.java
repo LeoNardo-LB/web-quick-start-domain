@@ -107,6 +107,7 @@ public interface FileMetaConverter {
      * @param mimeType MIME类型
      * @return 文件扩展名（如".jpg"），如果无法识别则返回""
      */
+    @SuppressWarnings("checkstyle:CyclomaticComplexity")
     @Named("getExtensionFromMimeType")
     default String getExtensionFromMimeType(String mimeType) {
         if (mimeType == null || mimeType.trim().isEmpty()) {
@@ -157,7 +158,8 @@ public interface FileMetaConverter {
             return ".docx";
         } else if (lowerMimeType.contains("application/vnd.ms-excel") || lowerMimeType.contains("spreadsheetml")) {
             return ".xlsx";
-        } else if (lowerMimeType.contains("application/vnd.ms-powerpoint") || lowerMimeType.contains("presentationml")) {
+        } else if (lowerMimeType.contains("application/vnd.ms-powerpoint")
+                           || lowerMimeType.contains("presentationml")) {
             return ".pptx";
         } else if (lowerMimeType.startsWith("text/")) {
             return ".txt";

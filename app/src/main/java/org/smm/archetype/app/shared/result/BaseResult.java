@@ -11,6 +11,8 @@ import java.time.Instant;
 /**
  * 统一结果返回对象，封装错误码和数据。
  * 自动获取 traceId 用于请求追踪。
+ *
+ * @param <T> 数据类型
  */
 @Getter
 @Setter

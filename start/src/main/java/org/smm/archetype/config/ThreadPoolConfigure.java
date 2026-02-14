@@ -68,6 +68,10 @@ public class ThreadPoolConfigure implements AsyncConfigurer {
      */
     private final ThreadPoolProperties threadPoolProperties;
 
+    /**
+     * 创建 IO 密集型线程池（主线程池）
+     * @return IO 密集型线程池
+     */
     @Primary
     @Bean(name = IO_TASK_EXECUTOR)
     public ThreadPoolTaskExecutor ioTaskExecutor() {
@@ -102,6 +106,10 @@ public class ThreadPoolConfigure implements AsyncConfigurer {
         return executor;
     }
 
+    /**
+     * 创建 CPU 密集型线程池
+     * @return CPU 密集型线程池
+     */
     @Bean(name = CPU_TASK_EXECUTOR)
     public ThreadPoolTaskExecutor cpuTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -135,6 +143,10 @@ public class ThreadPoolConfigure implements AsyncConfigurer {
         return executor;
     }
 
+    /**
+     * 创建守护线程池
+     * @return 守护线程池
+     */
     @Bean(name = DAEMON_TASK_EXECUTOR)
     public ThreadPoolTaskExecutor daemonTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -173,6 +185,10 @@ public class ThreadPoolConfigure implements AsyncConfigurer {
         return Executors.newVirtualThreadPerTaskExecutor();
     }
 
+    /**
+     * 创建任务调度器
+     * @return 任务调度器
+     */
     @Bean
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();

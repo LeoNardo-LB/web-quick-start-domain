@@ -288,9 +288,9 @@ public class LogAspect {
     }
 
     /**
-         * 日志上下文内部类，封装日志类型和业务描述
-         */
-        private record LogContext(String type, String description) {
+     * 日志上下文内部类，封装日志类型和业务描述
+     */
+    private record LogContext(String type, String description) {
 
     }
 

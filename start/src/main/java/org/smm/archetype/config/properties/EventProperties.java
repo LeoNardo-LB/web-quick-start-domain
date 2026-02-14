@@ -25,6 +25,9 @@ public class EventProperties {
      */
     private Consumer consumer = new Consumer();
 
+    /**
+     * 事件消费者配置
+     */
     @Getter
     @Setter
     public static class Consumer {
@@ -34,6 +37,9 @@ public class EventProperties {
          */
         private Kafka kafka = new Kafka();
 
+        /**
+         * Kafka 配置
+         */
         @Getter
         @Setter
         public static class Kafka {

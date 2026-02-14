@@ -28,6 +28,12 @@ public class DomainEventCollectAspectJ {
 
     }
 
+    /**
+     * 环绕通知，收集领域事件
+     * @param joinPoint 连接点
+     * @return 方法执行结果
+     * @throws Throwable 方法执行异常
+     */
     @SneakyThrows
     @Around("appLayer()")
     public Object around(ProceedingJoinPoint joinPoint) {

@@ -10,6 +10,8 @@ import java.util.List;
 
 /**
  * 分页结果对象，封装分页数据和总记录数。
+ *
+ * @param <T> 分页数据类型
  */
 @Getter
 @Setter

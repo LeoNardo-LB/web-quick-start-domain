@@ -1,18 +1,24 @@
 # 测试环境配置
 server:
   port: 0  # 随机端口
-  servlet:
-    context-path: /web-quick-start-test
 
 spring:
   application:
     name: web-quick-start-test
 
   datasource:
-    url: jdbc:mysql://localhost:3306/testdb?characterEncoding=utf-8&useInformationSchema=true
-    driverClassName: com.mysql.cj.jdbc.Driver
-    username: root
-    password: leonardo123
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: false
+
+  sql:
+    init:
+      mode: always
 
 springdoc:
   swagger-ui:

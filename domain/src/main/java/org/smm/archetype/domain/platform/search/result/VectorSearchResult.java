@@ -1,33 +1,19 @@
 package org.smm.archetype.domain.platform.search.result;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
 /**
- * 向量搜索结果
+ * 向量搜索结果。
  *
-
-
+ * @param <T>  文档类型
+ * @param hits 命中的文档列表
+ *
+ *             按相似度排序
+ * @param took 搜索耗时（毫秒）
  */
-@Getter
 @Builder
-@AllArgsConstructor
-@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
-public class VectorSearchResult<T> {
+public record VectorSearchResult<T>(List<VectorSearchHit<T>> hits, Long took) {
 
-    /**
-     * 命中的文档列表
-     *
-    按相似度排序
-     */
-    private final List<VectorSearchHit<T>> hits;
-
-    /**
-     * 搜索耗时（毫秒）
-     */
-    private final Long took;
 }

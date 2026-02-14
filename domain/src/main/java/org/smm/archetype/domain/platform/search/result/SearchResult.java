@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * 搜索结果对象，包含命中文档和聚合信息。
+ *
+ * @param <T> 文档类型
  */
 @Getter
 @Builder

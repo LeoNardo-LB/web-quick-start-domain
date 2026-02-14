@@ -1,7 +1,6 @@
 package org.smm.archetype.adapter.exampleorder.converter;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.smm.archetype.adapter.exampleorder.web.dto.response.AddressResponse;
 import org.smm.archetype.adapter.exampleorder.web.dto.response.ContactInfoResponse;

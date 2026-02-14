@@ -24,9 +24,10 @@ public interface FileBusinessConverter {
      * @return 领域对象
      */
     @Mapping(target = "order", source = "sort")
-    @Mapping(target = "type", expression = "java(dataObject.getType() != null ? FileBusiness.Type.valueOf(dataObject.getType()) : null)")
-    @Mapping(target = "usage",
-            expression = "java(dataObject.getUsage() != null ? FileBusiness.Usage.valueOf(dataObject.getUsage()) : null)")
+    @Mapping(target = "type", expression = "java(dataObject.getType() != null ? "
+                                                   + "FileBusiness.Type.valueOf(dataObject.getType()) : null)")
+    @Mapping(target = "usage", expression = "java(dataObject.getUsage() != null ? "
+                                                    + "FileBusiness.Usage.valueOf(dataObject.getUsage()) : null)")
     @Mapping(target = "fileMetadata", ignore = true)  // fileMetadata需要单独查询
     @Mapping(target = "version", ignore = true)  // DO没有version字段
     FileBusiness toEntity(FileBusinessDO dataObject);

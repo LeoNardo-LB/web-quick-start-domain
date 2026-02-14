@@ -10,15 +10,14 @@ import org.smm.archetype.adapter.exampleorder.web.dto.request.CreateOrderRequest
 import org.smm.archetype.adapter.exampleorder.web.dto.request.PayOrderRequest;
 import org.smm.archetype.adapter.exampleorder.web.dto.request.RefundOrderRequest;
 import org.smm.archetype.adapter.exampleorder.web.dto.response.OrderResponse;
-import org.smm.archetype.app.shared.result.BaseResult;
-import org.smm.archetype.app.shared.result.PageResult;
 import org.smm.archetype.app.exampleorder.OrderAppService;
-import org.smm.archetype.app.exampleorder.command.PayOrderCommand;
 import org.smm.archetype.app.exampleorder.command.ShipOrderCommand;
 import org.smm.archetype.app.exampleorder.dto.OrderDTO;
 import org.smm.archetype.app.exampleorder.query.GetOrderByIdQuery;
 import org.smm.archetype.app.exampleorder.query.GetOrdersByCustomerQuery;
 import org.smm.archetype.app.exampleorder.query.OrderListQuery;
+import org.smm.archetype.app.shared.result.BaseResult;
+import org.smm.archetype.app.shared.result.PageResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,7 +67,7 @@ public class OrderController {
             return BaseResult.success(response);
 
         } catch (Exception e) {
-            log.error("创建订单失败: {}", e.getMessage(), e);
+            log.error("创建订单失败", e);
             return BaseResult.error("500", "创建订单失败: " + e.getMessage());
         }
     }
@@ -96,7 +95,7 @@ public class OrderController {
             return BaseResult.success(response);
 
         } catch (Exception e) {
-            log.error("支付订单失败: {}", e.getMessage(), e);
+            log.error("支付订单失败", e);
             return BaseResult.error("500", "支付订单失败: " + e.getMessage());
         }
     }
@@ -124,7 +123,7 @@ public class OrderController {
             return BaseResult.success(response);
 
         } catch (Exception e) {
-            log.error("取消订单失败: {}", e.getMessage(), e);
+            log.error("取消订单失败", e);
             return BaseResult.error("500", "取消订单失败: " + e.getMessage());
         }
     }
@@ -153,7 +152,7 @@ public class OrderController {
             return BaseResult.success(response);
 
         } catch (Exception e) {
-            log.error("退款订单失败: {}", e.getMessage(), e);
+            log.error("退款订单失败", e);
             return BaseResult.error("500", "退款订单失败: " + e.getMessage());
         }
     }
@@ -175,7 +174,7 @@ public class OrderController {
             return BaseResult.success(response);
 
         } catch (Exception e) {
-            log.error("发货订单失败: {}", e.getMessage(), e);
+            log.error("发货订单失败", e);
             return BaseResult.error("500", "发货订单失败: " + e.getMessage());
         }
     }
@@ -196,7 +195,7 @@ public class OrderController {
             return BaseResult.success(response);
 
         } catch (Exception e) {
-            log.error("完成订单失败: {}", e.getMessage(), e);
+            log.error("完成订单失败", e);
             return BaseResult.error("500", "完成订单失败: " + e.getMessage());
         }
     }
@@ -218,7 +217,7 @@ public class OrderController {
             return BaseResult.success(response);
 
         } catch (Exception e) {
-            log.error("查询订单详情失败: {}", e.getMessage(), e);
+            log.error("查询订单详情失败", e);
             return BaseResult.error("500", "查询订单详情失败: " + e.getMessage());
         }
     }
@@ -242,7 +241,7 @@ public class OrderController {
             return BaseResult.success(responses);
 
         } catch (Exception e) {
-            log.error("查询客户订单列表失败: {}", e.getMessage(), e);
+            log.error("查询客户订单列表失败", e);
             return BaseResult.error("500", "查询客户订单列表失败: " + e.getMessage());
         }
     }
@@ -284,7 +283,7 @@ public class OrderController {
                            .build();
 
         } catch (Exception e) {
-            log.error("分页查询订单列表失败: {}", e.getMessage(), e);
+            log.error("分页查询订单列表失败", e);
             return PageResult.<List<OrderResponse>>PRBuilder()
                            .setCode("500")
                            .setData(null)

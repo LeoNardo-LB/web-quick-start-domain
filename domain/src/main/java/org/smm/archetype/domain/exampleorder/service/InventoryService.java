@@ -64,6 +64,10 @@ public interface InventoryService {
 
     /**
      * 库存项
+     *
+     * @param productId 商品ID
+     * @param skuCode   SKU编码
+     * @param quantity  数量
      */
     record InventoryItem(
             /**
@@ -80,6 +84,9 @@ public interface InventoryService {
             Integer quantity
     ) {
 
+        /**
+         * 紧凑构造器，验证数量必须大于0
+         */
         public InventoryItem {
             if (quantity <= 0) {
                 throw new IllegalArgumentException("数量必须大于0");

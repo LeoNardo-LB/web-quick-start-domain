@@ -19,7 +19,8 @@ public class DesensitizingConverter extends MessageConverter {
     private static final Pattern PHONE_PATTERN     = Pattern.compile("(\\d{3})(\\d{4})(\\d{4})");
     private static final Pattern ID_CARD_PATTERN   = Pattern.compile("(\\d{3})(\\d{11})(\\d{3}[0-9Xx])");
     private static final Pattern BANK_CARD_PATTERN = Pattern.compile("(\\d{4})(\\d{8,12})(\\d{4})");
-    private static final Pattern IP_PATTERN        = Pattern.compile("(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})");
+    private static final Pattern IP_PATTERN = Pattern.compile(
+            "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})");
     private static final Pattern EMAIL_PATTERN     = Pattern.compile("([\\w.-]+)@([\\w.-]+)\\.([a-zA-Z]{2,})");
 
     @Override

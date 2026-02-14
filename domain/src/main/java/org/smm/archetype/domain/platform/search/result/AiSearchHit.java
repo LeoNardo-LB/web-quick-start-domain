@@ -1,67 +1,34 @@
 package org.smm.archetype.domain.platform.search.result;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 
 import java.util.Map;
 
 /**
- * AI搜索命中文档
+ * AI搜索命中文档。
  *
-
-
+ * @param <T>        文档类型
+ * @param id         文档ID
+ * @param score      综合得分
+ *
+ *                   经过重排序后的最终分数
+ * @param document   文档源数据
+ * @param bm25Score  BM25分数（可选）
+ *
+ *                   原始全文搜索的分数
+ * @param aiScore    向量/AI分数（可选）
+ *
+ *                   AI模型计算的分数
+ * @param rankChange 重排名次变化（可选）
+ *
+ *                   正值表示排名上升，负值表示排名下降
+ *                   0表示排名未变化
+ * @param extraInfo  额外信息（可选）
+ *
+ *                   包含高亮信息、查询扩展词等
  */
-@Getter
 @Builder
-@AllArgsConstructor
-@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
-public class AiSearchHit<T> {
+public record AiSearchHit<T>(String id, Float score, T document, Float bm25Score, Float aiScore, Integer rankChange,
+                             Map<String, Object> extraInfo) {
 
-    /**
-     * 文档ID
-     */
-    private final String id;
-
-    /**
-     * 综合得分
-     *
-    经过重排序后的最终分数
-     */
-    private final Float score;
-
-    /**
-     * 文档源数据
-     */
-    private final T document;
-
-    /**
-     * BM25分数（可选）
-     *
-    原始全文搜索的分数
-     */
-    private final Float bm25Score;
-
-    /**
-     * 向量/AI分数（可选）
-     *
-    AI模型计算的分数
-     */
-    private final Float aiScore;
-
-    /**
-     * 重排名次变化（可选）
-     *
-    正值表示排名上升，负值表示排名下降
-    0表示排名未变化
-     */
-    private final Integer rankChange;
-
-    /**
-     * 额外信息（可选）
-     *
-    包含高亮信息、查询扩展词等
-     */
-    private final Map<String, Object> extraInfo;
 }

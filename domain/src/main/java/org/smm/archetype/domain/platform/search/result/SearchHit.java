@@ -10,6 +10,7 @@ import java.util.Map;
 /**
  * 命中文档值对象
  *
+ * @param <T> 文档类型
  */
 @Getter
 @SuperBuilder(setterPrefix = "set")

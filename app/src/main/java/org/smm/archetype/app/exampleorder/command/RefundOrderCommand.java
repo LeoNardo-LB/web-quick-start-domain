@@ -39,7 +39,16 @@ public class RefundOrderCommand implements Command {
     public RefundOrderCommand() {
     }
 
-    public RefundOrderCommand(Long orderId, String refundAmount, String currency, String refundType, String refundReason) {
+    /**
+     * 全参数构造方法
+     * @param orderId      订单ID
+     * @param refundAmount 退款金额
+     * @param currency     币种
+     * @param refundType   退款类型
+     * @param refundReason 退款原因
+     */
+    public RefundOrderCommand(Long orderId, String refundAmount, String currency,
+                              String refundType, String refundReason) {
         this.orderId = orderId;
         this.refundAmount = refundAmount;
         this.currency = currency;
