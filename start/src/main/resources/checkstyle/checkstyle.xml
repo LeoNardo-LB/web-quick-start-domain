@@ -20,7 +20,7 @@
 
     <!-- 引用 suppressions 文件 -->
     <module name="SuppressionFilter">
-        <property name="file" value="config/checkstyle/checkstyle-suppressions.xml"/>
+        <property name="file" value="checkstyle-suppressions.xml"/>
         <property name="optional" value="true"/>
     </module>
 
