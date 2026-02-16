@@ -23,7 +23,7 @@ public class DomainEventCollectAspectJ {
 
     private final DomainEventPublisher domainEventPublisher;
 
-    @Pointcut("execution(* org.smm.archetype.app..*AppServiceImpl.*(..))")
+    @Pointcut("execution(* org.smm.archetype.app..*AppService.*(..))")
     public void appLayer() {
 
     }
