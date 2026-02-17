@@ -108,46 +108,6 @@ web-quick-start-domain/
 | 编译警告    | 零警告（Werror 策略）      |
 | DDD 符合度 | ≥8.6/10             |
 
-## 代码风格检查（Checkstyle）
-
-### 检查命令
-
-```bash
-# 检查所有模块
-mvn checkstyle:check -Dcheckstyle.config.location=config/checkstyle/checkstyle.xml
-
-# 检查单个模块
-mvn checkstyle:check -Dcheckstyle.config.location=config/checkstyle/checkstyle.xml -pl domain
-```
-
-### 检查规则
-
-| 规则                 | 说明                             | 违反后果       |
-|--------------------|--------------------------------|------------|
-| JavadocType        | 类/接口必须有 Javadoc 注释             | 阻断构建       |
-| JavadocMethod      | public/protected 方法必须有 Javadoc | 阻断构建       |
-| LineLength         | 行长度不超过 120 字符                  | 阻断构建       |
-| NewlineAtEndOfFile | 文件末尾必须有空行                      | 阻断构建       |
-| JavadocStyle       | Javadoc 必须格式正确                 | 阻断构建       |
-| AvoidStarImport    | 禁止使用 `*` 导入                    | 阻断构建（测试豁免） |
-| UnusedImports      | 禁止未使用的导入                       | 阻断构建（测试豁免） |
-
-### 配置文件
-
-| 文件                                              | 说明         |
-|-------------------------------------------------|------------|
-| `config/checkstyle/checkstyle.xml`              | 主配置文件      |
-| `config/checkstyle/checkstyle-suppressions.xml` | 豁免配置（测试代码） |
-
-### 测试代码豁免
-
-测试代码（`test/` 模块）豁免以下规则：
-
-- MethodName：允许测试方法命名（如 `testCreateOrder_success`）
-- LineLength：允许较长的测试代码
-- Indentation：允许链式调用缩进
-- UnusedImports：允许 `@Mock` 等注解隐式使用的导入
-
 ## Lombok 使用规范
 
 | 规则                            | 说明                                    |

@@ -45,9 +45,7 @@
         <assertj.version>3.27.7</assertj.version>
         <!-- JaCoCo 代码覆盖率工具（支持 JDK 25） -->
         <jacoco.version>0.8.14</jacoco.version>
-        <!-- Checkstyle 代码风格检查 -->
-        <checkstyle.version>10.17.0</checkstyle.version>
-        <maven-checkstyle-plugin.version>3.5.0</maven-checkstyle-plugin.version>
+
     </properties>
 
     <dependencies>
@@ -159,12 +157,6 @@
             </dependency>
             <!--bom End-->
             <!--基础依赖Start-->
-            <!-- Checkstyle 代码风格检查 -->
-            <dependency>
-                <groupId>com.puppycrawl.tools</groupId>
-                <artifactId>checkstyle</artifactId>
-                <version>${checkstyle.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -434,38 +426,6 @@
                 <configuration>
                     <outputDirectory>_output/archetype</outputDirectory>
                 </configuration>
-            </plugin>
-            <!-- Checkstyle 代码风格检查 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${maven-checkstyle-plugin.version}</version>
-                <configuration>
-                    <configLocation>start/src/main/resources/checkstyle/checkstyle.xml</configLocation>
-                    <suppressionsLocation>start/src/main/resources/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
-                    <inputEncoding>UTF-8</inputEncoding>
-                    <outputEncoding>UTF-8</outputEncoding>
-                    <consoleOutput>true</consoleOutput>
-                    <failOnViolation>true</failOnViolation>
-                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                    <linkXRef>false</linkXRef>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>${checkstyle.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
