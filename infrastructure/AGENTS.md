@@ -42,6 +42,12 @@ infrastructure/src/main/java/org/smm/archetype/infrastructure/
 | 代码生成 | Mapper 和 DO 类使用 MyBatis Plus（Lambda查询） |
 | 依赖注入 | 使用构造函数注入                               |
 
+**MyBatis Plus 生成的 DO 类**（`generated/entity/`）：
+
+- 使用 `@Data` 注解（由代码生成器自动生成，属于可接受的例外）
+- 文件位置：`infrastructure/shared/dal/generated/entity/`
+- 示例：`EventDO.java`、`FileMetadataDO.java`、`FileBusinessDO.java`
+
 ```java
 @Mapper(componentModel = "spring")
 public interface OrderConverter {
@@ -131,4 +137,4 @@ public interface OrderConverter {
 - [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
 
 ---
-**版本**: 3.0 | **更新**: 2026-02-17
+**版本**: 3.1 | **更新**: 2026-02-18

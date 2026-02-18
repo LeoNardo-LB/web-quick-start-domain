@@ -155,4 +155,4 @@ public class Money extends ValueObject {
 - [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
 
 ---
-**版本**: 3.0 | **更新**: 2026-02-17
+**版本**: 3.1 | **更新**: 2026-02-18

@@ -6,7 +6,7 @@
 
 ```
 start/src/main/java/org/smm/archetype/
-├── ApplicationBootstrap.java          # Spring Boot 启动类
+├── ApplicationBootstrap.java          # Spring Boot 启动类（注意：main() 需为 public static）
 ├── exampleorder/                       # 示例聚合配置
 └── config/                            # 配置类（唯一位置）
     ├── AppConfigure.java              # 应用配置
@@ -25,7 +25,7 @@ start/src/main/java/org/smm/archetype/
 
 | 目标    | 位置                                   | 说明                                                 |
 |-------|--------------------------------------|----------------------------------------------------|
-| 启动入口  | `ApplicationBootstrap.java`          | @SpringBootApplication                             |
+| 启动入口  | `ApplicationBootstrap.java`          | @SpringBootApplication，main() 需为 public static     |
 | 配置类   | `config/*Configure.java`             | Bean 装配                                            |
 | 属性类   | `config/properties/*Properties.java` | @ConfigurationProperties                           |
 | 线程池配置 | `config/ThreadPoolConfigure.java`    | ioTaskExecutor、cpuTaskExecutor、virtualTaskExecutor |
@@ -138,4 +138,4 @@ public class CacheConfigure {
 - [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
 
 ---
-**版本**: 3.0 | **更新**: 2026-02-17
+**版本**: 3.1 | **更新**: 2026-02-18

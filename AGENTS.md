@@ -1,8 +1,8 @@
 # 项目知识库
 
-**生成时间**: 2026-02-17
-**Commit**: 37918aa
-**Branch**: main
+**生成时间**: 2026-02-18
+**Commit**: 6a4d596
+**Branch**: feat/mybatis-plus-migration
 **项目**: DDD Web Quick Start Domain
 **架构**: 四层 DDD (Domain-Driven Design)
 
@@ -157,4 +157,4 @@ web-quick-start-domain/
 
 ---
 
-**版本**: 2.2 | **更新**: 2026-02-17
+**版本**: 2.3 | **更新**: 2026-02-18
