@@ -104,8 +104,7 @@ public class MybatisPlusGenerator {
                             // Mapper 策略配置
                             .mapperBuilder()
                             .superClass(com.baomidou.mybatisplus.core.mapper.BaseMapper.class)
-                            .enableMapperAnnotation()
-                            .formatMapperFileName("%sMapper")
+                            .mapperAnnotation(org.apache.ibatis.annotations.Mapper.class).formatMapperFileName("%sMapper")
                             .enableFileOverride()  // 启用 Mapper 文件覆盖
                             // Controller 策略配置（禁用，遵循 DDD 架构）
                             .controllerBuilder()
