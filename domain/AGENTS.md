@@ -141,6 +141,31 @@ public class Money extends ValueObject {
 | 字段使用 String 存储枚举值               | 使用枚举类型                                     |
 | 内部类过度膨胀                         | 独立类放在 common/enums/                        |
 
+## 模块边界
+
+### 对外暴露
+
+| 类型      | 位置                                 | 说明     |
+|---------|------------------------------------|--------|
+| 聚合根     | `{模块}/model/*Aggr.java`            | 业务逻辑入口 |
+| 值对象     | `{模块}/model/valueobject/*.java`    | 不可变值   |
+| 仓储接口    | `{模块}/repository/*Repository.java` | 持久化抽象  |
+| 领域事件    | `{模块}/event/*.java`                | 事件定义   |
+| 技术客户端接口 | `shared/client/*Client.java`       | 基础设施接口 |
+
+### 依赖下游
+
+| 模块 | 依赖方式 | 说明            |
+|----|------|---------------|
+| 无  | -    | Domain 层零外部依赖 |
+
+### 禁止
+
+- ❌ 依赖 Spring 框架（`@Transactional`、`@Autowired`）
+- ❌ 依赖 Infrastructure 实现（仅通过接口声明）
+- ❌ 使用 `@Data` 注解
+- ❌ 引入 MyBatis/JPA 注解
+
 ---
 
 ## 相关文档
@@ -155,4 +180,4 @@ public class Money extends ValueObject {
 - [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
 
 ---
-**版本**: 3.1 | **更新**: 2026-02-18
+**版本**: 3.2 | **更新**: 2026-02-18

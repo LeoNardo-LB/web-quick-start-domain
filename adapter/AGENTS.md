@@ -151,6 +151,33 @@ middleware:
 | 直接返回异常堆栈          | 统一异常处理，脱敏敏感信息                      |
 | 返回完整领域模型          | 返回 Response DTO                    |
 
+## 模块边界
+
+### 对外暴露
+
+| 类型            | 位置                                | 说明      |
+|---------------|-----------------------------------|---------|
+| Controller    | `web/api/*Controller.java`        | REST 端点 |
+| Request       | `web/dto/request/*Request.java`   | 请求 DTO  |
+| Response      | `web/dto/response/*Response.java` | 响应 DTO  |
+| EventListener | `listener/*Listener.java`         | 事件监听器   |
+
+### 依赖下游
+
+| 模块             | 依赖方式   | 说明                   |
+|----------------|--------|----------------------|
+| Application    | 直接依赖   | 调用 AppService        |
+| Domain         | 直接依赖   | 使用领域枚举、值对象           |
+| Infrastructure | **禁止** | 通过 Application 层间接访问 |
+
+### 禁止
+
+- ❌ 直接依赖 Infrastructure 层
+- ❌ Controller 包含业务逻辑
+- ❌ 创建配置类（配置类在 start 模块）
+- ❌ 返回完整领域模型（应返回 Response DTO）
+- ❌ 事件处理器同步执行
+
 ---
 
 ## 相关文档
@@ -165,4 +192,4 @@ middleware:
 - [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
 
 ---
-**版本**: 3.1 | **更新**: 2026-02-18
+**版本**: 3.2 | **更新**: 2026-02-18

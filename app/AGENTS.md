@@ -109,6 +109,31 @@ public class OrderAppService {
 | 事件处理器同步执行                   | 使用 `@Async("virtualTaskExecutor")` |
 | 大事务包含多聚合                    | 拆分为多个独立事务                          |
 
+## 模块边界
+
+### 对外暴露
+
+| 类型      | 位置                         | 说明     |
+|---------|----------------------------|--------|
+| 应用服务    | `**/*AppService.java`      | 用例编排入口 |
+| Command | `**/command/*Command.java` | 命令对象   |
+| Query   | `**/query/*Query.java`     | 查询对象   |
+| DTO     | `**/dto/*DTO.java`         | 数据传输对象 |
+
+### 依赖下游
+
+| 模块             | 依赖方式 | 说明                    |
+|----------------|------|-----------------------|
+| Domain         | 直接依赖 | 调用聚合根、仓储接口            |
+| Infrastructure | 间接依赖 | 通过 Domain 接口，不直接引用实现类 |
+
+### 禁止
+
+- ❌ 直接依赖 Infrastructure 实现类
+- ❌ 暴露 Domain 对象到 Adapter 层
+- ❌ 命令返回完整领域模型（应返回 ID/值对象）
+- ❌ 查询包含业务逻辑
+
 ---
 
 ## 相关文档
@@ -123,4 +148,4 @@ public class OrderAppService {
 - [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
 
 ---
-**版本**: 3.1 | **更新**: 2026-02-18
+**版本**: 3.2 | **更新**: 2026-02-18

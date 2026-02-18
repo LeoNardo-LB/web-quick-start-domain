@@ -123,6 +123,31 @@ public interface OrderConverter {
 | 新增事件发布        | 使用 `EventPublisher.publishEvent(DomainEvent event)`                                         |
 | 新增中间件         | 1. 完成评估清单<br>2. 在根 POM 管理版本<br>3. 使用 `@ConditionalOnProperty` 按需加载                          |
 
+## 模块边界
+
+### 对外暴露
+
+| 类型             | 位置                                    | 说明              |
+|----------------|---------------------------------------|-----------------|
+| Repository 实现  | `**/persistence/*RepositoryImpl.java` | 仓储实现            |
+| Converter      | `**/*Converter.java`                  | Domain ↔ DO 转换  |
+| EventPublisher | `shared/event/`                       | 事件发布器           |
+| 技术客户端实现        | `common/cache/`、`common/file/`        | CacheClient 等实现 |
+
+### 依赖下游
+
+| 模块      | 依赖方式 | 说明             |
+|---------|------|----------------|
+| Domain  | 直接依赖 | 实现仓储接口、使用领域对象  |
+| Adapter | 无依赖  | 通过 Domain 接口解耦 |
+
+### 禁止
+
+- ❌ 被 Adapter 层直接依赖
+- ❌ 在 Domain 层进行 DO ↔ Domain 转换
+- ❌ 创建配置类（配置类在 start 模块）
+- ❌ Repository 直接操作数据库实体（应使用 Mapper）
+
 ---
 
 ## 相关文档
@@ -137,4 +162,4 @@ public interface OrderConverter {
 - [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
 
 ---
-**版本**: 3.1 | **更新**: 2026-02-18
+**版本**: 3.2 | **更新**: 2026-02-18
