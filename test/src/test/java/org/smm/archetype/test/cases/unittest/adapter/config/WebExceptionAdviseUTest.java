@@ -21,6 +21,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -167,7 +168,9 @@ class WebExceptionAdviseUTest extends UnitTestBase {
             String message = response.getBody().getMessage();
             assertNotNull(message);
             // 消息顺序可能不确定，只验证包含关键内容
-            assertEquals("参数校验失败: 用户名不能为空, 密码长度必须在6-20之间", message);
+            assertTrue(message.startsWith("参数校验失败:"), "应包含前缀");
+            assertTrue(message.contains("用户名不能为空"), "应包含用户名错误");
+            assertTrue(message.contains("密码长度必须在6-20之间"), "应包含密码错误");
         }
 
     }

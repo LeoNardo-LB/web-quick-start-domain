@@ -1,6 +1,6 @@
 package org.smm.archetype.infrastructure.shared.event.publisher;
 
-import com.mybatisflex.core.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.shared.event.Action;
@@ -143,7 +143,7 @@ public abstract class DomainEventCollectPublisher implements DomainEventPublishe
         try {
             EventDO eventDO = new EventDO();
             eventDO.setStatus(status.name());
-            eventMapper.updateByQuery(eventDO, QueryWrapper.create().where("event_id = ?", eventId));
+            eventMapper.update(eventDO, Wrappers.<EventDO>lambdaUpdate().eq(EventDO::getEid, eventId));
             log.debug("事件状态已更新: eventId={}, status={}", eventId, status);
         } catch (Exception e) {
             log.error("更新事件状态失败: eventId={}, status={}", eventId, status, e);

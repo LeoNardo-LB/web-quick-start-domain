@@ -1,11 +1,13 @@
-package org.smm.archetype.infrastructure.platform.file;
+package org.smm.archetype.infrastructure.platform.file.persistence;
 
-import com.mybatisflex.core.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.smm.archetype.domain.platform.file.FileRepository;
 import org.smm.archetype.domain.platform.file.FileBusiness;
 import org.smm.archetype.domain.platform.file.FileMetadata;
+import org.smm.archetype.domain.platform.file.FileRepository;
+import org.smm.archetype.infrastructure.platform.file.FileBusinessConverter;
+import org.smm.archetype.infrastructure.platform.file.FileMetaConverter;
 import org.smm.archetype.infrastructure.shared.dal.generated.entity.FileBusinessDO;
 import org.smm.archetype.infrastructure.shared.dal.generated.entity.FileMetadataDO;
 import org.smm.archetype.infrastructure.shared.dal.generated.mapper.FileBusinessMapper;
@@ -14,15 +16,12 @@ import org.smm.archetype.infrastructure.shared.dal.generated.mapper.FileMetadata
 import java.util.List;
 import java.util.Optional;
 
-import static org.smm.archetype.infrastructure.shared.dal.generated.entity.table.FileBusinessDOTableDef.FILE_BUSINESS_DO;
-import static org.smm.archetype.infrastructure.shared.dal.generated.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
-
 /**
  * 通用文件仓储实现
  *
-负责FileBusiness和FileMeta的持久化操作
-
-
+ 负责FileBusiness和FileMeta的持久化操作
+ 
+ 
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -40,15 +39,15 @@ public class FileRepositoryImpl implements FileRepository {
                 fileBusiness.getType(),
                 fileBusiness.getUsage());
 
-        // 1. 保存文件元数据
+        // 1. 保存文件元数据（使用原子操作 upsertByMd5）
         FileMetadata fileMetadata = fileBusiness.getFileMetadata();
         FileMetadataDO metadataDO = fileMetaConverter.toDataObject(fileMetadata);
-        metadataMapper.insertOrUpdate(metadataDO);
+        metadataMapper.upsertByMd5(metadataDO);
 
-        // 2. 保存业务关联（使用 file_metadata.id 作为关联）
+        // 2. 保存业务关联（使用原子操作 upsertById）
         FileBusinessDO businessDO = fileBusinessConverter.toDataObject(fileBusiness);
         businessDO.setFileMetaId(String.valueOf(metadataDO.getId()));
-        businessMapper.insertOrUpdate(businessDO);
+        businessMapper.upsertById(businessDO);
 
         log.debug("Business file saved successfully: id={}", businessDO.getId());
         return fileBusiness;
@@ -59,18 +58,16 @@ public class FileRepositoryImpl implements FileRepository {
         log.debug("Finding business file by id: {}", id);
 
         // 从file_business表查询
-        FileBusinessDO businessDO = businessMapper.selectOneById(id);
+        FileBusinessDO businessDO = businessMapper.selectById(id);
         if (businessDO == null) {
             log.warn("Business file not found: id={}", id);
             return Optional.empty();
         }
 
         // 查询文件元数据 - 使用 id 关联
-        FileMetadataDO metadataDO = metadataMapper.selectOneByQuery(
-                QueryWrapper.create()
-                        .select()
-                        .from(FILE_METADATA_DO)
-                        .where(FILE_METADATA_DO.ID.eq(Long.parseLong(businessDO.getFileMetaId())))
+        FileMetadataDO metadataDO = metadataMapper.selectOne(
+                Wrappers.<FileMetadataDO>lambdaQuery()
+                        .eq(FileMetadataDO::getId, Long.parseLong(businessDO.getFileMetaId()))
         );
 
         if (metadataDO == null) {
@@ -89,17 +86,14 @@ public class FileRepositoryImpl implements FileRepository {
                                                               FileBusiness.Usage usage) {
         log.debug("Finding business files: businessId={}, type={}, usage={}", businessId, type, usage);
 
-        // 暂时只按type和usage查询，不按businessId过滤
         // 从file_business表查询
-        QueryWrapper query = QueryWrapper.create()
-                                     .select()
-                                     .from(FILE_BUSINESS_DO)
-                                     .where(FILE_BUSINESS_DO.BUSINESS_ID.eq(businessId))  // 取消注释：表结构中缺少business_id字段
-                                     .where(FILE_BUSINESS_DO.TYPE.eq(type.name()))
-                                     .and(FILE_BUSINESS_DO.USAGE.eq(usage.name()))
-                                     .orderBy(FILE_BUSINESS_DO.SORT.asc());
-
-        List<FileBusinessDO> businessDOList = businessMapper.selectListByQuery(query);
+        List<FileBusinessDO> businessDOList = businessMapper.selectList(
+                Wrappers.<FileBusinessDO>lambdaQuery()
+                        .eq(FileBusinessDO::getBusinessId, businessId)
+                        .eq(FileBusinessDO::getType, type.name())
+                        .eq(FileBusinessDO::getUsage, usage.name())
+                        .orderByAsc(FileBusinessDO::getSort)
+        );
 
         // 转换为领域对象
         return businessDOList.stream()
@@ -113,11 +107,9 @@ public class FileRepositoryImpl implements FileRepository {
     public Optional<FileMetadata> findFileMetaByFileId(String fileId) {
         log.debug("Finding file meta by id: {}", fileId);
 
-        FileMetadataDO metadataDO = metadataMapper.selectOneByQuery(
-                QueryWrapper.create()
-                        .select()
-                        .from(FILE_METADATA_DO)
-                        .where(FILE_METADATA_DO.ID.eq(Long.parseLong(fileId)))
+        FileMetadataDO metadataDO = metadataMapper.selectOne(
+                Wrappers.<FileMetadataDO>lambdaQuery()
+                        .eq(FileMetadataDO::getId, Long.parseLong(fileId))
         );
 
         if (metadataDO == null) {
@@ -155,11 +147,9 @@ public class FileRepositoryImpl implements FileRepository {
      * 将FileBusinessDO转换为FileBusiness（包含元数据）
      */
     private Optional<FileBusiness> toFileBusinessWithMetadata(FileBusinessDO businessDO) {
-        FileMetadataDO metadataDO = metadataMapper.selectOneByQuery(
-                QueryWrapper.create()
-                        .select()
-                        .from(FILE_METADATA_DO)
-                        .where(FILE_METADATA_DO.ID.eq(Long.parseLong(businessDO.getFileMetaId())))
+        FileMetadataDO metadataDO = metadataMapper.selectOne(
+                Wrappers.<FileMetadataDO>lambdaQuery()
+                        .eq(FileMetadataDO::getId, Long.parseLong(businessDO.getFileMetaId()))
         );
 
         if (metadataDO == null) {

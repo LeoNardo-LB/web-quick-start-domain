@@ -32,14 +32,22 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
-        <!-- MyBatis-Flex -->
+        <!-- MyBatis-Plus -->
         <dependency>
-            <groupId>com.mybatis-flex</groupId>
-            <artifactId>mybatis-flex-spring-boot4-starter</artifactId>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
         </dependency>
+        <!-- MyBatis-Plus 代码生成器（开发工具，可选依赖） -->
         <dependency>
-            <groupId>com.mybatis-flex</groupId>
-            <artifactId>mybatis-flex-codegen</artifactId>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- Freemarker 模板引擎（代码生成器需要） -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!--中间件依赖Start-->

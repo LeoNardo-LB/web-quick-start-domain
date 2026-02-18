@@ -1,6 +1,6 @@
 package org.smm.archetype.infrastructure.shared.event.persistence;
 
-import com.mybatisflex.core.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.smm.archetype.domain.shared.event.Action;
@@ -18,7 +18,7 @@ import java.util.List;
  * 事件仓储
  *
  封装 EventMapper，提供事件发布和消费的持久化操作。
- 
+
 
  */
 @Slf4j
@@ -45,10 +45,9 @@ public class EventRepository {
      * @return true-更新成功，false-版本冲突
      */
     public boolean updateStatusWithVersion(EventDO eventDO) {
-        int rows = eventMapper.updateByQuery(
-                eventDO,
-                QueryWrapper.create()
-                        .where("id = ?", eventDO.getId())
+        int rows = eventMapper.update(eventDO,
+                Wrappers.<EventDO>lambdaUpdate()
+                        .eq(EventDO::getId, eventDO.getId())
         );
         return rows > 0;
     }
@@ -61,10 +60,10 @@ public class EventRepository {
      * @return 事件发布记录，不存在则返回 null
      */
     public EventDO findPublishByEventId(String eventId) {
-        return eventMapper.selectOneByQuery(
-                QueryWrapper.create()
-                        .where("eid = ?", eventId)
-                        .and("action = 'PUBLISH'")
+        return eventMapper.selectOne(
+                Wrappers.<EventDO>lambdaQuery()
+                        .eq(EventDO::getEid, eventId)
+                        .eq(EventDO::getAction, "PUBLISH")
         );
     }
 
@@ -76,10 +75,10 @@ public class EventRepository {
      * @return 消费记录，不存在则返回 null
      */
     public EventDO findConsumeByEventId(String eventId) {
-        return eventMapper.selectOneByQuery(
-                QueryWrapper.create()
-                        .where("eid = ?", eventId)
-                        .and("action = 'CONSUME'")
+        return eventMapper.selectOne(
+                Wrappers.<EventDO>lambdaQuery()
+                        .eq(EventDO::getEid, eventId)
+                        .eq(EventDO::getAction, "CONSUME")
         );
     }
 
@@ -91,11 +90,12 @@ public class EventRepository {
      * @return 消费记录，不存在则返回 null
      */
     public EventDO findByEventIdAndConsumer(String eventId, String consumerGroup, String consumerName) {
-        return eventMapper.selectOneByQuery(
-                QueryWrapper.create()
-                        .where("eid = ? AND executor_group = ? AND executor = ?",
-                                eventId, consumerGroup, consumerName)
-                        .and("action = 'CONSUME'")
+        return eventMapper.selectOne(
+                Wrappers.<EventDO>lambdaQuery()
+                        .eq(EventDO::getEid, eventId)
+                        .eq(EventDO::getExecutorGroup, consumerGroup)
+                        .eq(EventDO::getExecutor, consumerName)
+                        .eq(EventDO::getAction, "CONSUME")
         );
     }
 
@@ -106,36 +106,40 @@ public class EventRepository {
      * @return 消费记录列表
      */
     public List<EventDO> findPendingConsumeEvents(List<String> consumeStatus, int limit) {
-        String statusIn = String.join(",",
-                consumeStatus.stream().map(s -> "'" + s + "'").toList());
-        return eventMapper.selectListByQuery(
-                QueryWrapper.create()
-                        .where("status IN (" + statusIn + ")")
-                        .and("action = 'CONSUME'")
-                        .and("(next_retry_time IS NULL OR next_retry_time <= ?)", Instant.now())
-                        .orderBy("retry_times", false)
-                        .orderBy("create_time", true)
-                        .limit(limit)
+        return eventMapper.selectList(
+                Wrappers.<EventDO>lambdaQuery()
+                        .in(EventDO::getStatus, consumeStatus)
+                        .eq(EventDO::getAction, "CONSUME")
+                        .and(wrapper -> wrapper
+                                                .isNull(EventDO::getNextRetryTime)
+                                                .or()
+                                                .le(EventDO::getNextRetryTime, Instant.now())
+                        )
+                        .orderByDesc(EventDO::getRetryTimes)
+                        .orderByAsc(EventDO::getCreateTime)
+                        .last("LIMIT " + limit)
         );
     }
 
     /**
      * 根据幂等键查询消费记录
      *
-    幂等键组成：eid + action + executor_group + delete_time
+     * 幂等键组成：eid + action + executor_group
+     * 注意：使用 @TableLogic 后，MyBatis Plus 自动过滤已删除记录
+     *
      * @param eventId       事件ID
      * @param action        动作类型（CONSUME）
      * @param executorGroup 执行者组
-     * @param deleteTime    删除时间（0表示未删除）
+     * @param deleteTime    废弃参数（保留向后兼容，@TableLogic 自动处理）
      * @return 消费记录，不存在则返回 null
      */
     public EventDO findByIdempotentKey(String eventId, String action, String executorGroup, Long deleteTime) {
-        return eventMapper.selectOneByQuery(
-                QueryWrapper.create()
-                        .where("eid = ?", eventId)
-                        .and("action = ?", action)
-                        .and("executor_group = ?", executorGroup)
-                        .and("delete_time = ?", deleteTime)
+        // @TableLogic 自动添加 delete_time = 0 条件，无需手动过滤
+        return eventMapper.selectOne(
+                Wrappers.<EventDO>lambdaQuery()
+                        .eq(EventDO::getEid, eventId)
+                        .eq(EventDO::getAction, action)
+                        .eq(EventDO::getExecutorGroup, executorGroup)
         );
     }
 
@@ -143,19 +147,21 @@ public class EventRepository {
      * 查询待重试事件（RETRYING 状态且到达重试时间）
      *
      * 返回 EventConsumeRecord 而非 EventDO，避免上层直接依赖 Infrastructure 层实体。
+     * 注意：使用 @TableLogic 后，MyBatis Plus 自动过滤已删除记录
+     *
      * @param limit 限制数量
      * @return 消费记录列表
      */
     public List<EventConsumeRecord> findRetryConsumeEvents(int limit) {
-        List<EventDO> eventDOs = eventMapper.selectListByQuery(
-                QueryWrapper.create()
-                        .where("status = 'RETRYING'")
-                        .and("action = 'CONSUME'")
-                        .and("next_retry_time <= ?", Instant.now())
-                        .and("delete_time = 0")
-                        .orderBy("retry_times", true)
-                        .orderBy("create_time", true)
-                        .limit(limit)
+        // @TableLogic 自动添加 delete_time = 0 条件，无需手动过滤
+        List<EventDO> eventDOs = eventMapper.selectList(
+                Wrappers.<EventDO>lambdaQuery()
+                        .eq(EventDO::getStatus, "RETRYING")
+                        .eq(EventDO::getAction, "CONSUME")
+                        .le(EventDO::getNextRetryTime, Instant.now())
+                        .orderByAsc(EventDO::getRetryTimes)
+                        .orderByAsc(EventDO::getCreateTime)
+                        .last("LIMIT " + limit)
         );
         return eventDOs.stream().map(recordConverter::from).toList();
     }
@@ -198,12 +204,12 @@ public class EventRepository {
      * @return 消费记录列表
      */
     public List<EventDO> findFailedConsumeEvents(int limit) {
-        return eventMapper.selectListByQuery(
-                QueryWrapper.create()
-                        .where("status = 'FAILED'")
-                        .and("action = 'CONSUME'")
-                        .orderBy("create_time", false)
-                        .limit(limit)
+        return eventMapper.selectList(
+                Wrappers.<EventDO>lambdaQuery()
+                        .eq(EventDO::getStatus, "FAILED")
+                        .eq(EventDO::getAction, "CONSUME")
+                        .orderByDesc(EventDO::getCreateTime)
+                        .last("LIMIT " + limit)
         );
     }
 

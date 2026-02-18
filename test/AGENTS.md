@@ -141,36 +141,35 @@ class OrderControllerITest extends IntegrationTestBase {
 }
 ```
 
-### 覆盖率标准
-
-| 指标    | 单元测试 | 集成测试 |
-|-------|------|------|
-| 行覆盖率  | ≥95% | ≥90% |
-| 分支覆盖率 | ≥95% | ≥80% |
-| 通过率   | 100% | 100% |
-
 ### TDD 验证流程（NON-NEGOTIABLE）
 
-> **编码前必须加载 `tdd-workflow` skill**：`/tdd-workflow`
+> **详细流程规范**: `openspec/config.yaml` 中的 TDD 验证流程章节
 
-**五阶段验证流程**：
+**四阶段验证流程**：
 
-| 阶段       | 命令/操作                                                          | 说明           |
-|----------|----------------------------------------------------------------|--------------|
-| 1. 编码验证  | `mvn clean compile`                                            | 确保编译通过       |
-| 2. 单元测试  | `python scripts/python/run-unit-tests.py --diff HEAD~1`        | 仅变更关联的单元测试   |
-| 3. 集成测试  | `python scripts/python/run-integration-tests.py --diff HEAD~1` | 仅变更关联的集成测试   |
-| 4. 覆盖率验证 | `mvn verify -pl test`                                          | 生成 JaCoCo 报告 |
-| 5. 抽检测试  | `python scripts/python/run-sample-tests.py`                    | 所有测试中抽取 10%  |
+| 阶段        | 触发时机        | 命令                                  | 通过标准           |
+|-----------|-------------|-------------------------------------|----------------|
+| 1. LSP 检查 | 每个文件/小功能完成  | `lsp_diagnostics`                   | 零错误            |
+| 2. 单元测试   | TODOLIST 完成 | `mvn test -Dtest=XxxUTest -pl test` | 100% 通过，分支全覆盖  |
+| 3. 集成测试   | 所有开发完成      | `mvn test -Dtest=XxxITest -pl test` | 100% 通过，重要分支覆盖 |
+| 4. 抽检     | 单测+集测通过后    | `mvn test -pl test`（抽检 10%）         | 100% 通过        |
 
-**报告位置**：`test/target/site/jacoco/index.html`
+**阶段提交原则**（防止 diff 过大）：
+
+| 阶段完成     | 提交格式                                              |
+|----------|---------------------------------------------------|
+| 阶段 1（编码） | `feat(xxx): complete phase 1 - implementation`    |
+| 阶段 2（单测） | `test(xxx): complete phase 2 - unit tests`        |
+| 阶段 3（集测） | `test(xxx): complete phase 3 - integration tests` |
+| 阶段 4（抽检） | `feat(xxx): complete TDD verification`            |
 
 ### 禁止行为
 
-- ❌ 直接使用 `mvn test` 运行测试（必须使用 TDD 脚本）
-- ❌ 跳过技能加载直接编码
+- ❌ 跳过阶段 2/3 直接进入阶段 4
+- ❌ 跨多个阶段不提交代码（导致 diff 过大）
 - ❌ 删除失败测试以通过构建
 - ❌ 提交失败的测试代码
+- ❌ 单元测试启动 Spring 上下文
 
 ## 反模式（禁止）
 
@@ -184,19 +183,28 @@ class OrderControllerITest extends IntegrationTestBase {
 ## 验证命令
 
 ```bash
-# 单元测试（仅变更文件）
-python scripts/python/run-unit-tests.py --diff HEAD~1
+# 单元测试（指定类）
+mvn test -Dtest=OrderAppServiceUTest -pl test
 
-# 集成测试（仅变更文件）
-python scripts/python/run-integration-tests.py --diff HEAD~1
+# 集成测试（指定类）
+mvn test -Dtest=OrderControllerITest -pl test
 
 # 启动验证
 mvn test -Dtest=ApplicationStartupTests -pl test
-
-# 覆盖率报告
-mvn verify -pl test
-# 报告: test/target/site/jacoco/index.html
 ```
 
 ---
-**版本**: 2.0 | **整合自**: CONSTITUTION.md §XVII/§XVIII/§XIX/§XXXII
+
+## 相关文档
+
+- [项目知识库](../AGENTS.md) - 架构概览和全局规范
+- [Domain 层](../domain/AGENTS.md) - 领域层规范
+- [Application 层](../app/AGENTS.md) - 应用层规范
+- [Infrastructure 层](../infrastructure/AGENTS.md) - 基础设施层规范
+- [Adapter 层](../adapter/AGENTS.md) - 接口层规范
+- [Start 模块](../start/AGENTS.md) - 启动模块规范
+- [Test 模块](../test/AGENTS.md) - 测试规范
+- [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
+
+---
+**版本**: 3.1 | **更新**: 2026-02-17

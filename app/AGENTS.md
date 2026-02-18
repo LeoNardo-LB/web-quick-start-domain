@@ -6,7 +6,7 @@
 
 ```
 app/src/main/java/org/smm/archetype/app/
-├── bizshared/          # 共享应用服务
+├── shared/             # 共享应用服务
 │   ├── event/          # 事件处理器（@Async 异步执行）
 │   ├── query/          # 共享查询服务
 │   └── result/         # 统一响应（BaseResult、PageResult）
@@ -110,4 +110,17 @@ public class OrderAppService {
 | 大事务包含多聚合                    | 拆分为多个独立事务                          |
 
 ---
-**版本**: 2.0 | **整合自**: CONSTITUTION.md §III/§IV/§XI/§XII
+
+## 相关文档
+
+- [项目知识库](../AGENTS.md) - 架构概览和全局规范
+- [Domain 层](../domain/AGENTS.md) - 领域层规范
+- [Application 层](../app/AGENTS.md) - 应用层规范
+- [Infrastructure 层](../infrastructure/AGENTS.md) - 基础设施层规范
+- [Adapter 层](../adapter/AGENTS.md) - 接口层规范
+- [Start 模块](../start/AGENTS.md) - 启动模块规范
+- [Test 模块](../test/AGENTS.md) - 测试规范
+- [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
+
+---
+**版本**: 3.0 | **更新**: 2026-02-17

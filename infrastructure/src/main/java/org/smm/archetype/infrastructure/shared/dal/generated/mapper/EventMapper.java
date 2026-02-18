@@ -1,6 +1,6 @@
 package org.smm.archetype.infrastructure.shared.dal.generated.mapper;
 
-import com.mybatisflex.core.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.smm.archetype.infrastructure.shared.dal.generated.entity.EventDO;
 
 /**

@@ -76,24 +76,23 @@ mvn test
 mvn test -Dtest=ApplicationStartupTests -pl test
 ```
 
-详细流程：使用 `/tdd-workflow` 命令加载 TDD 验证流程
+详细流程：参考 [TDD 流程规范](openspec/config.yaml)
 
 ---
 
 ## 技术栈
 
-| 分类       | 技术                | 版本          | 说明              |
-|----------|-------------------|-------------|-----------------|
-| **语言**   | Java              | 25          | 虚拟线程支持          |
-| **核心框架** | Spring Boot       | 4.0.2       | 基础框架            |
-| **持久层**  | MyBatis-Flex      | 1.11.5      | ORM框架           |
-| **消息队列** | Kafka             | -           | 事件驱动（可选）        |
-| **缓存**   | Redis             | -           | 分布式缓存           |
-| **搜索**   | Elasticsearch     | -           | 全文搜索（可选）        |
-| **工具库**  | Lombok            | latest      | 简化代码            |
-| **工具库**  | MapStruct         | 1.5.5.Final | 对象映射            |
-| **测试**   | JUnit 5 + Mockito | -           | 单元测试            |
-| **测试**   | JaCoCo            | 0.8.14      | 代码覆盖率（支持JDK 25） |
+| 分类       | 技术                | 版本          | 说明       |
+|----------|-------------------|-------------|----------|
+| **语言**   | Java              | 25          | 虚拟线程支持   |
+| **核心框架** | Spring Boot       | 4.0.2       | 基础框架     |
+| **持久层**  | MyBatis Plus      | 3.5.16      | ORM框架    |
+| **消息队列** | Kafka             | -           | 事件驱动（可选） |
+| **缓存**   | Redis             | -           | 分布式缓存    |
+| **搜索**   | Elasticsearch     | -           | 全文搜索（可选） |
+| **工具库**  | Lombok            | latest      | 简化代码     |
+| **工具库**  | MapStruct         | 1.5.5.Final | 对象映射     |
+| **测试**   | JUnit 5 + Mockito | -           | 单元测试     |
 
 ---
 
@@ -101,43 +100,19 @@ mvn test -Dtest=ApplicationStartupTests -pl test
 
 ### 四层架构
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Adapter 层                            │
-│  (Controller、EventListener、Schedule、Request/Response DTO)  │
-└────────────────────┬────────────────────────────────────────┘
-                     │ 依赖
-┌────────────────────▼────────────────────────────────────────┐
-│                     Application 层                             │
-│         (ApplicationService、CQRS、DTO转换、事务管理)          │
-└────────────────────┬────────────────────────────────────────┘
-                     │ 依赖
-┌────────────────────▼────────────────────────────────────────┐
-│                      Domain 层                               │
-│     (聚合根、实体、值对象、领域事件、仓储接口、领域服务)         │
-│                      ↕                                      │
-│              (纯净业务逻辑，无外部依赖)                        │
-└────────────────────┬────────────────────────────────────────┘
-                     │ 接口
-┌────────────────────▼────────────────────────────────────────┐
-│                  Infrastructure 层                            │
-│   (Repository实现、EventPublisher、CacheService、外部服务)      │
-└─────────────────────────────────────────────────────────────┘
-```
+本项目采用严格的 DDD 四层架构，依赖方向为：
+**Adapter → Application → Domain ← Infrastructure**
 
-**依赖规则**：
-- ✅ Adapter → Application → Domain ← Infrastructure
-- ✅ Domain层无外部依赖，纯净的业务逻辑
-- ✅ 接口在Domain层，实现在Infrastructure层
+> 📖 详细的架构图和各层职责请参考 [项目知识库 - 四层架构原则](AGENTS.md#四层架构原则)
 
-### 各层职责
+### 各层职责（简表）
 
-| 层 | 职责 | 详解 |
-|---|------|------|
-| **Domain** | 领域模型 | 聚合根、实体、值对象、领域事件、仓储接口 |
-| **Application** | 用例编排 | ApplicationService、CQRS、DTO转换、事务边界 |
-| **Infrastructure** | 基础设施 | Repository实现、EventPublisher、CacheService |
-| **Adapter** | 接口适配 | Controller、EventListener、Schedule |
+| 层                  | 职责   | 详解                               |
+|--------------------|------|----------------------------------|
+| **Domain**         | 领域模型 | [详细规范](domain/AGENTS.md)         |
+| **Application**    | 用例编排 | [详细规范](app/AGENTS.md)            |
+| **Infrastructure** | 基础设施 | [详细规范](infrastructure/AGENTS.md) |
+| **Adapter**        | 接口适配 | [详细规范](adapter/AGENTS.md)        |
 
 
 
@@ -317,7 +292,7 @@ web-quick-start-domain/
 │       │   └── search/  # 搜索实现
 │       ├── _shared/     # 共享基础设施
 │       │   ├── event/   # 事件发布
-│       │   ├── generated/ # MyBatis-Flex生成代码
+│       │   ├── generated/ # MyBatis Plus生成代码
 │       │   └── retry/   # 重试策略
 │       └── config/      # 配置类
 │
@@ -343,7 +318,7 @@ web-quick-start-domain/
 │   │   │   ├── unit/    # 单元测试
 │   │   │   └── integration/ # 集成测试
 │   │   └── resources/   # 测试资源
-│   └── pom.xml          # JaCoCo配置
+│   └── pom.xml          # 测试配置
 │
 ├── openspec/             # OpenSpec 规范目录
 │   ├── changes/         # 变更记录
@@ -403,215 +378,14 @@ public interface ProductRepository {
 
 ### 开发新功能的步骤
 
-#### 1. 创建领域模型（Domain层）
+1. **创建领域模型** → 参考 [Domain 层指南](domain/AGENTS.md)
+2. **实现应用服务** → 参考 [Application 层指南](app/AGENTS.md) 和 [Start 模块指南](start/AGENTS.md)
+3. **开发 Controller** → 参考 [Adapter 层指南](adapter/AGENTS.md)
+4. **实现 Repository** → 参考 [Infrastructure 层指南](infrastructure/AGENTS.md)
+5. **编写测试** → 参考 [Test 模块指南](test/AGENTS.md)
+6. **验证代码质量** → 参考 [TDD 流程规范](openspec/config.yaml)
 
-```java
-// 1.1 创建聚合根
-public class OrderAggr extends AggregateRoot<OrderAggr, OrderId> {
-    private OrderId id;
-    private List<OrderItem> items;
-    private OrderStatus status;
-
-    // 业务逻辑方法
-    public static OrderAggr create(String customerId, Money totalAmount) {
-        OrderAggr order = new OrderAggr();
-        order.id = OrderId.generate();
-        order.status = OrderStatus.CREATED;
-        order.recordEvent(new OrderCreatedEvent(order.id));
-        return order;
-    }
-
-    public void pay(PaymentMethod method) {
-        if (this.status != OrderStatus.CREATED) {
-            throw new IllegalStateException("只有已创建的订单可以支付");
-        }
-        this.status = OrderStatus.PAID;
-        this.recordEvent(new OrderPaidEvent(this.id));
-    }
-}
-
-// 1.2 创建实体和值对象
-@ValueObject
-public class Money {
-    private BigDecimal amount;
-    private String currency;
-    // 值对象逻辑
-}
-
-// 1.3 创建仓储接口
-public interface OrderAggrRepository {
-    void save(OrderAggr order);
-    OrderAggr findById(OrderId id);
-    List<OrderAggr> findByCustomerId(String customerId);
-}
-```
-
-> **详细规范**：[Domain 层指南](domain/AGENTS.md) - 领域层设计模式
-
-
-
-#### 2. 实现应用服务（Application层）
-
-```java
-// 2.1 创建ApplicationService
-@Configuration
-public class OrderConfigure {
-    @Bean
-    public OrderAppService orderAppService(
-        OrderAggrRepository orderRepository) {
-        return new OrderAppService(orderRepository);
-    }
-}
-
-// 2.2 实现用例编排
-public class OrderAppService {
-    public OrderId create(CreateOrderCommand command) {
-        // 编排业务逻辑
-        OrderAggr order = OrderAggr.create(command.getCustomerId(), command.getTotalAmount());
-        orderRepository.save(order);
-        return order.getId();
-    }
-
-    public List<OrderDTO> query(OrderQuery query) {
-        // 查询逻辑
-        return orderRepository.findByCustomerId(query.getCustomerId())
-            .stream()
-            .map(this::toDTO)
-            .toList();
-    }
-}
-```
-
-> **详细规范**：[Start 模块指南](start/AGENTS.md) - 配置类命名和Bean装配
-
-
-
-#### 3. 开发Controller（Adapter层）
-
-```java
-// 3.1 创建Controller
-@RestController
-@RequestMapping("/api/orders")
-public class OrderController {
-    private OrderAppService orderAppService;
-
-    @PostMapping
-    public Response<OrderDTO> create(@RequestBody CreateOrderRequest request) {
-        // 调用应用服务
-        OrderId orderId = orderAppService.create(new CreateOrderCommand(request));
-        return Response.success(orderAppService.queryById(orderId));
-    }
-
-    @GetMapping
-    public Response<List<OrderDTO>> list(@RequestParam String customerId) {
-        return Response.success(orderAppService.query(new OrderQuery(customerId)));
-    }
-}
-```
-
-
-
-#### 4. 实现Repository（Infrastructure层）
-
-```java
-// 4.1 实现仓储
-public class OrderAggrRepositoryImpl implements OrderAggrRepository {
-    private OrderMapper orderMapper;
-    private OrderBusinessConverter converter;
-
-    @Override
-    public void save(OrderAggr order) {
-        OrderDO orderDO = converter.toDO(order);
-        orderMapper.insertOrUpdate(orderDO);
-    }
-
-    @Override
-    public OrderAggr findById(OrderId id) {
-        OrderDO orderDO = orderMapper.selectById(id.getValue());
-        return converter.toDomain(orderDO);
-    }
-
-    @Override
-    public List<OrderAggr> findByCustomerId(String customerId) {
-        List<OrderDO> orderDOList = orderMapper.selectByCustomerId(customerId);
-        return converter.toDomainList(orderDOList);
-    }
-}
-```
-
-
-
-#### 5. 编写测试
-
-```java
-// 5.1 单元测试
-class OrderAppServiceTest extends UnitTestBase {
-    @Mock
-    private OrderAggrRepository orderRepository;
-
-    @Test
-    void testCreateOrder() {
-        // Given-When-Then
-        CreateOrderCommand command = new CreateOrderCommand("customer123", new Money("100.00", "CNY"));
-        when(orderRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
-
-        OrderId orderId = orderAppService.create(command);
-
-        assertNotNull(orderId);
-        verify(orderRepository, times(1)).save(any());
-    }
-}
-
-// 5.2 集成测试
-class OrderControllerTest extends IntegrationTestBase {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Test
-    void testCreateOrderApi() throws Exception {
-        String requestBody = "{\"customerId\":\"customer123\",\"totalAmount\":{\"amount\":\"100.00\",\"currency\":\"CNY\"}}";
-
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.success").value(true));
-    }
-}
-```
-
-> **详细规范**：[Test 模块指南](test/AGENTS.md) - 测试编写最佳实践
-
-
-
-#### 6. 验证代码质量
-
-```bash
-# 6.1 编译验证
-mvn clean compile
-
-# 6.2 单元测试验证
-mvn test
-
-# 6.3 代码风格检查（Checkstyle）⭐
-mvn checkstyle:check -Dcheckstyle.config.location=config/checkstyle/checkstyle.xml
-
-# 6.4 启动验证（最关键）⭐
-mvn test -Dtest=ApplicationStartupTests -pl test
-```
-
-**Checkstyle 代码风格检查**：
-
-项目使用 Checkstyle 统一代码风格，包括：
-
-- Javadoc 注释规范（类、方法必须有文档注释）
-- 行长度限制（120 字符）
-- 文件末尾换行
-- 日志格式规范
-
-配置文件位置：`config/checkstyle/checkstyle.xml`
-
-详细流程：使用 `/tdd-workflow` 命令加载 TDD 验证流程
+> 💡 每个步骤的详细代码示例和最佳实践请参考对应的模块指南。
 
 ---
 
@@ -619,12 +393,12 @@ mvn test -Dtest=ApplicationStartupTests -pl test
 
 ### 📚 完整文档索引
 
-| 文档                                                     | 用途                   | 读者      |
-|--------------------------------------------------------|----------------------|---------|
-| **[项目知识库](AGENTS.md)**                                 | 项目架构概览和架构偏差分析        | 开发者、架构师 |
-| **[AI开发指南](CLAUDE.md)**                                | AI开发元指南（包含文档导航和快速参考） | 开发者、AI  |
-| **[Maven Archetype使用指南](ARCHETYPE%20用法.md)**           | 快速生成基于DDD架构的Java项目骨架 | 开发者     |
-| **TDD 验证流程** - 使用 `/tdd-workflow` 命令 | TDD验证流程          | 开发者、AI  |
+| 文档                                           | 用途                   | 读者      |
+|----------------------------------------------|----------------------|---------|
+| **[项目知识库](AGENTS.md)**                       | 项目架构概览和架构偏差分析        | 开发者、架构师 |
+| **[AI开发指南](CLAUDE.md)**                      | AI开发元指南（包含文档导航和快速参考） | 开发者、AI  |
+| **[Maven Archetype使用指南](ARCHETYPE%20用法.md)** | 快速生成基于DDD架构的Java项目骨架 | 开发者     |
+| **[TDD 流程规范](openspec/config.yaml)**         | 四阶段 TDD 验证流程         | 开发者、AI  |
 
 ### 📚 项目知识库（AGENTS.md）
 
@@ -671,7 +445,7 @@ mvn test          # 单元测试验证
 mvn test -Dtest=ApplicationStartupTests -pl test  # 启动验证
 ```
 
-详细流程：使用 `/tdd-workflow` 命令加载 TDD 验证流程
+详细流程：参考 [TDD 流程规范](openspec/config.yaml)
 
 ### Q3: 如何解决循环依赖？
 
@@ -681,17 +455,7 @@ mvn test -Dtest=ApplicationStartupTests -pl test  # 启动验证
 
 参考：[Start 模块指南](start/AGENTS.md) - 依赖隔离原则
 
-### Q4: 如何查看测试覆盖率？
-
-**A**:
-```bash
-mvn verify -pl test
-# 报告位置：test/target/site/jacoco/index.html
-```
-
-覆盖率要求：行≥95%，分支=100%
-
-### Q5: 测试环境配置说明？
+### Q4: 测试环境配置说明？
 
 **A**: 测试环境使用独立配置，与生产环境解耦：
 
@@ -802,6 +566,6 @@ middleware:
 
 ---
 
-**文档版本**: v2.0
-**最后更新**: 2026-02-14
+**文档版本**: v3.0
+**最后更新**: 2026-02-17
 **维护者**: Leonardo

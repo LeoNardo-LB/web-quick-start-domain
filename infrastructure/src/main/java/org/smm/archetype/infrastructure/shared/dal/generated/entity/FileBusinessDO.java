@@ -1,13 +1,13 @@
 package org.smm.archetype.infrastructure.shared.dal.generated.entity;
 
-import com.mybatisflex.annotation.Table;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.smm.archetype.infrastructure.shared.dal.BaseDO;
-import org.smm.archetype.infrastructure.shared.dal.BaseDOFillListener;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -22,7 +22,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(value = "file_business", onInsert = BaseDOFillListener.class, onUpdate = BaseDOFillListener.class)
+@TableName("file_business")
 public class FileBusinessDO extends BaseDO implements Serializable {
 
     @Serial
@@ -64,8 +64,9 @@ public class FileBusinessDO extends BaseDO implements Serializable {
     private String remark;
 
     /**
-     * 删除标记：0=未删除，非0=删除时间戳
+     * 逻辑删除标记：0=未删除，非0=删除时间戳（毫秒）
      */
+    @TableLogic(value = "0", delval = "UNIX_TIMESTAMP(NOW()) * 1000")
     private Long deleteTime;
 
     /**

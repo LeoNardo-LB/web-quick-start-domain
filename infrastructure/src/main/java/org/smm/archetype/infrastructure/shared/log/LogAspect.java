@@ -167,7 +167,7 @@ public class LogAspect {
      *
      * 定义切入点，拦截Client实现类的所有方法。
      */
-    @Pointcut("execution(* org.smm.archetype.infrastructure..*.*(..))")
+    @Pointcut("execution(* org.smm.archetype.infrastructure..clientImpl(..))")
     public void clientCut() {
     }
 

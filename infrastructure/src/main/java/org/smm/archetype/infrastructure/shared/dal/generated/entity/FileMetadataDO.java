@@ -1,13 +1,13 @@
 package org.smm.archetype.infrastructure.shared.dal.generated.entity;
 
-import com.mybatisflex.annotation.Table;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.smm.archetype.infrastructure.shared.dal.BaseDO;
-import org.smm.archetype.infrastructure.shared.dal.BaseDOFillListener;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -15,15 +15,15 @@ import java.time.Instant;
 
     /**
      * 文件元数据表DO实体。
-    
-    
+
+
      */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(value = "file_metadata", onInsert = BaseDOFillListener.class, onUpdate = BaseDOFillListener.class)
+@TableName("file_metadata")
 public class FileMetadataDO extends BaseDO implements Serializable {
 
     @Serial
@@ -60,8 +60,9 @@ public class FileMetadataDO extends BaseDO implements Serializable {
     private String path;
 
     /**
-     * 删除标记：0=未删除，非0=删除时间戳
+     * 逻辑删除标记：0=未删除，非0=删除时间戳（毫秒）
      */
+    @TableLogic(value = "0", delval = "UNIX_TIMESTAMP(NOW()) * 1000")
     private Long deleteTime;
 
     /**

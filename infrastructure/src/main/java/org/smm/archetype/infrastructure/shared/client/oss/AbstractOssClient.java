@@ -1,22 +1,19 @@
 package org.smm.archetype.infrastructure.shared.client.oss;
 
-import com.mybatisflex.core.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.smm.archetype.domain.platform.file.FileMetadata;
+import org.smm.archetype.domain.platform.file.FileMetadata.Status;
 import org.smm.archetype.domain.shared.client.OssClient;
 import org.smm.archetype.domain.shared.exception.ClientErrorCode;
 import org.smm.archetype.domain.shared.exception.ClientException;
-import org.smm.archetype.domain.platform.file.FileMetadata;
-import org.smm.archetype.domain.platform.file.FileMetadata.Status;
 import org.smm.archetype.infrastructure.shared.dal.generated.entity.FileMetadataDO;
 import org.smm.archetype.infrastructure.shared.dal.generated.mapper.FileMetadataMapper;
-import org.smm.archetype.infrastructure.shared.util.context.ScopedThreadContext;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.List;
-
-import static org.smm.archetype.infrastructure.shared.dal.generated.entity.table.FileMetadataDOTableDef.FILE_METADATA_DO;
 
 /**
  * 对象存储服务抽象基类，提供通用文件操作流程。
@@ -83,11 +80,9 @@ public abstract class AbstractOssClient implements OssClient {
             }
 
             // 2. 从数据库查询文件元数据（数据库操作）
-            FileMetadataDO metadata = metadataMapper.selectOneByQuery(
-                    QueryWrapper.create()
-                            .select()
-                            .from(FILE_METADATA_DO)
-                            .where(FILE_METADATA_DO.PATH.eq(filePath))
+            FileMetadataDO metadata = metadataMapper.selectOne(
+                    Wrappers.<FileMetadataDO>lambdaQuery()
+                            .eq(FileMetadataDO::getPath, filePath)
             );
 
             if (metadata == null) {
@@ -117,11 +112,9 @@ public abstract class AbstractOssClient implements OssClient {
             }
 
             // 2. 从数据库查询文件元数据（数据库操作）
-            FileMetadataDO metadata = metadataMapper.selectOneByQuery(
-                    QueryWrapper.create()
-                            .select()
-                            .from(FILE_METADATA_DO)
-                            .where(FILE_METADATA_DO.PATH.eq(filePath))
+            FileMetadataDO metadata = metadataMapper.selectOne(
+                    Wrappers.<FileMetadataDO>lambdaQuery()
+                            .eq(FileMetadataDO::getPath, filePath)
             );
 
             if (metadata == null) {
@@ -302,13 +295,12 @@ public abstract class AbstractOssClient implements OssClient {
     }
 
     /**
-     * 删除文件元数据（软删除）
+     * 删除文件元数据（逻辑删除）
      *
-     * <p>软删除策略：
+     * <p>使用 MyBatis Plus 的 @TableLogic 自动处理逻辑删除：
      * <ul>
-     *   <li>设置 deleteTime 为当前时间戳</li>
-     *   <li>设置 deleteUser 为当前操作用户（如果有）</li>
-     *   <li>保留记录以便审计和恢复</li>
+     *   <li>deleteById 会自动转换为 UPDATE SET delete_time = UNIX_TIMESTAMP(NOW()) * 1000</li>
+     *   <li>SELECT 会自动添加 WHERE delete_time = 0 条件</li>
      * </ul>
      *
      * @param metadataId 元数据ID
@@ -320,35 +312,17 @@ public abstract class AbstractOssClient implements OssClient {
         }
 
         try {
-            // 查询元数据
-            FileMetadataDO metadata = metadataMapper.selectOneById(metadataId);
+            // 使用 MyBatis Plus 逻辑删除（自动转换为 UPDATE）
+            int deleted = metadataMapper.deleteById(metadataId);
 
-            if (metadata == null) {
-                log.warn("文件元数据未找到: id={}", metadataId);
-                return;
-            }
-
-            // 检查是否已经删除
-            if (metadata.getDeleteTime() != null) {
-                log.debug("文件元数据已删除，跳过: id={}", metadataId);
-                return;
-            }
-
-            // 执行软删除
-            metadata.setDeleteTime(System.currentTimeMillis());
-            metadata.setDeleteUser(ScopedThreadContext.getUserId());
-
-            int updated = metadataMapper.update(metadata);
-
-            if (updated > 0) {
-                log.info("文件元数据软删除成功: id={}, path={}, deleteTime={}",
-                        metadataId, metadata.getPath(), metadata.getDeleteTime());
+            if (deleted > 0) {
+                log.info("文件元数据逻辑删除成功: id={}", metadataId);
             } else {
-                log.warn("文件元数据删除失败: id={}", metadataId);
+                log.warn("文件元数据删除失败或已删除: id={}", metadataId);
             }
 
         } catch (Exception e) {
-            log.error("文件元数据软删除异常: id={}", metadataId, e);
+            log.error("文件元数据删除异常: id={}", metadataId, e);
             // 不抛出异常，避免影响外部文件删除操作
         }
     }
@@ -359,18 +333,17 @@ public abstract class AbstractOssClient implements OssClient {
      * @return 文件元数据列表
      */
     protected List<FileMetadataDO> queryFileMetadataByPattern(String fileNamePattern) {
-        QueryWrapper query = QueryWrapper.create()
-                                     .select()
-                                     .from(FILE_METADATA_DO);
-
-        // 如果有文件名模式，添加模糊查询
         if (fileNamePattern != null && !fileNamePattern.isBlank()) {
             // 将通配符 * 和 ? 转换为 SQL 的 % 和 _
             String sqlPattern = fileNamePattern.replace("*", "%").replace("?", "_");
-            query.where(FILE_METADATA_DO.PATH.like(sqlPattern));
+            return metadataMapper.selectList(
+                    Wrappers.<FileMetadataDO>lambdaQuery()
+                            .like(FileMetadataDO::getPath, sqlPattern)
+            );
         }
-
-        return metadataMapper.selectListByQuery(query);
+        return metadataMapper.selectList(
+                Wrappers.lambdaQuery()
+        );
     }
 
     /**

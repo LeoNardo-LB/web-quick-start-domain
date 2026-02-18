@@ -6,9 +6,9 @@
 
 ```
 infrastructure/src/main/java/org/smm/archetype/infrastructure/
-├── bizshared/          # 共享基础设施
+├── shared/             # 共享基础设施
 │   ├── event/          # 事件发布（EventPublisher、EventRepository）
-│   ├── dal/            # 数据访问层（MyBatis-Flex 生成代码）
+│   ├── dal/            # 数据访问层（MyBatis Plus 生成代码）
 │   ├── log/            # 日志服务（LogAspect、Log、MyLog）
 │   ├── util/           # 工具类（SpringContextUtils、KryoSerializer）
 │   └── retry/          # 重试策略（指数退避、外部调度）
@@ -39,7 +39,7 @@ infrastructure/src/main/java/org/smm/archetype/infrastructure/
 |------|----------------------------------------|
 | 转换工具 | 必须使用 MapStruct 进行 Domain ↔ DO 转换       |
 | 枚举转换 | Domain ↔ DO 的枚举转换**必须**在 Converter 中完成 |
-| 代码生成 | Mapper 和 Table 类使用 MyBatis-Flex 代码生成器  |
+| 代码生成 | Mapper 和 DO 类使用 MyBatis Plus（Lambda查询） |
 | 依赖注入 | 使用构造函数注入                               |
 
 ```java
@@ -118,4 +118,17 @@ public interface OrderConverter {
 | 新增中间件         | 1. 完成评估清单<br>2. 在根 POM 管理版本<br>3. 使用 `@ConditionalOnProperty` 按需加载                          |
 
 ---
-**版本**: 2.0 | **整合自**: CONSTITUTION.md §IV/§X/§XXII/§XXIII
+
+## 相关文档
+
+- [项目知识库](../AGENTS.md) - 架构概览和全局规范
+- [Domain 层](../domain/AGENTS.md) - 领域层规范
+- [Application 层](../app/AGENTS.md) - 应用层规范
+- [Infrastructure 层](../infrastructure/AGENTS.md) - 基础设施层规范
+- [Adapter 层](../adapter/AGENTS.md) - 接口层规范
+- [Start 模块](../start/AGENTS.md) - 启动模块规范
+- [Test 模块](../test/AGENTS.md) - 测试规范
+- [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
+
+---
+**版本**: 3.0 | **更新**: 2026-02-17

@@ -6,7 +6,7 @@
 
 ```
 domain/src/main/java/org/smm/archetype/domain/
-├── bizshared/          # 共享领域对象
+├── shared/             # 共享领域对象
 │   ├── base/           # 基类：AggregateRoot、ValueObject、Entity、Command、Query、BaseRepository
 │   ├── client/         # 技术客户端接口：CacheClient、OssClient、SearchClient
 │   ├── event/          # 领域事件基类
@@ -142,4 +142,17 @@ public class Money extends ValueObject {
 | 内部类过度膨胀                         | 独立类放在 common/enums/                        |
 
 ---
-**版本**: 2.0 | **整合自**: CONSTITUTION.md §I/§VIII/§XI/§XV/§XXIV
+
+## 相关文档
+
+- [项目知识库](../AGENTS.md) - 架构概览和全局规范
+- [Domain 层](../domain/AGENTS.md) - 领域层规范
+- [Application 层](../app/AGENTS.md) - 应用层规范
+- [Infrastructure 层](../infrastructure/AGENTS.md) - 基础设施层规范
+- [Adapter 层](../adapter/AGENTS.md) - 接口层规范
+- [Start 模块](../start/AGENTS.md) - 启动模块规范
+- [Test 模块](../test/AGENTS.md) - 测试规范
+- [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
+
+---
+**版本**: 3.0 | **更新**: 2026-02-17

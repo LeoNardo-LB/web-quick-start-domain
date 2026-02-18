@@ -1,6 +1,8 @@
 # 项目知识库
 
-**生成时间**: 2026-02-14
+**生成时间**: 2026-02-17
+**Commit**: 37918aa
+**Branch**: main
 **项目**: DDD Web Quick Start Domain
 **架构**: 四层 DDD (Domain-Driven Design)
 
@@ -65,32 +67,35 @@ web-quick-start-domain/
 | Infrastructure | [infrastructure/AGENTS.md](infrastructure/AGENTS.md) | Repository 实现、事件发布、中间件 |
 | Adapter        | [adapter/AGENTS.md](adapter/AGENTS.md)               | REST 接口、异常处理、参数验证      |
 | Start          | [start/AGENTS.md](start/AGENTS.md)                   | 配置集中化、Bean 装配、线程池      |
-| Test           | [test/AGENTS.md](test/AGENTS.md)                     | 测试规范、TDD 流程、覆盖率标准      |
+| Test           | [test/AGENTS.md](test/AGENTS.md)                     | 测试规范、TDD 流程            |
 
 ## 技术栈
 
-| 分类   | 技术                | 版本          |
-|------|-------------------|-------------|
-| 语言   | Java              | 25（虚拟线程）    |
-| 核心框架 | Spring Boot       | 4.0.2       |
-| 持久层  | MyBatis-Flex      | 1.11.5      |
-| 对象映射 | MapStruct         | 1.5.5.Final |
-| 测试   | JUnit 5 + Mockito | -           |
-| 覆盖率  | JaCoCo            | 0.8.14      |
+| 分类     | 技术                         | 版本          | 说明          |
+|--------|----------------------------|-------------|-------------|
+| 语言     | Java                       | 25（虚拟线程）    |             |
+| 核心框架   | Spring Boot                | 4.0.2       |             |
+| 持久层    | MyBatis Plus               | 3.5.16      | ORM 框架      |
+| 对象映射   | MapStruct                  | 1.5.5.Final | DTO/DO 转换   |
+| 工具库    | Hutool                     | 5.8.41      | 通用工具类       |
+| 工具库    | Lombok                     | 1.18.42     | 代码简化        |
+| API 文档 | SpringDoc OpenAPI          | 3.0.1       | OpenAPI 3.0 |
+| JSON   | Jackson                    | 2.19.4      | JSON 序列化    |
+| 日志     | Logback + Logstash Encoder | 7.4         | 日志框架        |
+| 测试     | JUnit 5 + Mockito          | -           | 单元测试        |
 
 ## 验证流程
 
-> **编码前必须加载 TDD skill**：`/tdd-workflow`
+> **TDD 流程规范**: `openspec/config.yaml` → **测试规范**: `test/AGENTS.md`
 
-### 五阶段验证（NON-NEGOTIABLE）
+### 四阶段验证（NON-NEGOTIABLE）
 
-| 阶段       | 命令                                                             | 说明           |
-|----------|----------------------------------------------------------------|--------------|
-| 1. 编码验证  | `mvn clean compile`                                            | 确保编译通过       |
-| 2. 单元测试  | `python scripts/python/run-unit-tests.py --diff HEAD~1`        | 仅变更关联的单元测试   |
-| 3. 集成测试  | `python scripts/python/run-integration-tests.py --diff HEAD~1` | 仅变更关联的集成测试   |
-| 4. 覆盖率验证 | `mvn verify -pl test`                                          | 生成 JaCoCo 报告 |
-| 5. 抽检测试  | `python scripts/python/run-sample-tests.py`                    | 所有测试中抽取 10%  |
+| 阶段        | 触发时机        | 命令                                  | 通过标准    |
+|-----------|-------------|-------------------------------------|---------|
+| 1. LSP 检查 | 每个文件/小功能完成  | `lsp_diagnostics`                   | 零错误     |
+| 2. 单元测试   | TODOLIST 完成 | `mvn test -Dtest=XxxUTest -pl test` | 100% 通过 |
+| 3. 集成测试   | 所有开发完成      | `mvn test -Dtest=XxxITest -pl test` | 100% 通过 |
+| 4. 抽检     | 单测+集测通过后    | 抽检 10%                              | 100% 通过 |
 
 ### Maven Lifecycle 说明
 
@@ -103,8 +108,6 @@ web-quick-start-domain/
 | 指标      | 标准                  |
 |---------|---------------------|
 | 测试通过率   | **100%**（禁止提交失败的测试） |
-| 单元测试覆盖率 | 行≥95%，分支≥95%        |
-| 集成测试覆盖率 | 行≥90%，分支≥80%        |
 | 编译警告    | 零警告（Werror 策略）      |
 | DDD 符合度 | ≥8.6/10             |
 
@@ -144,14 +147,14 @@ web-quick-start-domain/
 |----------------------------------------------------|----------------------|
 | `mvn clean compile`                                | 编译验证                 |
 | `mvn test -Dtest=ApplicationStartupTests -pl test` | 启动验证（Spring 上下文健康检查） |
-| `mvn verify -pl test`                              | 生成覆盖率报告              |
 | `mvn spring-boot:run -pl start`                    | 启动应用                 |
 
 ## 相关文档
 
 - [README](README.md) - 项目概览、快速开始
-- TDD 验证流程 - 使用 `/tdd-workflow` 命令加载
+- [TDD 流程规范](openspec/config.yaml) - 四阶段验证流程
+- [测试规范](test/AGENTS.md) - 单测/集测编写规范
 
 ---
 
-**版本**: 2.0 | **整合自**: CONSTITUTION.md + 原 AGENTS.md
+**版本**: 2.2 | **更新**: 2026-02-17

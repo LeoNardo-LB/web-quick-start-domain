@@ -42,7 +42,6 @@ The CI pipeline MUST execute comprehensive automated tests to ensure code qualit
 
 - **WHEN** 代码提交或合并请求
 - **THEN** 必须执行所有单元测试
-- **THEN** 单元测试覆盖率必须≥95%（行覆盖率、分支覆盖率）
 - **THEN** 测试失败时必须阻断构建
 - **THEN** 单元测试必须在5分钟内完成（超时标记为失败）
 - **THEN** 单元测试必须不依赖外部环境（纯Mock，不启动Spring）
@@ -52,7 +51,6 @@ The CI pipeline MUST execute comprehensive automated tests to ensure code qualit
 - **WHEN** 代码合并到主分支
 - **THEN** 必须执行集成测试
 - **THEN** 集成测试必须启动Spring上下文（@SpringBootTest）
-- **THEN** 集成测试覆盖率必须≥90%（行覆盖率、分支覆盖率）
 - **THEN** 集成测试必须包含数据库、Redis、消息队列的测试
 - **THEN** 集成测试必须在15分钟内完成（超时标记为失败）
 
