@@ -61,55 +61,50 @@ public class MybatisPlusGenerator {
     /**
      * 生成代码
      */
-    static void main(String[] args) {
+    static void main() {
         FastAutoGenerator.create(DATABASE_URL, USERNAME, PASSWORD)
                 // ========== 全局配置 ==========
-                .globalConfig(builder -> {
-                    builder.author("CodeGenerator")
-                            .outputDir(SOURCE_DIR)
-                            .dateType(DateType.TIME_PACK)
-                            .disableOpenDir();
-                })
+                .globalConfig(builder -> builder.author("CodeGenerator")
+                                                 .outputDir(SOURCE_DIR)
+                                                 .dateType(DateType.TIME_PACK)
+                                                 .disableOpenDir())
                 // ========== 包配置 ==========
-                .packageConfig(builder -> {
-                    builder.parent(PACKAGE)
-                            .entity("entity")
-                            .mapper("mapper")
-                            .pathInfo(Collections.singletonMap(OutputFile.xml, ""));
-                })
+                .packageConfig(builder -> builder.parent(PACKAGE)
+                                                  .entity("entity")
+                                                  .mapper("mapper")
+                                                  .pathInfo(Collections.singletonMap(OutputFile.xml, "")))
                 // ========== 策略配置 ==========
-                .strategyConfig(builder -> {
-                    builder.addInclude(TABLES)
-                            .addTablePrefix("")
-                            // Entity 策略配置
-                            .entityBuilder()
-                            .superClass(BaseDO.class)
-                            .naming(NamingStrategy.underline_to_camel)
-                            .columnNaming(NamingStrategy.underline_to_camel)
-                            .enableLombok()
-                            .enableTableFieldAnnotation()
-                            .logicDeleteColumnName("delete_time")
-                            .logicDeletePropertyName("deleteTime")
-                            .addSuperEntityColumns("id", "create_time", "update_time",
-                                    "create_user", "update_user")
-                            .formatFileName("%sDO")
-                            .idType(IdType.ASSIGN_ID)
-                            .addTableFills(
-                                    new Column("create_time", FieldFill.INSERT),
-                                    new Column("update_time", FieldFill.INSERT_UPDATE),
-                                    new Column("create_user", FieldFill.INSERT),
-                                    new Column("update_user", FieldFill.INSERT_UPDATE)
-                            )
-                            .enableFileOverride()  // 启用 Entity 文件覆盖
-                            // Mapper 策略配置
-                            .mapperBuilder()
-                            .superClass(com.baomidou.mybatisplus.core.mapper.BaseMapper.class)
-                            .mapperAnnotation(org.apache.ibatis.annotations.Mapper.class).formatMapperFileName("%sMapper")
-                            .enableFileOverride()  // 启用 Mapper 文件覆盖
-                            // Controller 策略配置（禁用，遵循 DDD 架构）
-                            .controllerBuilder()
-                            .disable();
-                })
+                .strategyConfig(builder -> builder.addInclude(TABLES)
+                                                   .addTablePrefix("")
+                                                   // Entity 策略配置
+                                                   .entityBuilder()
+                                                   .superClass(BaseDO.class)
+                                                   .naming(NamingStrategy.underline_to_camel)
+                                                   .columnNaming(NamingStrategy.underline_to_camel)
+                                                   .enableLombok()
+                                                   .enableTableFieldAnnotation()
+                                                   .logicDeleteColumnName("delete_time")
+                                                   .logicDeletePropertyName("deleteTime")
+                                                   .addSuperEntityColumns("id", "create_time", "update_time",
+                                                           "create_user", "update_user")
+                                                   .formatFileName("%sDO")
+                                                   .idType(IdType.ASSIGN_ID)
+                                                   .addTableFills(
+                                                           new Column("create_time", FieldFill.INSERT),
+                                                           new Column("update_time", FieldFill.INSERT_UPDATE),
+                                                           new Column("create_user", FieldFill.INSERT),
+                                                           new Column("update_user", FieldFill.INSERT_UPDATE)
+                                                   )
+                                                   .enableFileOverride()  // 启用 Entity 文件覆盖
+                                                   // Mapper 策略配置
+                                                   .mapperBuilder()
+                                                   .superClass(com.baomidou.mybatisplus.core.mapper.BaseMapper.class)
+                                                   .mapperAnnotation(org.apache.ibatis.annotations.Mapper.class).formatMapperFileName(
+                                "%sMapper")
+                                                   .enableFileOverride()  // 启用 Mapper 文件覆盖
+                                                   // Controller 策略配置（禁用，遵循 DDD 架构）
+                                                   .controllerBuilder()
+                                                   .disable())
                 // ========== 模板引擎配置 ==========
                 .templateEngine(new FreemarkerTemplateEngine())
                 // ========== 执行生成 ==========
