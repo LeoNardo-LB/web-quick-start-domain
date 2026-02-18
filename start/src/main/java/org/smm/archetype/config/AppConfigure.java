@@ -1,6 +1,7 @@
 package org.smm.archetype.config;
 
 import lombok.RequiredArgsConstructor;
+import org.smm.archetype.app.aop.AopTestAppService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -40,6 +41,16 @@ public class AppConfigure {
     @Bean
     public TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager) {
         return new TransactionTemplate(transactionManager);
+    }
+
+    /**
+     * 配置 AOP 测试服务
+     * 用于验证 DomainEventCollectAspectJ 切面是否生效
+     * @return AOP 测试服务实例
+     */
+    @Bean
+    public AopTestAppService aopTestAppService() {
+        return new AopTestAppService();
     }
 
 }

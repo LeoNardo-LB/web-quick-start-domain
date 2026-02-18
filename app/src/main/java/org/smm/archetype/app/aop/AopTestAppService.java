@@ -1,15 +1,14 @@
 package org.smm.archetype.app.aop;
 
 import org.smm.archetype.infrastructure.shared.util.context.ScopedThreadContext;
-import org.springframework.stereotype.Service;
 
 /**
  * AOP 测试专用的 AppService
  * 用于验证 DomainEventCollectAspectJ 切面是否生效
  *
  * <p>注意：此类必须放在 org.smm.archetype.app 包下才能被切点表达式匹配。</p>
+ * <p>此类不使用 @Service 注解，在 start 模块通过 @Bean 配置。</p>
  */
-@Service
 public class AopTestAppService {
 
     /**
