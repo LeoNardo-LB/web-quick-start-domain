@@ -143,25 +143,28 @@ class OrderControllerITest extends IntegrationTestBase {
 
 ### TDD 验证流程（NON-NEGOTIABLE）
 
-> **详细流程规范**: `openspec/config.yaml` 中的 TDD 验证流程章节
+> **详细流程规范**: `openspec/config.yaml` - 包含阶段式测试策略、测试对象规则、验证命令
 
-**四阶段验证流程**：
+**快速参考**：
 
-| 阶段        | 触发时机        | 命令                                  | 通过标准           |
-|-----------|-------------|-------------------------------------|----------------|
-| 1. LSP 检查 | 每个文件/小功能完成  | `lsp_diagnostics`                   | 零错误            |
-| 2. 单元测试   | TODOLIST 完成 | `mvn test -Dtest=XxxUTest -pl test` | 100% 通过，分支全覆盖  |
-| 3. 集成测试   | 所有开发完成      | `mvn test -Dtest=XxxITest -pl test` | 100% 通过，重要分支覆盖 |
-| 4. 抽检     | 单测+集测通过后    | `mvn test -pl test`（抽检 10%）         | 100% 通过        |
+| 阶段     | 触发时机    | 命令                                                 |
+|--------|---------|----------------------------------------------------|
+| LSP 检查 | 每个文件完成后 | `lsp_diagnostics`                                  |
+| 编译验证   | 模块实现完成后 | `mvn clean compile`                                |
+| 单元测试   | 模块测试阶段  | `mvn test -Dtest=XxxUTest -pl test`                |
+| 集成测试   | 所有模块完成后 | `mvn test -Dtest=XxxITest -pl test`                |
+| 启动验证   | 所有测试通过后 | `mvn test -Dtest=ApplicationStartupTests -pl test` |
 
-**阶段提交原则**（防止 diff 过大）：
+**测试对象规则**（详见 `openspec/config.yaml`）：
 
-| 阶段完成     | 提交格式                                              |
-|----------|---------------------------------------------------|
-| 阶段 1（编码） | `feat(xxx): complete phase 1 - implementation`    |
-| 阶段 2（单测） | `test(xxx): complete phase 2 - unit tests`        |
-| 阶段 3（集测） | `test(xxx): complete phase 3 - integration tests` |
-| 阶段 4（抽检） | `feat(xxx): complete TDD verification`            |
+| 类类型        | 单元测试 | 集成测试   |
+|------------|------|--------|
+| 值对象/实体     | ✅    | ❌      |
+| 领域服务       | ✅    | ❌      |
+| AppService | ✅    | ✅      |
+| Repository | ✅    | ⚡ 推荐   |
+| Controller | ✅    | ✅      |
+| 配置类        | ❌    | ✅ 启动验证 |
 
 ### 禁止行为
 

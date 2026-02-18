@@ -88,14 +88,17 @@ web-quick-start-domain/
 
 > **TDD 流程规范**: `openspec/config.yaml` → **测试规范**: `test/AGENTS.md`
 
-### 四阶段验证（NON-NEGOTIABLE）
+### 阶段式测试流程（NON-NEGOTIABLE）
 
-| 阶段        | 触发时机        | 命令                                  | 通过标准    |
-|-----------|-------------|-------------------------------------|---------|
-| 1. LSP 检查 | 每个文件/小功能完成  | `lsp_diagnostics`                   | 零错误     |
-| 2. 单元测试   | TODOLIST 完成 | `mvn test -Dtest=XxxUTest -pl test` | 100% 通过 |
-| 3. 集成测试   | 所有开发完成      | `mvn test -Dtest=XxxITest -pl test` | 100% 通过 |
-| 4. 抽检     | 单测+集测通过后    | 抽检 10%                              | 100% 通过 |
+| 阶段        | 触发时机    | 命令                                                 | 通过标准    |
+|-----------|---------|----------------------------------------------------|---------|
+| 1. LSP 检查 | 每个文件完成后 | `lsp_diagnostics`                                  | 零错误     |
+| 2. 编译验证   | 模块实现完成后 | `mvn clean compile`                                | 编译成功    |
+| 3. 单元测试   | 模块测试阶段  | `mvn test -Dtest=XxxUTest -pl test`                | 100% 通过 |
+| 4. 集成测试   | 所有模块完成后 | `mvn test -Dtest=XxxITest -pl test`                | 100% 通过 |
+| 5. 启动验证   | 所有测试通过后 | `mvn test -Dtest=ApplicationStartupTests -pl test` | 通过      |
+
+**效率优化**：实现阶段保持连贯，测试阶段集中验证，避免高频打断。
 
 ### Maven Lifecycle 说明
 
@@ -206,15 +209,6 @@ AI: 澄清几个问题：
 | 自动跳过澄清               | 每阶段至少问一个澄清问题               |
 | 先实现后测试               | TDD：Red → Green → Refactor |
 | 跳过 `lsp_diagnostics` | 每个文件完成后必须验证                |
-
-## Speccoding 质量记分板
-
-| 维度       | 目标 | 当前     | 保障机制                  |
-|----------|----|--------|-----------------------|
-| **规范性**  | 10 | **10** | OpenSpec + Spec 覆盖率脚本 |
-| **稳定性**  | 10 | **10** | TDD 四阶段 + ArchUnit 测试 |
-| **一致性**  | 10 | **10** | 编码规范 + Speccoding 规则  |
-| **职责分明** | 10 | **10** | DDD 四层 + 模块边界文档       |
 
 ---
 
