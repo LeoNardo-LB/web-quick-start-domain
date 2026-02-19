@@ -7,7 +7,6 @@
 ```
 start/src/main/java/org/smm/archetype/
 ├── ApplicationBootstrap.java          # Spring Boot 启动类（注意：main() 需为 public static）
-├── exampleorder/                       # 示例聚合配置
 └── config/                            # 配置类（唯一位置）
     ├── AppConfigure.java              # 应用配置
     ├── CacheConfigure.java            # 缓存配置

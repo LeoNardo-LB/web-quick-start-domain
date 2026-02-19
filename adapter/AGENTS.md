@@ -1,6 +1,6 @@
 # Adapter 层 - 接口适配层
 
-**接口适配层**：REST 接口、事件监听、定时调度、异常处理、参数验证。
+**接口适配层**：REST 接口、事件监听、定时调度、异常处理。
 
 ## 目录结构
 
@@ -16,38 +16,34 @@ adapter/src/main/java/org/smm/archetype/adapter/
 
 ## 关键查找
 
-| 目标           | 位置                                           | 说明                      |
-|--------------|----------------------------------------------|-------------------------|
-| Controller   | `adapter/web/api/*Controller.java`           | REST 端点                 |
-| Request DTO  | `adapter/web/dto/request/*Request.java`      | 命名 `{UseCase}Request`   |
-| Response DTO | `adapter/web/dto/response/*Response.java`    | 命名 `{Entity}Response`   |
-| 异常处理         | `adapter/web/config/WebExceptionAdvise.java` | `@RestControllerAdvice` |
-| 事件监听         | `adapter/listener/`                          | Spring/Kafka 事件监听       |
-| 定时任务         | `adapter/schedule/`                          | 事件重试调度                  |
+| 目标           | 位置                                           |
+|--------------|----------------------------------------------|
+| Controller   | `adapter/web/api/*Controller.java`           |
+| Request DTO  | `adapter/web/dto/request/*Request.java`      |
+| Response DTO | `adapter/web/dto/response/*Response.java`    |
+| 异常处理         | `adapter/web/config/WebExceptionAdvise.java` |
+| 事件监听         | `adapter/listener/`                          |
 
 ## 核心规则
 
 ### Request/Response 设计（NON-NEGOTIABLE）
 
-| 规则   | Request                                        | Response                         |
-|------|------------------------------------------------|----------------------------------|
-| 命名格式 | `{UseCase}Request`                             | `{Entity}Response`               |
-| 验证   | JSR-303 注解（`@NotNull`、`@NotBlank`、`@NotEmpty`） | -                                |
-| 构建模式 | -                                              | `@Builder(setterPrefix = "set")` |
-| 转换方法 | -                                              | `fromDTO(DTO dto)` 静态方法          |
-| 可见性  | **必须 `public`**（对外 API 契约）                     | **必须 `public`**                  |
+| 规则   | Request                            | Response                         |
+|------|------------------------------------|----------------------------------|
+| 命名格式 | `{UseCase}Request`                 | `{Entity}Response`               |
+| 验证   | JSR-303 注解（`@NotNull`、`@NotBlank`） | -                                |
+| 构建模式 | -                                  | `@Builder(setterPrefix = "set")` |
+| 转换方法 | -                                  | `fromDTO(DTO dto)` 静态方法          |
 
 ```java
-// Request 示例
+// Request
 @Data
 public class CreateOrderRequest {
     @NotBlank(message = "客户ID不能为空")
     private String customerId;
-    @NotNull(message = "金额不能为空")
-    private MoneyDTO totalAmount;
 }
 
-// Response 示例
+// Response
 @Builder(setterPrefix = "set")
 @Data
 public class OrderResponse {
@@ -63,193 +59,40 @@ public class OrderResponse {
 }
 ```
 
-### 参数验证原则（NON-NEGOTIABLE）
+### 异常处理（NON-NEGOTIABLE）
 
-| 字段类型 | 验证注解                 |
-|------|----------------------|
-| 字符串  | `@NotBlank`（非空非空白）   |
-| 对象   | `@NotNull`（非 null）   |
-| 集合   | `@NotEmpty`（非空）      |
-| 自定义  | `@Validated` + 自定义注解 |
-
-**验证消息必须国际化（支持多语言）。**
-
-### 异常处理原则（NON-NEGOTIABLE）
-
-**异常分类**：
-
-| 异常类型              | HTTP 状态码 | 说明                 |
-|-------------------|----------|--------------------|
-| `BizException`    | 400      | 可预期的业务异常           |
-| `ClientException` | 4xx      | 外部客户端调用失败（必须提供错误码） |
-| `SysException`    | 500      | 系统内部异常             |
-
-**统一异常处理**：
-
-```java
-@RestControllerAdvice
-public class WebExceptionAdvise {
-    @ExceptionHandler(BizException.class)
-    public BaseResult<?> handleBizException(BizException e) {
-        return BaseResult.error(e.getCode(), e.getMessage());
-    }
-    
-    @ExceptionHandler(SysException.class)
-    public BaseResult<?> handleSysException(SysException e) {
-        return BaseResult.error(ResultEnum.SYSTEM_ERROR);
-    }
-}
-```
+| 异常类型              | HTTP 状态码 |
+|-------------------|----------|
+| `BizException`    | 400      |
+| `ClientException` | 4xx      |
+| `SysException`    | 500      |
 
 **BaseResult 统一封装**：`code`、`data`、`message`、`time`、`traceId`
-
-**禁止**：
-
-- ❌ 直接返回异常堆栈给前端
-- ❌ 敏感信息未脱敏
 
 ### 事件监听规范
 
 | 规则   | 说明                                   |
 |------|--------------------------------------|
 | 异步执行 | 必须使用 `@Async("virtualTaskExecutor")` |
-| 事件来源 | 仅处理 `Source.DOMAIN` 源的事件             |
 | 分发机制 | 通过 `EventDispatcher` 分发到具体 Handler   |
 
-### API 设计原则
+### RESTful 端点规范
 
-| 规则         | 说明                   |
-|------------|----------------------|
-| RESTful 命名 | 遵循 REST 规范，确保可读性和一致性 |
-| 版本控制       | 提供版本控制机制，确保向后兼容      |
-| 幂等性        | 关键操作必须保证幂等性          |
-| 限流降级       | 实现限流和熔断机制            |
+| 操作类型 | HTTP 方法 | 路径模式                            |
+|------|---------|---------------------------------|
+| 创建资源 | POST    | `/api/{resource}`               |
+| 状态变更 | POST    | `/api/{resource}/{id}/{action}` |
+| 查询单条 | GET     | `/api/{resource}/{id}`          |
+| 查询列表 | GET     | `/api/{resource}`               |
 
-### 定时任务（事件重试）
+## 禁止
 
-**重试策略**：
-
-1. **指数退避策略**（`ExponentialBackoffRetryStrategy`）：内置实现，简单场景
-2. **外部调度策略**（`ExternalSchedulerRetryStrategy`）：XXL-JOB、PowerJob，分布式场景
-
-```yaml
-# application.yml
-middleware:
-  event:
-    retry:
-      strategy: external-scheduler
-      interval-minutes: 5
-```
-
-## 反模式（禁止）
-
-| ❌ 禁止              | ✅ 正确做法                             |
-|-------------------|------------------------------------|
-| Adapter 层创建配置类    | 配置类在 start 模块 config 包             |
-| Controller 包含业务逻辑 | 业务逻辑在 Domain 层                     |
-| 事件处理器同步执行         | 使用 `@Async("virtualTaskExecutor")` |
-| 直接返回异常堆栈          | 统一异常处理，脱敏敏感信息                      |
-| 返回完整领域模型          | 返回 Response DTO                    |
-
-## Order Demo 设计模式
-
-以下模式提取自 `exampleorder` 模块，体现接口层核心设计思想。
-
-### REST 端点设计模式
-
-**核心思想**：Controller 仅负责请求/响应转换，不包含业务逻辑。
-
-**RESTful 端点规范**：
-
-| 操作类型  | HTTP 方法 | 路径模式                            | 示例                              |
-|-------|---------|---------------------------------|---------------------------------|
-| 创建资源  | POST    | `/api/{resource}`               | `POST /api/orders`              |
-| 状态变更  | POST    | `/api/{resource}/{id}/{action}` | `POST /api/orders/{id}/pay`     |
-| 查询单条  | GET     | `/api/{resource}/{id}`          | `GET /api/orders/{id}`          |
-| 查询列表  | GET     | `/api/{resource}`               | `GET /api/orders`               |
-| 按条件查询 | GET     | `/api/{resource}/{condition}`   | `GET /api/orders/customer/{id}` |
-
-**Controller 方法结构**：
-
-```
-Request → Converter.toCommand() → AppService.method() → Converter.toResponse() → Result
-```
-
-### Request/Response DTO 模式
-
-**核心思想**：Request/Response 与领域模型解耦，使用 JSR-303 校验。
-
-**Request 设计要点**：
-
-| 模式    | 说明                | 示例                                    |
-|-------|-------------------|---------------------------------------|
-| 字段校验  | JSR-303 注解        | `@NotBlank`, `@NotNull`, `@Min(1)`    |
-| 嵌套校验  | `@Valid` 触发嵌套对象校验 | `@Valid List<OrderItemRequest>`       |
-| 静态内部类 | 嵌套结构用静态内部类        | `CreateOrderRequest.OrderItemRequest` |
-
-**Response 设计要点**：
-
-| 模式          | 说明                               | 示例                                 |
-|-------------|----------------------------------|------------------------------------|
-| Builder 模式  | `@Builder(setterPrefix = "set")` | 链式构建                               |
-| 字符串时间       | 时间字段序列化为字符串                      | ISO 8601 格式                        |
-| 嵌套 Response | 独立 Response 类表示嵌套结构              | `MoneyResponse`, `AddressResponse` |
-
-### MapStruct 转换模式
-
-**核心思想**：Adapter 层负责 Request→Command 和 DTO→Response 转换。
-
-**转换职责**：
-
-| 转换器               | 方向                | 方法                              |
-|-------------------|-------------------|---------------------------------|
-| RequestConverter  | Request → Command | `toCommand(CreateOrderRequest)` |
-| ResponseConverter | DTO → Response    | `toResponse(OrderDTO)`          |
-
-**关键设计点**：
-
-- 嵌套对象转换：`Address toAddress(AddressRequest)`
-- 列表转换：`List<OrderItemResponse> toItemResponses(List<OrderItemDTO>)`
-
-## 模块边界
-
-### 对外暴露
-
-| 类型            | 位置                                | 说明      |
-|---------------|-----------------------------------|---------|
-| Controller    | `web/api/*Controller.java`        | REST 端点 |
-| Request       | `web/dto/request/*Request.java`   | 请求 DTO  |
-| Response      | `web/dto/response/*Response.java` | 响应 DTO  |
-| EventListener | `listener/*Listener.java`         | 事件监听器   |
-
-### 依赖下游
-
-| 模块             | 依赖方式   | 说明                   |
-|----------------|--------|----------------------|
-| Application    | 直接依赖   | 调用 AppService        |
-| Domain         | 直接依赖   | 使用领域枚举、值对象           |
-| Infrastructure | **禁止** | 通过 Application 层间接访问 |
-
-### 禁止
-
-- ❌ 直接依赖 Infrastructure 层
-- ❌ Controller 包含业务逻辑
-- ❌ 创建配置类（配置类在 start 模块）
-- ❌ 返回完整领域模型（应返回 Response DTO）
-- ❌ 事件处理器同步执行
+| ❌ 禁止                  | ✅ 正确                   |
+|-----------------------|------------------------|
+| Adapter 层创建配置类        | 配置类在 start 模块 config 包 |
+| Controller 包含业务逻辑     | 业务逻辑在 Domain 层         |
+| 返回完整领域模型              | 返回 Response DTO        |
+| 直接依赖 Infrastructure 层 | 通过 Application 层间接访问   |
 
 ---
-
-## 相关文档
-
-- [项目知识库](../AGENTS.md) - 架构概览和全局规范
-- [Domain 层](../domain/AGENTS.md) - 领域层规范
-- [Application 层](../app/AGENTS.md) - 应用层规范
-- [Infrastructure 层](../infrastructure/AGENTS.md) - 基础设施层规范
-- [Adapter 层](../adapter/AGENTS.md) - 接口层规范
-- [Start 模块](../start/AGENTS.md) - 启动模块规范
-- [Test 模块](../test/AGENTS.md) - 测试规范
-- [TDD 流程](../openspec/config.yaml) - 四阶段验证流程
-
----
-**版本**: 3.2 | **更新**: 2026-02-18
+← [项目知识库](../AGENTS.md) | **版本**: 3.3 | **更新**: 2026-02-19

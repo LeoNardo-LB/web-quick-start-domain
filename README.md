@@ -28,7 +28,7 @@
 - ✅ **完整的DDD基础设施**：聚合根、值对象、领域事件、仓储、规格模式
 - ✅ **CQRS模式支持**：Command/Query分离，读写优化
 - ✅ **事件驱动架构**：支持Kafka和Spring事件，灵活切换
-- ✅ **丰富的示例代码**：订单模块75个类，涵盖所有DDD概念
+- ✅ **完善的文档体系**：从入门到精通的完整指南
 - ✅ **完善的文档体系**：从入门到精通的完整指南
 
 **DDD符合度评分**：⭐ 8.6/10
@@ -52,9 +52,6 @@ mvn test
 
 # 4. 启动应用
 mvn spring-boot:run -pl start
-
-# 5. 访问API
-curl http://localhost:9102/quickstart/api/orders
 ```
 
 ### 环境要求
@@ -267,8 +264,6 @@ web-quick-start-domain/
 │       │   ├── file/    # 文件管理
 │       │   ├── search/  # 搜索
 │       │   └── event/   # 领域事件
-│       ├── _example/    # 示例代码（订单模块75个类）
-│       │   └── order/
 │       └── _shared/     # 共享领域对象
 │           ├── base/    # 领域对象基类
 │           ├── client/  # 技术客户端接口
@@ -276,11 +271,9 @@ web-quick-start-domain/
 │
 ├── app/                 # 应用层（用例编排）
 │   └── src/main/java/org/smm/archetype/app/
-│       ├── _shared/     # 共享应用服务
-│       │   ├── event/   # 事件处理器
-│       │   └── query/   # 查询服务
-│       └── _example/    # 示例代码
-│           └── order/
+│       └── _shared/     # 共享应用服务
+│           ├── event/   # 事件处理器
+│           └── query/   # 查询服务
 │
 ├── infrastructure/      # 基础设施层（技术实现）
 │   └── src/main/java/org/smm/archetype/infrastructure/
@@ -298,9 +291,6 @@ web-quick-start-domain/
 │
 ├── adapter/             # 接口层（对外接口）
 │   └── src/main/java/org/smm/archetype/adapter/
-│       ├── _example/    # 示例代码
-│       │   └── order/
-│       │       └── web/api/  # Controller
 │       ├── access/      # 接入层
 │       │   ├── listener/  # 事件监听器
 │       │   └── schedule/  # 定时任务
@@ -417,16 +407,13 @@ public interface ProductRepository {
 #### 初学者
 
 1. 阅读 [项目知识库](AGENTS.md) - 编码规范
-2. 参考订单示例代码 - 学习DDD概念
 
 #### 有经验开发者
 
 1. 阅读 [项目知识库](AGENTS.md) - 编码规范
-2. 参考订单示例代码 - 学习DDD概念
 
 #### 架构师
 1. 阅读 [README.md](README.md) - 项目架构
-2. 查看订单模块示例 - DDD实战
 
 ---
 
@@ -479,7 +466,7 @@ mvn test -Dtest=ApplicationStartupTests -pl test  # 启动验证
 
 **A**: 推荐阅读顺序：
 1. [README.md](README.md) - 项目架构和快速开始部分
-2. 订单示例代码 - 75个类，涵盖所有DDD概念
+2. [项目知识库](AGENTS.md) - 各模块详细规范
 
 ### Q6: 配置类应该放哪里？
 
@@ -551,7 +538,6 @@ middleware:
 
 - ✅ **架构清晰**：四层架构，职责明确
 - ✅ **文档完善**：从入门到精通的完整指南
-- ✅ **示例丰富**：订单模块75个类
 - ✅ **质量保障**：完善的测试和验证流程
 
 **适合场景**：
@@ -562,10 +548,9 @@ middleware:
 **下一步**：
 
 1. 阅读 [项目知识库](AGENTS.md) 学习各模块规范
-2. 参考订单示例代码，开始开发
 
 ---
 
-**文档版本**: v3.0
-**最后更新**: 2026-02-17
+**文档版本**: v3.1
+**最后更新**: 2026-02-19
 **维护者**: Leonardo
