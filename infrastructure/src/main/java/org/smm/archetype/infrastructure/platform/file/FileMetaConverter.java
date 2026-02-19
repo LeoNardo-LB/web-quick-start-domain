@@ -26,7 +26,6 @@ public interface FileMetaConverter {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "createTime", source = "createTime")
     @Mapping(target = "updateTime", source = "updateTime")
-    @Mapping(target = "version", ignore = true)  // DO没有version字段，使用默认值
     FileMetadata toEntity(FileMetadataDO dataObject);
 
     /**

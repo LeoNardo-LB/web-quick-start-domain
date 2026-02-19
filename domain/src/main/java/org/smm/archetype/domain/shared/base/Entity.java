@@ -38,11 +38,6 @@ public abstract class Entity implements Identifier {
     protected String updateUser;
 
     /**
-     * 版本号（用于乐观锁）
-     */
-    protected Long version;
-
-    /**
      * 标记为已创建
      *
     在实体创建时调用此方法设置创建时间。
@@ -51,7 +46,6 @@ public abstract class Entity implements Identifier {
         if (this.createTime == null) {
             this.createTime = Instant.now();
             this.updateTime = this.createTime;
-            this.version = 0L;
         }
     }
 
@@ -62,9 +56,6 @@ public abstract class Entity implements Identifier {
      */
     protected void markAsUpdated() {
         this.updateTime = Instant.now();
-        if (this.version != null) {
-            this.version++;
-        }
     }
 
 }
