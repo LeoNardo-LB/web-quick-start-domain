@@ -6,9 +6,9 @@ context: |
   
   详细规范: AGENTS.md
   测试规范: test/AGENTS.md
-
+  
   ═══════════════════════════════════════════════════════════════════════════════
-  TDD 核心：🔴 Red → 🟢 Green → 🔵 Refactor
+  TDD 核心：🔴 Red → 🟢 Green → 🔵 Refactor（阶段式优化版）
   ═══════════════════════════════════════════════════════════════════════════════
   
   测试结构：Arrange → Act → Assert（或 Given → When → Then）
@@ -23,7 +23,6 @@ rules:
       AI: 根据需求，我需要确认以下主题：
       1. [主题A] - 一句话描述
       2. [主题B] - 一句话描述
-      3. [主题C] - 一句话描述
       ...
       请问需要补充或调整吗？
       ```
@@ -37,8 +36,6 @@ rules:
         用户: 回答
         AI: 根据你的回答，我需要进一步确认：
             - 追问细节1？
-            - 追问细节2？
-        用户: 回答
         ...（根据回答动态展开子节点，直到该主题澄清完毕）
       ```
       
@@ -51,8 +48,7 @@ rules:
       │   ├── [子节点A1]: <澄清结论>
       │   └── [子节点A2]: <澄清结论>
       ├── [主题B]
-      │   ├── [子节点B1]: <澄清结论>
-      │   └── [子节点B2]: <澄清结论>
+      │   └── [子节点B1]: <澄清结论>
       └── [主题C]: <澄清结论>
       
       是否完整准确？可以继续生成 proposal 吗？
@@ -71,6 +67,100 @@ rules:
       - 假设用户意图
       - 固定问题模板（必须根据回答动态调整）
       - 跳过澄清直接生成 proposal
+
+  specs:
+    - |
+      **[Event Storming 风格]** 场景定义采用 Event Storming 模式：
+      
+      **场景格式**（使用 4 个 `#`）：
+      ```
+      #### Scenario: <场景名称>
+      - **WHEN** <触发条件/命令>
+      - **THEN** <预期结果/领域事件>
+      ```
+      
+      **示例**：
+      ```
+      #### Scenario: 订单支付成功
+      - **WHEN** 用户完成支付，支付金额等于订单金额
+      - **THEN** 订单状态变更为 PAID，发布 OrderPaidEvent
+      ```
+
+    - |
+      **[领域建模约束]** 每个 Requirement 必须可映射到 DDD 元素：
+      
+      | DDD 元素 | 识别特征 | 示例 |
+      |----------|----------|------|
+      | 聚合根 | 有唯一标识，维护一致性边界 | OrderAggr |
+      | 实体 | 有标识，生命周期 | OrderItem |
+      | 值对象 | 无标识，不可变 | Money, Address |
+      | 领域事件 | 过去时，事实记录 | OrderPaidEvent |
+      | 命令 | 祈使语气，触发变更 | PayOrderCommand |
+      | 仓储接口 | 持久化聚合根 | OrderAggrRepository |
+      
+      **规格中必须说明**：
+      - 涉及哪些聚合根/实体/值对象
+      - 触发哪些领域事件
+      - 需要哪些仓储接口
+
+  design:
+    - |
+      **[ADR 决策记录]** 设计文档必须包含 Architecture Decision Record：
+      
+      格式：
+      ```
+      ### Decision: <决策标题>
+      - **Context**: 为什么需要做这个决策？
+      - **Decision**: 选择了什么方案？
+      - **Alternatives**: 考虑了哪些备选方案？
+      - **Consequences**: 这个决策的影响（正面/负面）
+      ```
+      
+      示例：
+      ```
+      ### Decision: 使用乐观锁处理并发退款
+      - **Context**: 多用户同时退款同一订单
+      - **Decision**: 使用 version 字段 + @Version 注解
+      - **Alternatives**: 悲观锁（性能差）、分布式锁（复杂）
+      - **Consequences**: 冲突时需重试，但性能更好
+      ```
+
+    - |
+      **[四层架构约束]** 设计必须遵循依赖规则：
+      
+      ```
+      Adapter → Application → Domain ← Infrastructure
+      ```
+      
+      | 层 | 允许依赖 | 禁止依赖 |
+      |---|---------|---------|
+      | Domain | 无 | 任何外部层 |
+      | Application | Domain | Infrastructure, Adapter |
+      | Infrastructure | Domain | Application, Adapter |
+      | Adapter | Application | Infrastructure, Domain 实现 |
+      
+      **设计文档必须说明**：
+      - 新增/修改哪些层的代码
+      - 是否有违反依赖规则的例外（需说明理由）
+
+    - |
+      **[配置类归属]** 所有配置类必须在 start 模块：
+      
+      - 位置：`start/src/main/java/org/smm/archetype/config/`
+      - 命名：`{Aggregate}Configure.java`
+      - 禁止：在 adapter/infrastructure 创建配置类
+
+    - |
+      **[风险评估]** 设计文档必须包含风险评估：
+      
+      | 风险类型 | 说明 | 示例 |
+      |----------|------|------|
+      | 性能 | 可能的性能瓶颈 | 大数据量查询 |
+      | 安全 | 安全隐患 | 敏感数据暴露 |
+      | 兼容性 | 向后兼容问题 | API 变更 |
+      | 数据 | 数据一致性风险 | 并发写入 |
+      
+      格式：`[风险] → [缓解措施]`
 
   tasks:
     - |
