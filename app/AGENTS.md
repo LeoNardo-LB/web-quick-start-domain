@@ -109,6 +109,73 @@ public class OrderAppService {
 | 事件处理器同步执行                   | 使用 `@Async("virtualTaskExecutor")` |
 | 大事务包含多聚合                    | 拆分为多个独立事务                          |
 
+## Order Demo 设计模式
+
+以下模式提取自 `exampleorder` 模块，体现应用层核心设计思想。
+
+### 应用服务编排模式
+
+**核心思想**：应用服务是用例编排入口，协调领域对象完成业务流程，不包含业务逻辑。
+
+**关键设计点**：
+
+| 模式     | 说明                                                  | 示例                                        |
+|--------|-----------------------------------------------------|-------------------------------------------|
+| 事务边界   | 命令用 `@Transactional(rollbackFor = Exception.class)` | `createOrder()`                           |
+| 只读优化   | 查询用 `@Transactional(readOnly = true)`               | `getOrderById()`                          |
+| 领域服务   | 复杂规则委托给领域服务                                         | `orderDomainService.validateOrderItems()` |
+| DTO 转换 | 返回 DTO，不暴露领域对象                                      | `dtoConverter.toDTO(order)`               |
+| 日志追踪   | 记录关键操作                                              | `log.info("创建订单: id={}", id)`             |
+
+**命令方法结构**：
+
+```
+日志记录 → 领域服务验证 → 创建/修改聚合 → 持久化 → 后续操作 → 返回DTO
+```
+
+### Command/Query 分离模式
+
+**核心思想**：命令承载写操作参数，查询承载读操作参数，严格分离。
+
+**命名规范**：
+
+| 类型      | 命名格式               | 示例                                      |
+|---------|--------------------|-----------------------------------------|
+| Command | `{UseCase}Command` | `CreateOrderCommand`, `PayOrderCommand` |
+| Query   | `{UseCase}Query`   | `GetOrderByIdQuery`, `OrderListQuery`   |
+
+**Command 字段特点**：
+
+- 包含执行写操作所需的全部参数
+- 可引用领域值对象（如 `Money`, `Address`）
+
+**Query 字段特点**：
+
+- 包含查询条件和分页参数
+- 提供默认值（如 `pageNum = 1`, `pageSize = 10`）
+
+### DTO 转换模式（MapStruct）
+
+**核心思想**：MapStruct 实现领域对象到 DTO 的映射，保持层间解耦。
+
+**关键设计点**：
+
+| 模式   | 说明                                      | 示例                                               |
+|------|-----------------------------------------|--------------------------------------------------|
+| 组件模型 | 标注 `@Mapper(componentModel = "spring")` | Spring 自动注入                                      |
+| 字段映射 | 使用 `@Mapping` 处理字段差异                    | `@Mapping(target = "createTime", ignore = true)` |
+| 嵌套转换 | 独立 DTO 表示嵌套结构                           | `MoneyDTO`, `AddressDTO`                         |
+| 枚举转换 | 枚举转字符串，DTO 不依赖领域枚举                      | `default String toString(RefundType)`            |
+
+**转换职责边界**：
+
+| 转换方向              | 责任层            | 工具                                 |
+|-------------------|----------------|------------------------------------|
+| Domain → DTO      | Application    | MapStruct `OrderDtoConverter`      |
+| Request → Command | Adapter        | MapStruct `OrderRequestConverter`  |
+| DTO → Response    | Adapter        | MapStruct `OrderResponseConverter` |
+| Domain ↔ DO       | Infrastructure | MapStruct `OrderConverter`         |
+
 ## 模块边界
 
 ### 对外暴露

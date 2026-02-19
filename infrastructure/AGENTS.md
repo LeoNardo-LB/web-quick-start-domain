@@ -115,6 +115,74 @@ public interface OrderConverter {
 | 为抽象而抽象（简单场景创建 Abstract*Client） | 直接实现接口                       |
 | 使用 `spring-boot-starter` 引入依赖  | 手动指定具体依赖                     |
 
+## Order Demo 设计模式
+
+以下模式提取自 `exampleorder` 模块，体现基础设施层核心设计思想。
+
+### Repository 实现模式
+
+**核心思想**：Repository 返回领域对象，使用 MapStruct 进行 Domain ↔ DO 转换。
+
+**测试环境（内存仓储）**：
+
+| 模式   | 说明                     | 示例                          |
+|------|------------------------|-----------------------------|
+| 线程安全 | `ConcurrentHashMap` 存储 | `new ConcurrentHashMap<>()` |
+| 测试数据 | `@PostConstruct` 初始化   | 预置 2 条测试订单                  |
+| 分页实现 | Java Stream + subList  | 内存分页                        |
+| 返回类型 | 直接返回领域对象               | 不经过 DO 转换                   |
+
+**生产环境（MyBatis Plus）**：
+
+| 组件             | 职责              | 文件位置                                                  |
+|----------------|-----------------|-------------------------------------------------------|
+| DO             | 数据库映射           | `shared/dal/generated/entity/OrderDO`                 |
+| Mapper         | MyBatis Plus 接口 | `shared/dal/generated/mapper/OrderMapper`             |
+| Converter      | Domain ↔ DO 转换  | `exampleorder/converter/OrderConverter`               |
+| RepositoryImpl | 实现仓储接口          | `exampleorder/persistence/OrderRepositoryMyBatisImpl` |
+
+**Converter 关键设计**：
+
+| 转换方向        | 枚举处理                                        |
+|-------------|---------------------------------------------|
+| Domain → DO | `order.getStatus().getCode()`               |
+| DO → Domain | `OrderStatus.fromCode(orderDO.getStatus())` |
+
+### 事件发布架构
+
+**核心思想**：事件先持久化，事务提交后再发布，确保可靠性。
+
+**发布链路**：
+
+```
+Domain.recordEvent() 
+    → DomainEventCollectPublisher (收集 + 持久化)
+        → SpringDomainEventPublisher (发布)
+            → Spring ApplicationEventPublisher
+```
+
+**关键设计点**：
+
+| 组件                          | 职责        | 关键技术               |
+|-----------------------------|-----------|--------------------|
+| DomainEventCollectPublisher | 收集、持久化、发布 | ThreadLocal + 事务同步 |
+| SpringDomainEventPublisher  | 实际发布      | Spring Event       |
+| EventDO                     | 事件持久化     | MyBatis Plus       |
+| EventMapper                 | 事件表操作     | BaseMapper         |
+
+**事件状态机**：
+
+```
+PENDING → SUCCESS（发布成功）
+        → RETRYING（发布失败，等待重试）
+```
+
+**可靠性保证**：
+
+- ThreadLocal 隔离并发请求
+- 事务提交后发布（`TransactionSynchronization.afterCommit()`）
+- 事件表记录状态，支持重试
+
 ## 常见任务
 
 | 任务            | 步骤                                                                                          |

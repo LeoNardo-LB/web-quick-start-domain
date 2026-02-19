@@ -151,6 +151,66 @@ middleware:
 | 直接返回异常堆栈          | 统一异常处理，脱敏敏感信息                      |
 | 返回完整领域模型          | 返回 Response DTO                    |
 
+## Order Demo 设计模式
+
+以下模式提取自 `exampleorder` 模块，体现接口层核心设计思想。
+
+### REST 端点设计模式
+
+**核心思想**：Controller 仅负责请求/响应转换，不包含业务逻辑。
+
+**RESTful 端点规范**：
+
+| 操作类型  | HTTP 方法 | 路径模式                            | 示例                              |
+|-------|---------|---------------------------------|---------------------------------|
+| 创建资源  | POST    | `/api/{resource}`               | `POST /api/orders`              |
+| 状态变更  | POST    | `/api/{resource}/{id}/{action}` | `POST /api/orders/{id}/pay`     |
+| 查询单条  | GET     | `/api/{resource}/{id}`          | `GET /api/orders/{id}`          |
+| 查询列表  | GET     | `/api/{resource}`               | `GET /api/orders`               |
+| 按条件查询 | GET     | `/api/{resource}/{condition}`   | `GET /api/orders/customer/{id}` |
+
+**Controller 方法结构**：
+
+```
+Request → Converter.toCommand() → AppService.method() → Converter.toResponse() → Result
+```
+
+### Request/Response DTO 模式
+
+**核心思想**：Request/Response 与领域模型解耦，使用 JSR-303 校验。
+
+**Request 设计要点**：
+
+| 模式    | 说明                | 示例                                    |
+|-------|-------------------|---------------------------------------|
+| 字段校验  | JSR-303 注解        | `@NotBlank`, `@NotNull`, `@Min(1)`    |
+| 嵌套校验  | `@Valid` 触发嵌套对象校验 | `@Valid List<OrderItemRequest>`       |
+| 静态内部类 | 嵌套结构用静态内部类        | `CreateOrderRequest.OrderItemRequest` |
+
+**Response 设计要点**：
+
+| 模式          | 说明                               | 示例                                 |
+|-------------|----------------------------------|------------------------------------|
+| Builder 模式  | `@Builder(setterPrefix = "set")` | 链式构建                               |
+| 字符串时间       | 时间字段序列化为字符串                      | ISO 8601 格式                        |
+| 嵌套 Response | 独立 Response 类表示嵌套结构              | `MoneyResponse`, `AddressResponse` |
+
+### MapStruct 转换模式
+
+**核心思想**：Adapter 层负责 Request→Command 和 DTO→Response 转换。
+
+**转换职责**：
+
+| 转换器               | 方向                | 方法                              |
+|-------------------|-------------------|---------------------------------|
+| RequestConverter  | Request → Command | `toCommand(CreateOrderRequest)` |
+| ResponseConverter | DTO → Response    | `toResponse(OrderDTO)`          |
+
+**关键设计点**：
+
+- 嵌套对象转换：`Address toAddress(AddressRequest)`
+- 列表转换：`List<OrderItemResponse> toItemResponses(List<OrderItemDTO>)`
+
 ## 模块边界
 
 ### 对外暴露
