@@ -133,6 +133,81 @@ web-quick-start-domain/
 | 注解处理器      | 必须在根 POM `<annotationProcessorPaths>` 中配置     |
 | 禁止 starter | 禁止使用 `spring-boot-starter` 引入传递依赖，手动指定具体依赖    |
 
+## 编码风格规范
+
+### 命名规范
+
+| 类型 | 规则          | 示例                                      |
+|----|-------------|-----------------------------------------|
+| 类名 | PascalCase  | `OrderAggr`, `OrderRepository`          |
+| 接口 | 无 I 前缀      | `OrderRepository`（非 `IOrderRepository`） |
+| 方法 | 动词 + 名词     | `createOrder()`, `findById()`           |
+| 变量 | camelCase   | `orderList`, `customerId`               |
+| 常量 | UPPER_SNAKE | `MAX_RETRY`, `DEFAULT_SIZE`             |
+| 包名 | 全小写         | `org.smm.archetype.domain.order`        |
+
+### 方法动词表
+
+| 操作   | 前缀       | 示例                           |
+|------|----------|------------------------------|
+| 单条查询 | find/get | `findById()`, `getOrderNo()` |
+| 列表查询 | list     | `listByStatus()`             |
+| 存在判断 | exists   | `existsByOrderNo()`          |
+| 数量统计 | count    | `countByCustomer()`          |
+| 创建   | create   | `createOrder()`              |
+| 更新   | update   | `updateStatus()`             |
+| 删除   | delete   | `deleteById()`               |
+| 保存   | save     | `save()`                     |
+
+### Import 顺序
+
+```java
+// 1. java.* / javax.*
+
+import java.time.Instant;
+import java.util.List;
+
+// 2. 第三方（按字母排序）
+import lombok.Builder;
+import org.springframework.stereotype.Service;
+
+// 3. 本项目
+import org.smm.archetype.domain.order.OrderAggr;
+
+// 4. 静态（最后）
+import static org.assertj.core.api.Assertions.assertThat;
+```
+
+### 注释规范
+
+| 元素   | 要求                   | 语言 |
+|------|----------------------|----|
+| 公共类  | Javadoc 描述职责         | 中文 |
+| 公共方法 | Javadoc 描述功能 + 参数/返回 | 中文 |
+| 复杂逻辑 | 行内注释说明原因             | 中文 |
+| 简单方法 | 可省略                  | -  |
+
+### 日志规范
+
+| 级别    | 场景   | 格式                                 |
+|-------|------|------------------------------------|
+| DEBUG | 详细流程 | `log.debug("查询: id={}", id)`       |
+| INFO  | 关键操作 | `log.info("创建成功: orderNo={}", no)` |
+| WARN  | 边界情况 | `log.warn("状态异常: {}", status)`     |
+| ERROR | 异常失败 | `log.error("操作失败: {}", id, e)`     |
+
+**禁止**：日志中包含敏感信息（密码、token、身份证）
+
+### 异常规范
+
+| 类型                | HTTP | 场景       |
+|-------------------|------|----------|
+| `BizException`    | 400  | 可预期的业务错误 |
+| `ClientException` | 4xx  | 外部服务调用失败 |
+| `SysException`    | 500  | 系统内部错误   |
+
+**消息格式**：`{操作}失败: {原因}` → `"支付失败: 余额不足"`
+
 ## 全局反模式（禁止）
 
 | ❌ 禁止                         | ✅ 正确做法                                     | 规范位置                               |
@@ -151,6 +226,71 @@ web-quick-start-domain/
 | `mvn clean compile`                                | 编译验证                 |
 | `mvn test -Dtest=ApplicationStartupTests -pl test` | 启动验证（Spring 上下文健康检查） |
 | `mvn spring-boot:run -pl start`                    | 启动应用                 |
+
+## 新模块开发指南
+
+> **开发顺序**：Domain → Infrastructure → Application → Adapter → Start → Test
+
+### 步骤概览
+
+| 步骤 | 模块             | 产出                           | 参考文档                                                 |
+|----|----------------|------------------------------|------------------------------------------------------|
+| 1  | Domain         | 聚合根、实体、仓储接口、领域服务             | [domain/AGENTS.md](domain/AGENTS.md)                 |
+| 2  | Infrastructure | Repository 实现、Converter      | [infrastructure/AGENTS.md](infrastructure/AGENTS.md) |
+| 3  | Application    | Command、Query、DTO、AppService | [app/AGENTS.md](app/AGENTS.md)                       |
+| 4  | Adapter        | Controller、Request、Response  | [adapter/AGENTS.md](adapter/AGENTS.md)               |
+| 5  | Start          | Configure 配置类                | [start/AGENTS.md](start/AGENTS.md)                   |
+| 6  | Test           | 单元测试、集成测试                    | [test/AGENTS.md](test/AGENTS.md)                     |
+
+### 快速清单
+
+**Domain 层**：
+
+```
+domain/src/main/java/org/smm/archetype/domain/{模块}/
+├── model/
+│   ├── {Entity}Aggr.java        # 聚合根
+│   ├── {Entity}.java            # 实体
+│   └── valueobject/             # 值对象
+├── repository/
+│   └── {Entity}Repository.java  # 仓储接口
+└── service/
+    └── {Entity}DomainService.java # 领域服务
+```
+
+**Infrastructure 层**：
+
+```
+infrastructure/src/main/java/org/smm/archetype/infrastructure/{模块}/
+├── persistence/
+│   └── {Entity}RepositoryImpl.java
+└── {Entity}Converter.java
+```
+
+**Application 层**：
+
+```
+app/src/main/java/org/smm/archetype/app/{模块}/
+├── command/{UseCase}Command.java
+├── query/{UseCase}Query.java
+├── dto/{Entity}DTO.java
+└── {Entity}AppService.java
+```
+
+**Adapter 层**：
+
+```
+adapter/src/main/java/org/smm/archetype/adapter/web/
+├── api/{Entity}Controller.java
+├── dto/request/{UseCase}Request.java
+└── dto/response/{Entity}Response.java
+```
+
+**Start 层**：
+
+```
+start/src/main/java/org/smm/archetype/config/{Entity}Configure.java
+```
 
 ## 相关文档
 
@@ -212,4 +352,4 @@ AI: 澄清几个问题：
 
 ---
 
-**版本**: 2.8 | **更新**: 2026-02-18
+**版本**: 2.9 | **更新**: 2026-02-19

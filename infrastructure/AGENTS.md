@@ -36,17 +36,6 @@ infrastructure/src/main/java/org/smm/archetype/infrastructure/
 | 枚举转换 | Domain ↔ DO 的枚举转换**必须**在 Converter 中完成 |
 | 代码生成 | Mapper 和 DO 类使用 MyBatis Plus（Lambda查询） |
 
-```java
-@Mapper(componentModel = "spring")
-public interface OrderConverter {
-    @Mapping(target = "orderStatus", expression = "java(orderDO.getStatusEnum())")
-    OrderAggr toDomain(OrderDO orderDO);
-    
-    @Mapping(target = "status", expression = "java(order.getStatus().getCode())")
-    OrderDO toDO(OrderAggr order);
-}
-```
-
 ### 事件驱动架构（NON-NEGOTIABLE）
 
 | 规则        | 说明                                            |
@@ -56,7 +45,6 @@ public interface OrderConverter {
 | 幂等性       | 事件必须幂等，重复处理不得产生副作用                            |
 
 **发布链路**：
-
 ```
 Domain.recordEvent() 
     → DomainEventCollectPublisher (收集 + 持久化)
@@ -72,6 +60,127 @@ Domain.recordEvent()
 
 **条件化配置**：使用 `@ConditionalOnProperty` 按需加载
 
+## 代码模板
+
+### Converter（枚举转换）
+
+```java
+
+@Mapper(componentModel = "spring")
+public interface FileBusinessConverter {
+
+    // DO → Domain：枚举从 String 转换
+    @Mapping(target = "type", expression = "java(dataObject.getType() != null ? "
+            + "FileBusiness.Type.valueOf(dataObject.getType()) : null)")
+    @Mapping(target = "usage", expression = "java(dataObject.getUsage() != null ? "
+            + "FileBusiness.Usage.valueOf(dataObject.getUsage()) : null)")
+    @Mapping(target = "fileMetadata", ignore = true)
+    // 需要单独查询
+    FileBusiness toEntity(FileBusinessDO dataObject);
+
+    // Domain → DO：枚举转 String
+    @Mapping(target = "type", expression = "java(entity.getType() != null ? "
+            + "entity.getType().name() : null)")
+    @Mapping(target = "usage", expression = "java(entity.getUsage() != null ? "
+            + "entity.getUsage().name() : null)")
+    FileBusinessDO toDataObject(FileBusiness entity);
+
+}
+```
+
+### Converter（复杂转换：default 方法）
+
+```java
+
+@Mapper(componentModel = "spring")
+public interface FileMetaConverter {
+
+    @Mapping(target = "status", expression = "java(toStatus(dataObject))")
+    FileMetadata toEntity(FileMetadataDO dataObject);
+
+    @Mapping(target = "deleteTime", expression = "java(toDeleteTime(entity))")
+    FileMetadataDO toDataObject(FileMetadata entity);
+
+    // DO.deleteTime → Domain.Status
+    default Status toStatus(FileMetadataDO dataObject) {
+        if (dataObject == null || dataObject.getDeleteTime() == null || dataObject.getDeleteTime() == 0) {
+            return Status.ACTIVE;
+        }
+        return Status.DELETED;
+    }
+
+    // Domain.Status → DO.deleteTime
+    default Long toDeleteTime(FileMetadata entity) {
+        return entity.getStatus() == Status.ACTIVE ? 0L : System.currentTimeMillis();
+    }
+
+}
+```
+
+### Repository 实现
+
+```java
+
+@RequiredArgsConstructor
+public class FileRepositoryImpl implements FileRepository {
+
+    private final FileBusinessMapper    businessMapper;
+    private final FileMetadataMapper    metadataMapper;
+    private final FileBusinessConverter converter;
+
+    @Override
+    public FileBusiness save(FileBusiness fileBusiness) {
+        // 1. 保存元数据
+        FileMetadataDO metadataDO = metaConverter.toDataObject(fileBusiness.getFileMetadata());
+        metadataMapper.upsertByMd5(metadataDO);
+
+        // 2. 保存业务关联
+        FileBusinessDO businessDO = converter.toDataObject(fileBusiness);
+        businessDO.setFileMetaId(String.valueOf(metadataDO.getId()));
+        businessMapper.upsertById(businessDO);
+
+        return fileBusiness;
+    }
+
+    @Override
+    public Optional<FileBusiness> findById(String id) {
+        FileBusinessDO businessDO = businessMapper.selectById(id);
+        if (businessDO == null)
+            return Optional.empty();
+
+        // 查询关联的元数据
+        FileMetadataDO metadataDO = metadataMapper.selectOne(
+                Wrappers.<FileMetadataDO>lambdaQuery()
+                        .eq(FileMetadataDO::getId, Long.parseLong(businessDO.getFileMetaId()))
+        );
+        if (metadataDO == null)
+            return Optional.empty();
+
+        // 组装领域对象
+        FileBusiness fileBusiness = converter.toEntity(businessDO);
+        fileBusiness.setFileMetadata(metaConverter.toEntity(metadataDO));
+        return Optional.of(fileBusiness);
+    }
+
+    @Override
+    public List<FileBusiness> findByBusinessIdAndTypeAndUsage(String businessId, Type type, Usage usage) {
+        return businessMapper.selectList(
+                Wrappers.<FileBusinessDO>lambdaQuery()
+                        .eq(FileBusinessDO::getBusinessId, businessId)
+                        .eq(FileBusinessDO::getType, type.name())
+                        .eq(FileBusinessDO::getUsage, usage.name())
+                        .orderByAsc(FileBusinessDO::getSort)
+        ).stream().map(this::toFileBusinessWithMetadata).toList();
+    }
+
+    @Override
+    public void deleteById(String id) {
+        businessMapper.deleteById(id);
+    }
+
+}
+```
+
 ## 禁止
 
 | ❌ 禁止                           | ✅ 正确                         |
@@ -82,4 +191,4 @@ Domain.recordEvent()
 | 创建配置类                          | 配置类在 start 模块                |
 
 ---
-← [项目知识库](../AGENTS.md) | **版本**: 3.3 | **更新**: 2026-02-19
+← [项目知识库](../AGENTS.md) | **版本**: 3.4 | **更新**: 2026-02-19

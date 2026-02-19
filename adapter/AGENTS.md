@@ -35,30 +35,6 @@ adapter/src/main/java/org/smm/archetype/adapter/
 | 构建模式 | -                                  | `@Builder(setterPrefix = "set")` |
 | 转换方法 | -                                  | `fromDTO(DTO dto)` 静态方法          |
 
-```java
-// Request
-@Data
-public class CreateOrderRequest {
-    @NotBlank(message = "客户ID不能为空")
-    private String customerId;
-}
-
-// Response
-@Builder(setterPrefix = "set")
-@Data
-public class OrderResponse {
-    private String orderId;
-    private String status;
-    
-    public static OrderResponse fromDTO(OrderDTO dto) {
-        return OrderResponse.builder()
-            .setOrderId(dto.getOrderId())
-            .setStatus(dto.getStatus().name())
-            .build();
-    }
-}
-```
-
 ### 异常处理（NON-NEGOTIABLE）
 
 | 异常类型              | HTTP 状态码 |
@@ -85,6 +61,127 @@ public class OrderResponse {
 | 查询单条 | GET     | `/api/{resource}/{id}`          |
 | 查询列表 | GET     | `/api/{resource}`               |
 
+## 代码模板
+
+### Request
+
+```java
+
+@Data
+public class CreateOrderRequest {
+
+    @NotBlank(message = "客户ID不能为空")
+    private String customerId;
+
+    @NotNull(message = "总金额不能为空")
+    private BigDecimal totalAmount;
+
+}
+```
+
+### Response
+
+```java
+@Getter @Builder(setterPrefix = "set")
+public class OrderResponse {
+    private String orderId;
+    private String status;
+    private BigDecimal totalAmount;
+    private Instant createTime;
+    
+    // 从 DTO 转换
+    public static OrderResponse fromDTO(OrderDTO dto) {
+        return OrderResponse.builder()
+            .setOrderId(dto.getOrderId())
+            .setStatus(dto.getStatus())
+            .setTotalAmount(dto.getTotalAmount())
+            .setCreateTime(dto.getCreateTime())
+            .build();
+    }
+}
+```
+
+### Controller
+
+```java
+@Slf4j
+@RestController
+@RequestMapping("/api/orders")
+@RequiredArgsConstructor
+public class OrderController {
+    
+    private final OrderAppService orderAppService;
+    
+    // 创建订单
+    @PostMapping
+    @BusinessLog
+    public BaseResult<String> create(@RequestBody @Valid CreateOrderRequest request) {
+        CreateOrderCommand command = toCommand(request);
+        String orderId = orderAppService.create(command);
+        return BaseResult.success(orderId);
+    }
+    
+    // 取消订单（状态变更）
+    @PostMapping("/{id}/cancel")
+    @BusinessLog
+    public BaseResult<Void> cancel(@PathVariable String id) {
+        orderAppService.cancel(id);
+        return BaseResult.success();
+    }
+    
+    // 查询单条
+    @GetMapping("/{id}")
+    public BaseResult<OrderResponse> getById(@PathVariable String id) {
+        OrderDTO dto = orderAppService.getById(id);
+        return BaseResult.success(OrderResponse.fromDTO(dto));
+    }
+    
+    // 查询列表
+    @GetMapping
+    public BaseResult<List<OrderResponse>> list(OrderQueryRequest request) {
+        OrderQuery query = toQuery(request);
+        List<OrderDTO> list = orderAppService.query(query);
+        List<OrderResponse> response = list.stream()
+            .map(OrderResponse::fromDTO)
+            .toList();
+        return BaseResult.success(response);
+    }
+    
+    // Request → Command
+    private CreateOrderCommand toCommand(CreateOrderRequest req) {
+        return CreateOrderCommand.builder()
+            .customerId(req.getCustomerId())
+            .totalAmount(req.getTotalAmount())
+            .build();
+    }
+}
+```
+
+### 事件监听器
+
+```java
+@Slf4j
+@RequiredArgsConstructor
+public class SpringDomainEventListener {
+    
+    private final EventDispatcher eventDispatcher;
+    
+    @EventListener
+    @Async("virtualTaskExecutor")
+    public void onEvent(Event<?> event) {
+        log.debug("接收事件: eventId={}", event.getEid());
+        
+        // 忽略非 DOMAIN 源事件
+        if (event.getType().getSource() != Source.DOMAIN) {
+            return;
+        }
+        
+        // 委托给 EventDispatcher 处理
+        eventDispatcher.dispatch(event, false);
+    }
+}
+```
+
 ## 禁止
 
 | ❌ 禁止                  | ✅ 正确                   |
@@ -95,4 +192,4 @@ public class OrderResponse {
 | 直接依赖 Infrastructure 层 | 通过 Application 层间接访问   |
 
 ---
-← [项目知识库](../AGENTS.md) | **版本**: 3.3 | **更新**: 2026-02-19
+← [项目知识库](../AGENTS.md) | **版本**: 3.4 | **更新**: 2026-02-19

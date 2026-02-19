@@ -19,13 +19,14 @@ domain/src/main/java/org/smm/archetype/domain/
 
 ## 关键查找
 
-| 目标   | 位置                                       |
-|------|------------------------------------------|
-| 聚合根  | `{模块}/model/*Aggr.java`                  |
-| 值对象  | `{模块}/model/valueobject/*.java`          |
-| 仓储接口 | `{模块}/repository/*Repository.java`       |
-| 领域枚举 | `domain/platform/enums/` 或 `{模块}/model/` |
-| 领域事件 | `{模块}/event/*.java`                      |
+| 目标   | 位置                                 |
+|------|------------------------------------|
+| 聚合根  | `{模块}/model/*Aggr.java`            |
+| 实体   | `{模块}/model/*.java`（继承 Entity）     |
+| 值对象  | `{模块}/model/valueobject/*.java`    |
+| 仓储接口 | `{模块}/repository/*Repository.java` |
+| 领域服务 | `{模块}/service/*DomainService.java` |
+| 领域枚举 | 内嵌于实体类或 `enums/` 目录                |
 
 ## 核心规则
 
@@ -40,55 +41,174 @@ domain/src/main/java/org/smm/archetype/domain/
 
 **禁止引入**：Spring 框架、`@Transactional`、`@Autowired`、Infrastructure 实现类
 
-### 聚合根模式
+## 代码模板
+
+### 聚合根
 
 ```java
-public class OrderAggr extends AggregateRoot<OrderAggr, OrderId> {
+
+@Getter
+@SuperBuilder(setterPrefix = "set")
+public class OrderAggr extends AggregateRoot {
     private OrderId id;
     private OrderStatus status;
     
     // 静态工厂创建
-    public static OrderAggr create(String customerId, Money totalAmount) {
+    public static OrderAggr create(String customerId) {
         OrderAggr order = new OrderAggr();
         order.id = OrderId.generate();
         order.status = OrderStatus.CREATED;
-        order.recordEvent(new OrderCreatedEvent(order.id)); // 记录事件
+        order.markAsCreated();
+        order.recordEvent(new OrderCreatedEvent(order.id));
         return order;
     }
-    
-    // 业务方法：验证 → 修改 → 发布事件
-    public void pay(PaymentMethod method) {
+
+    // 业务方法：验证 → 修改 → 更新时间戳 → 发布事件
+    public void pay() {
         if (!status.canPay()) throw new BizException("状态不允许支付");
         this.status = OrderStatus.PAID;
+        this.markAsUpdated();
         this.recordEvent(new OrderPaidEvent(this.id));
     }
 }
 ```
 
-### 值对象模式
+### 实体（参考 FileMetadata）
 
 ```java
-@AllArgsConstructor @FieldDefaults(makeFinal = true, level = PRIVATE)
-public class Money extends ValueObject {
-    private BigDecimal amount;
-    private String currency;
-    
-    // 运算返回新实例（不可变）
-    public Money add(Money other) {
-        if (!this.currency.equals(other.currency)) throw new IllegalArgumentException("币种不同");
-        return new Money(this.amount.add(other.amount), this.currency);
+
+@Getter
+@Setter
+@SuperBuilder(setterPrefix = "set")
+public class FileMetadata extends Entity {
+
+    private String fileName;
+    private String filePath;
+    private String fileUrl;
+    private Long   fileSize;
+    private Status status;
+
+    // 业务判断方法
+    public boolean isActive() {return status == Status.ACTIVE;}
+
+    public boolean isImage() {return contentType != null && contentType.startsWith("image/");}
+
+    // 状态变更方法
+    public void markAsDeleted() {
+        this.status = Status.DELETED;
+        this.markAsUpdated();  // 继承自 Entity
     }
+
+    // 内嵌枚举
+    @Getter
+    public enum Status {
+        ACTIVE("有效"),
+        DELETED("已删除");
+        private final String desc;
+
+        Status(String desc) {this.desc = desc;}
+    }
+
 }
 ```
 
-### 枚举状态机模式
+### 仓储接口
 
-| 模式   | 说明                          |
-|------|-----------------------------|
-| 状态判断 | 枚举提供 `canXxx()` 方法          |
-| 双向映射 | `code` 字段 + `fromCode()` 方法 |
+```java
+public interface FileRepository {
 
-**字段含 type/status/state/source/business/errorCode/level/mode 时必须使用枚举。**
+    // 保存（新增/更新）
+    FileBusiness save(FileBusiness fileBusiness);
+
+    // 单条查询
+    Optional<FileBusiness> findById(String id);
+
+    // 列表查询
+    List<FileBusiness> findByBusinessIdAndTypeAndUsage(String businessId, Type type, Usage usage);
+
+    // 删除
+    void deleteById(String id);
+
+}
+```
+
+### 领域服务
+
+```java
+public interface FileDomainService {
+
+    // 上传文件（协调多个领域对象）
+    void uploadFile(InputStream inputStream, FileMetadata metadata, FileBusiness business);
+
+    // 查询
+    List<FileBusiness> listFileBusinesss(String businessId, Type type, Usage usage);
+
+    FileBusiness getFileBusiness(String id);
+
+    // 获取文件URL（协调 OssClient）
+    String getFileUrl(String fileMetaId);
+
+}
+```
+
+### 枚举模式
+
+**内嵌枚举（推荐）**：
+
+```java
+
+@Getter
+public enum Status {
+    ACTIVE("有效"),
+    DELETED("已删除");
+    private final String desc;
+
+    Status(String desc) {this.desc = desc;}
+}
+```
+
+**状态判断方法**：
+
+```java
+public enum OrderStatus {
+    CREATED {
+        boolean canPay() {return true;}
+    },
+    PAID {
+        boolean canPay() {return false;}
+    };
+
+    abstract boolean canPay();
+}
+```
+
+**双向映射（需要 code 字段时）**：
+
+```java
+
+@Getter
+public enum OrderType {
+    NORMAL("normal", "普通订单"),
+    VIP("vip", "VIP订单");
+
+    private final String code;
+    private final String desc;
+
+    OrderType(String code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
+
+    // 双向映射
+    public static OrderType fromCode(String code) {
+        for (OrderType t : values()) {
+            if (t.code.equals(code))
+                return t;
+        }
+        throw new IllegalArgumentException("Unknown code: " + code);
+    }
+}
+```
 
 ## 禁止
 
@@ -100,4 +220,4 @@ public class Money extends ValueObject {
 | 字段使用 String 存储枚举值   | 使用枚举类型                                     |
 
 ---
-← [项目知识库](../AGENTS.md) | **版本**: 3.3 | **更新**: 2026-02-19
+← [项目知识库](../AGENTS.md) | **版本**: 3.4 | **更新**: 2026-02-19
